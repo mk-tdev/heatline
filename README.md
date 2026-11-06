@@ -9,7 +9,7 @@
     <img alt="Rules-only mode available" src="https://img.shields.io/badge/No_API_key-required-A7D8C5?style=flat-square" />
     <img alt="Hackathon prototype" src="https://img.shields.io/badge/Status-hackathon_prototype-F4BE68?style=flat-square" />
   </p>
-  <p><a href="#-take-the-supervisors-seat">Try the demo</a> · <a href="#-run-it-locally">Run locally</a> · <a href="docs/scientific-basis.md">Explore the science</a></p>
+  <p><a href="#-take-the-supervisors-seat">Try the demo</a> · <a href="docs/pitch-script.md">Read the pitch</a> · <a href="docs/demo-flow.md">Demo flow</a> · <a href="#-run-it-locally">Run locally</a> · <a href="docs/scientific-basis.md">Explore the science</a></p>
 </div>
 
 ![Heatline’s full-width animated coastal construction panorama](output/playwright/heatline-panorama-desktop.jpg)
@@ -66,7 +66,15 @@ A short path through the demo:
 
 **[Open Heatline](https://heatline-plum.vercel.app)** on desktop to enter the simulator.
 
+Guardian, Noor, Omar and multilingual speech are enabled in the live deployment. Functional checks on **7 November 2026** confirmed model-generated responses, a checked planner result and valid speech audio.
+
 Vercel hosts the web app and API functions. GitHub pushes to `main` deploy the production project automatically; other branches receive preview deployments. The deployment works in rules-only mode without an API key. To enable model-backed assistants and speech, configure `OPENAI_API_KEY` and optional model settings in Vercel project environment variables, then redeploy.
+
+## 🎤 Present Heatline
+
+- **[Short pitch script](docs/pitch-script.md)** — about 75 seconds, with slide cues and the closing ask.
+- **[Two-minute demo flow](docs/demo-flow.md)** — exact controls, presenter lines, rehearsal setup and a backup plan.
+- **[Google Slides](https://docs.google.com/presentation/d/1U0cnRU4kcdr1z3TvDzAg8BzZWnwEI871LIf-HcL61D0/edit)** — visual pitch, live AI screenshot and speaker notes. Deck access may require permission from its owner.
 
 ## 🚀 Run it locally
 
