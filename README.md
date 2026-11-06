@@ -62,6 +62,12 @@ A short path through the demo:
 
 </details>
 
+## 🌍 Live demo
+
+**[Open Heatline](https://heatline-plum.vercel.app)** on desktop to enter the simulator.
+
+Vercel hosts the web app and API functions. GitHub pushes to `main` deploy the production project automatically; other branches receive preview deployments. The deployment works in rules-only mode without an API key. To enable model-backed assistants and speech, configure `OPENAI_API_KEY` and optional model settings in Vercel project environment variables, then redeploy.
+
 ## 🚀 Run it locally
 
 Requires **Node.js 22.12 or newer** and npm.
@@ -122,7 +128,7 @@ npm run build       # Production web build
 npm run backtest    # Regenerate the August experiment and sensitivity variants
 ```
 
-The test suite currently contains **82 tests**. The backtest covers **31 days × 3 windows × 4 policies**, plus five sensitivity variants: **2,232 simulated shift-policy runs**. These are simulation results, not field-validation results.
+The test suite currently contains **86 tests**. The backtest covers **31 days × 3 windows × 4 policies**, plus five sensitivity variants: **2,232 simulated shift-policy runs**. These are simulation results, not field-validation results.
 
 The production build currently emits a large-bundle advisory for the 3D client. This remains a performance improvement opportunity.
 
