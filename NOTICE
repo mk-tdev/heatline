@@ -1,0 +1,19 @@
+Heatline
+Copyright 2026 PixelTrendAnalytics
+
+This product includes a TypeScript port of the Liljegren wet-bulb globe temperature
+implementation from ECMWF thermofeel (packages/climate/src/liljegren.ts):
+
+  thermofeel — (C) Copyright 1996- ECMWF.
+  Licensed under the Apache Licence, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0).
+  In applying this licence, ECMWF does not waive the privileges and immunities granted to it
+  by virtue of its status as an intergovernmental organisation nor does it submit to any
+  jurisdiction.
+  https://github.com/ecmwf/thermofeel
+
+thermofeel's Liljegren module transcribes Liljegren et al. (2008), "Modeling the wet bulb
+globe temperature using standard meteorological measurements", J. Occup. Environ. Hyg. 5(10),
+https://doi.org/10.1080/15459620802310770, and Kong & Huber (2022).
+
+Weather data: Open-Meteo Historical Weather API (https://open-meteo.com/), based on ERA5
+reanalysis; Open-Meteo data are offered under CC BY 4.0.
