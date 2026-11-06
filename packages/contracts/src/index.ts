@@ -25,6 +25,8 @@ export interface Zone {
   windFactor: number;
   hasWater: boolean;
   capacity?: number;
+  /** a shade tent can be put up here (needs a floor: decks and yards, not scaffolds) */
+  tentable?: boolean;
 }
 
 export interface Footprint {

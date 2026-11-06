@@ -36,6 +36,18 @@ Golden comparison (19 Aug, decision at 15:10): original schedule 190 worker-minu
 
 Decision recorded: the zone thresholds are a WBGT proxy for TWL (configurable, documented in `packages/rules/src/tables.ts`), because TWL cannot be computed from weather data and pure ACGIH limits would forbid all afternoon heavy work.
 
-## Next (M2, 7–9 Nov)
+## M2 agents and M3 first playable (6 Nov)
 
-Role projections with leakage tests; guardian, site-safety and planner agents with fallbacks; NDJSON server. Provider: **OpenAI only** (decided 6 Nov): `gpt-6.1-sol` planner/debrief, `gpt-6-luna` guardian/safety, `gpt-4o-mini-tts`, `gpt-transcribe`. Model calls need `OPENAI_API_KEY`.
+- `packages/agents`: role projections (crew summaries, red-flag disclosures, guardian context, planner roster), guardian prompt/schema/checks with fallback templates in 7 languages, Noor brief, Omar's tools backed by the engine (`get_conditions`, `get_roster`, `check_plan`, `submit_plan`).
+- `server/index.ts`: `/api/health`, `/api/guardian`, `/api/safety`, `/api/planner` (NDJSON). Strict input schemas; timeouts; rule fallbacks. Model `gpt-6-luna` for everything.
+- Live checks: Omar's loop ran 6 tool steps in about 10 s and submitted a plan the rules accepted (tents on deck and yard, pour 15:30–16:15, Anwar stood down; forecast 69 high-strain minutes, 0 red flags). Noor briefs in about 3 s; guardian messages in 2–5 s.
+- `apps/web`: playable 3D twin, console, phone, decision, rewind comparison. Browser-checked: no console errors.
+- Fixes found in the browser: tents restricted to tentable zones (Omar had put one on the scaffold; new `tent-placement` rule); drei `<Html>` labels replaced by projected DOM labels (they were disappearing and logging errors); stale guardian text dimmed.
+- Tests: **53**.
+
+## Next
+
+1. Agent evals (30 planner runs, 60 guardian messages) recorded under `docs/eval/`.
+2. Any-decision rewind with split-screen replay; debrief agent citing events.
+3. Back-test harness and report page (31 days × windows × policies).
+4. Voice (`gpt-4o-mini-tts`), forecast mode, field failure visuals, deployment.

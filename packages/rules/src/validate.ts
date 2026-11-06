@@ -54,6 +54,7 @@ export function validatePlan(input: ValidationInput): ValidationResult {
   for (const tent of plan.tents) {
     const zone = zones.get(tent.zone);
     if (!zone) add({ rule: 'unknown-zone', minute: tent.readyAt, detail: `Tent placed in unknown zone ${tent.zone}` });
+    else if (!zone.tentable) add({ rule: 'tent-placement', minute: tent.readyAt, detail: `A shade tent cannot be put up at ${zone.label}` });
   }
   if (plan.tents.length > 2) add({ rule: 'tents-available', minute: plan.effectiveAt, detail: 'Only two shade tents are on site' });
 

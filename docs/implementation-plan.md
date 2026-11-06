@@ -4,6 +4,19 @@ Planning date: 6 November 2026 (Abu Dhabi time). Concept: [`research/06-heatline
 
 Deadlines: registration closes **10 Nov**; prototype due **20 Nov** per Hack2skill (one report says 15 Nov). **Internal release candidate: 15 Nov, 20:00 GST. Submission: 19 Nov.** Everything after 15 Nov is polish, video and documents.
 
+## Progress log
+
+| Date | Milestone | State | Evidence |
+| --- | --- | --- | --- |
+| 6 Nov | M0 spikes | **Done** | Liljegren port matches ECMWF thermofeel on 744 hours; live `gpt-6-luna` structured output (4.8 s, Bengali) and strict tool call (2.8 s) |
+| 6 Nov | M1 engine | **Done** | Scenario, environment, physiology, rules, planner, three policies, golden comparison |
+| 6 Nov | M2 agents | **Mostly done** | Projections with leakage tests; guardian, Noor and Omar live on `gpt-6-luna` with rule fallbacks; NDJSON planner stream. Open: agent evals (section 9) |
+| 6 Nov | M3 experience | **First playable** | 3D twin with real sun and shadows, console, worker phone, 15:10 decision, rewind compare; runs locally with `npm run dev`. Open: voice, heat shimmer, polish, phone layout |
+| — | M4 rewind | **Partly done** | Branch from the 15:10 decision and side-by-side metrics. Open: any-decision rewind, split-screen replay, debrief agent |
+| — | M5 evidence, M6 field + forecast | Not started | |
+
+**Run it locally:** put `OPENAI_API_KEY` (and optionally `OPENAI_MODEL`) in `.env`, then `npm install` and `npm run dev`. Open http://127.0.0.1:5183. The API server runs on port 8787; without a key, everything runs in rules-only mode.
+
 ## 1. Planning assumptions and decisions
 
 | Decision | Choice | Why |
@@ -13,7 +26,7 @@ Deadlines: registration closes **10 Nov**; prototype due **20 Nov** per Hack2ski
 | Frontend | React 19 + Vite + Three.js via React Three Fiber | Proven in CrisisCraft and Brew & Reason |
 | Engine | Pure TypeScript package, deterministic, seeded, no wall-clock, no I/O | Replay, back-testing and tests depend on it |
 | Provider | **OpenAI for everything** (team decision, 6 Nov), official `openai` Node SDK, Responses API | One key and one SDK for agents, speech and transcription |
-| Models | Planner and debrief: `gpt-6.1-sol` (reasoning `medium`). Guardian and site safety: `gpt-6-luna` (reasoning `low`). Overridable by env (`HEATLINE_MODEL_PLANNER`, `HEATLINE_MODEL_FAST`) | Sol balances intelligence and cost; Luna is the cheapest and fastest for short, frequent messages. IDs from developers.openai.com/api/docs/models, read 6 Nov 2026 |
+| Models | **`gpt-6-luna` for every role** (team decision, 6 Nov), set by `OPENAI_MODEL` in `.env`; reasoning effort `low` everywhere | Cheapest and fastest current model; live tests show it handles the planner's tool loop (6 steps, ~10 s) and Bengali output. `gpt-6.1-sol` remains the upgrade path for the planner if evals show a need |
 | Voice | Text to speech: `gpt-4o-mini-tts` on `/v1/audio/speech` (voice `marin`/`cedar`, `instructions` for a calm tone). Supervisor orders: `gpt-transcribe` | `gpt-4o-mini-tts` shuts down 6 Jan 2027 (after the event); successor is Realtime-only. OpenAI lists Hindi, Urdu, Arabic and Tagalog for speech; **Bengali and Malayalam are not listed** — test in M0 |
 | Weather | Open-Meteo historical (scenario, back-test) and forecast (forecast mode); no key | Already downloaded and analysed in `research/data/` |
 | WBGT | TypeScript port of Liljegren (2008), validated against ECMWF thermofeel outputs on all 744 August hours (tolerance 0.15 °C) | Physically based; the simple approximation was shown to mislead ([research 03](../../research/03-abu-dhabi-heat-data.md)) |
@@ -179,10 +192,23 @@ Projection tests: for every role, a property test generates random states and as
 ### Model use details (OpenAI Responses API, docs read 6 Nov 2026)
 
 - Single-shot roles (guardian, site safety, debrief): `openai.responses.parse({ model, reasoning: { effort }, input, text: { format: zodTextFormat(schema, name) } })`, then `response.output_parsed`; reject and fall back if parsing fails or output is incomplete.
+- Implemented in `server/index.ts`; prompts, schemas, projections and fallbacks in `packages/agents`.
 - Planner: `openai.responses.create` with function tools defined `strict: true` (`additionalProperties: false`, every property in `required`, optional fields as `["type", "null"]`), loop on `function_call` items, append `function_call_output` items, ≤ 6 steps, and require a final `submit_plan` call. Tool calling for Sol requires the Responses API.
 - No `temperature`/`top_p` when reasoning effort is not `none`.
 - Budgets: guardian ≤ 6 s, planner ≤ 40 s total workflow, debrief ≤ 30 s; streamed to the UI as NDJSON with visible tool steps, as in CrisisCraft.
 - Every model output passes the same guardrail class as ReRoute's coach: length, language script, no medical claims, numbers must match engine values.
+
+### Planner levers (implemented)
+
+Omar does not write minute-by-minute schedules. He sets three levers, which `protectivePlan` compiles into a full plan and `validatePlan` checks:
+
+| Lever | Values |
+| --- | --- |
+| `tents` | Up to two of the tentable zones (deck, yard), in setup order; 15 minutes each to put up |
+| `pourStart` | `HH:MM`, or `null` for no pour today; omitted means the earliest lawful start |
+| `standDown` | Worker ids moved to indoor duties for the rest of the shift |
+
+`check_plan` compiles, validates and simulates the levers to 18:00, returning violations or a forecast (high-strain minutes, red flags, pour start and finish, rest minutes). `submit_plan` is accepted only if the plan passes; a refused submission goes back to Omar with the reasons.
 
 ### Without a model
 
@@ -227,6 +253,11 @@ Every number is about the **simulation**, and the report says so in its title. I
 - **Projection leakage:** 0 tolerated; enforced by tests, not evals.
 
 ## 10. User interface and visual direction
+
+**Implemented (first playable, 6 Nov):** `apps/web` with the site twin (React Three Fiber, real sun direction and shadows, tower, scaffold, yard, tents, truck, concrete filling the deck during the pour), labels projected to the DOM, top bar, supervisor console (Noor's brief, crew cards with counts only, red-flag disclosure, decision card with Omar's streamed tool steps, site log), worker phone (featured-worker tabs, native script + English, readings with source, stale-message indicator), timeline with event markers and speeds, and the rewind comparison table. The engine runs in the browser; only model calls go to the server.
+
+Still to do from the list below: heat shimmer, voice, captions, keyboard paths beyond play/pause, phone/narrow layout, 2D fallback.
+
 
 - **Site twin (centre):** stylised low-poly site, warm palette, heat shimmer shader over hot surfaces; real-time shadow from the computed sun; workers as small figures coloured by warning level only where the viewer is entitled to see it (supervisor sees crew rings, not individual colours).
 - **Top bar:** clock, date, WBGT (sun/shade), zone, ban status, mode (live models / rules-only / offline).

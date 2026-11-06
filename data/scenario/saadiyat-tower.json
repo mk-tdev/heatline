@@ -26,7 +26,8 @@
       },
       "height": 42,
       "windFactor": 1.3,
-      "hasWater": false
+      "hasWater": false,
+      "tentable": true
     },
     {
       "id": "yard",
@@ -38,7 +39,8 @@
       },
       "height": 0,
       "windFactor": 1,
-      "hasWater": false
+      "hasWater": false,
+      "tentable": true
     },
     {
       "id": "facade",

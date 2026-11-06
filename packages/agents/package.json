@@ -1,0 +1,8 @@
+{
+  "name": "@heatline/agents",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "dependencies": { "@heatline/contracts": "*", "@heatline/rules": "*", "@heatline/sim": "*", "zod": "^4.6.7" }
+}

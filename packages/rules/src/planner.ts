@@ -10,6 +10,19 @@
 import type { Activity, Assignment, Minute, Plan, Scenario, ShadeTent, WorkerProfile } from '@heatline/contracts';
 import { ZONE_RULES, exposureCapMin, heatZone, isAcclimatised, twlWorkClass } from './tables';
 
+/**
+ * High-level choices a person or a model can make; the planner turns them into a
+ * minute-by-minute plan that respects every rule it can.
+ */
+export interface PlanLevers {
+  /** zones to shade with the two site tents, in setup order */
+  tents?: string[];
+  /** pour start minute; null = no pour today; omitted = earliest lawful start */
+  pourStart?: Minute | null;
+  /** workers moved to light indoor duties for the rest of the shift */
+  standDown?: string[];
+}
+
 export interface PlannerInput {
   scenario: Scenario;
   effectiveAt: Minute;
@@ -19,6 +32,8 @@ export interface PlannerInput {
   unavailable?: string[];
   /** minutes a tent takes to put up */
   tentSetupMin?: number;
+  levers?: PlanLevers;
+  label?: string;
 }
 
 const SLOT = 60;
@@ -31,9 +46,16 @@ export function protectivePlan(input: PlannerInput): Plan {
   const { scenario, effectiveAt } = input;
   const setup = input.tentSetupMin ?? 15;
   const unavailable = new Set(input.unavailable ?? []);
-  const tents: ShadeTent[] = [{ zone: scenario.pour.zone, readyAt: effectiveAt + setup }];
-  const outdoorTask = scenario.tasks.find((t) => t.crew !== scenario.pour.crew && t.crew !== '*' && scenario.zones.find((z) => z.id === t.zone)?.kind === 'outdoor');
-  if (outdoorTask) tents.push({ zone: outdoorTask.zone, readyAt: effectiveAt + 2 * setup });
+  const levers = input.levers ?? {};
+  const standDown = new Set(levers.standDown ?? []);
+  let tents: ShadeTent[];
+  if (levers.tents) {
+    tents = levers.tents.map((zone, i) => ({ zone, readyAt: effectiveAt + (i + 1) * setup }));
+  } else {
+    tents = [{ zone: scenario.pour.zone, readyAt: effectiveAt + setup }];
+    const outdoorTask = scenario.tasks.find((t) => t.crew !== scenario.pour.crew && t.crew !== '*' && scenario.zones.find((z) => z.id === t.zone)?.kind === 'outdoor');
+    if (outdoorTask) tents.push({ zone: outdoorTask.zone, readyAt: effectiveAt + 2 * setup });
+  }
   const shade = { tents };
 
   const end = scenario.end;
@@ -62,7 +84,7 @@ export function protectivePlan(input: PlannerInput): Plan {
   };
 
   const lightDuty: WorkerProfile[] = [];
-  const pour = planPour(input, shade, unavailable);
+  const pour = levers.pourStart === null ? null : planPour(input, shade, new Set([...unavailable, ...standDown]), levers.pourStart);
   const pourCrew = new Set(pour?.crew.map((w) => w.id) ?? []);
   const pourEnd = pour ? pour.start + scenario.pour.durationMin : 0;
 
@@ -84,8 +106,8 @@ export function protectivePlan(input: PlannerInput): Plan {
     const members = scenario.workers.filter((w) => w.crew === task.crew);
     // Unacclimatised workers are never rotated into heat work: medium and high zones exclude
     // them outright, and their NIOSH exposure cap is spent within the first day or two.
-    const able = members.filter((w) => !unavailable.has(w.id) && isAcclimatised(w.acclimatisationDay));
-    lightDuty.push(...members.filter((w) => !unavailable.has(w.id) && !isAcclimatised(w.acclimatisationDay)));
+    const able = members.filter((w) => !unavailable.has(w.id) && !standDown.has(w.id) && isAcclimatised(w.acclimatisationDay));
+    lightDuty.push(...members.filter((w) => !unavailable.has(w.id) && (standDown.has(w.id) || !isAcclimatised(w.acclimatisationDay))));
     for (const w of members.filter((x) => unavailable.has(x.id))) {
       assignments.push({ worker: w.id, from: effectiveAt, to: end, zone: 'first-aid', activity: 'rest', drinkL: 1, reason: 'unavailable' });
     }
@@ -102,13 +124,15 @@ export function protectivePlan(input: PlannerInput): Plan {
 
   for (const w of lightDuty) {
     const capMin = exposureCapMin(w.acclimatisationDay, w.experienced);
-    const reason = `stood down from heat work (day ${w.acclimatisationDay}, cap ${capMin} min); light indoor duties`;
+    const reason = standDown.has(w.id)
+      ? 'stood down by the supervisor; light indoor duties'
+      : `stood down from heat work (day ${w.acclimatisationDay}, cap ${capMin} min); light indoor duties`;
     assignments.push({ worker: w.id, from: effectiveAt, to: end, zone: LIGHT_DUTY_ZONE, activity: 'light', drinkL: 0.5 * ((end - effectiveAt) / 60), reason });
   }
 
   return {
     id: `rules-${effectiveAt}`,
-    label: 'Rules-based protective plan',
+    label: input.label ?? 'Rules-based protective plan',
     effectiveAt,
     assignments: enforceLimits(input, assignments, shade),
     tents,
@@ -201,7 +225,7 @@ interface PourPlan {
 }
 
 /** Earliest pour start that can be staffed continuously within the rules, borrowing workers if needed. */
-function planPour(input: PlannerInput, shade: Pick<Plan, 'tents'>, unavailable: Set<string>): PourPlan | null {
+function planPour(input: PlannerInput, shade: Pick<Plan, 'tents'>, unavailable: Set<string>, fixedStart?: Minute): PourPlan | null {
   const { scenario } = input;
   const pour = scenario.pour;
   // The deck crew first, then acclimatised workers borrowed from other crews.
@@ -210,8 +234,9 @@ function planPour(input: PlannerInput, shade: Pick<Plan, 'tents'>, unavailable: 
     ...scenario.workers.filter((w) => w.crew === pour.crew && able(w)),
     ...scenario.workers.filter((w) => w.crew !== pour.crew && able(w)),
   ];
-  const earliest = Math.max(pour.truckArrives, input.effectiveAt);
-  for (let start = earliest; start + pour.durationMin <= scenario.end; start += 5) {
+  const earliest = fixedStart ?? Math.max(pour.truckArrives, input.effectiveAt);
+  const latest = fixedStart ?? scenario.end - pour.durationMin;
+  for (let start = earliest; start <= latest && start + pour.durationMin <= scenario.end; start += 5) {
     let work = 60;
     for (let m = start; m < start + pour.durationMin; m++) {
       work = Math.min(work, ZONE_RULES[heatZone(input.zoneWbgt(pour.zone, m, shade))].workPerHour.heavy);
