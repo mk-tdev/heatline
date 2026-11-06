@@ -1,6 +1,6 @@
 # Heatline implementation plan
 
-Planning date: 6 November 2026 (Abu Dhabi time). Concept: [`research/06-heatline-concept.md`](../../research/06-heatline-concept.md). Evidence: [`research/`](../../research/README.md).
+Planning date: 6 November 2026 (Abu Dhabi time). Concept: [`research/06-heatline-concept.md`](../research/06-heatline-concept.md). Evidence: [`research/`](../research/README.md).
 
 Deadlines: registration closes **10 Nov**; prototype due **20 Nov** per Hack2skill (one report says 15 Nov). **Internal release candidate: 15 Nov, 20:00 GST. Submission: 19 Nov.** Everything after 15 Nov is polish, video and documents.
 
@@ -67,7 +67,7 @@ Warning performance (from no-intervention runs, judged against true strain the w
 | Models | **`gpt-6-luna` for every role** (team decision, 6 Nov), set by `OPENAI_MODEL` in `.env`; reasoning effort `low` everywhere | Cheapest and fastest current model; live tests show it handles the planner's tool loop (6 steps, ~10 s) and Bengali output. `gpt-6.1-sol` remains the upgrade path for the planner if evals show a need |
 | Voice | Text to speech: `gpt-4o-mini-tts` on `/v1/audio/speech` (voice `marin`/`cedar`, `instructions` for a calm tone). Supervisor orders: `gpt-transcribe` | `gpt-4o-mini-tts` shuts down 6 Jan 2027 (after the event); successor is Realtime-only. OpenAI lists Hindi, Urdu, Arabic and Tagalog for speech; **Bengali and Malayalam are not listed** — test in M0 |
 | Weather | Open-Meteo historical (scenario, back-test) and forecast (forecast mode); no key | Already downloaded and analysed in `research/data/` |
-| WBGT | TypeScript port of Liljegren (2008), validated against ECMWF thermofeel outputs on all 744 August hours (tolerance 0.15 °C) | Physically based; the simple approximation was shown to mislead ([research 03](../../research/03-abu-dhabi-heat-data.md)) |
+| WBGT | TypeScript port of Liljegren (2008), validated against ECMWF thermofeel outputs on all 744 August hours (tolerance 0.15 °C) | Physically based; the simple approximation was shown to mislead ([research 03](../research/03-abu-dhabi-heat-data.md)) |
 | TWL | Shown only from a supplied measurement or a tested implementation of Brake & Bates; otherwise display WBGT and say so | Never present an approximation as a compliance value |
 | Hosting | One Node service serving the web build and API (Azure Container Apps or Fly.io), credentials server-side | Long model calls and NDJSON streaming; avoid serverless time limits that constrained CrisisCraft |
 | Data | Synthetic workers only; no real personal data anywhere | Governance and challenge rules |
@@ -202,13 +202,13 @@ Rule tables live in `data/rules/*.json`, each row with a `source` field pointing
 
 | Rule set | Content | Source |
 | --- | --- | --- |
-| Midday ban | 12:30–15:00, 15 Jun–15 Sep, outdoor direct-sun work blocked unless an exemption reason is recorded | MoHRE ([research 04](../../research/04-uae-regulation-and-governance.md)) |
-| Zone schedule | TWL zone → work/rest and water per hour; WBGT-based fallback schedule when TWL is unavailable | Sharjah CoP 33; ACGIH screening ([research 02](../../research/02-heat-stress-science-and-standards.md)) |
+| Midday ban | 12:30–15:00, 15 Jun–15 Sep, outdoor direct-sun work blocked unless an exemption reason is recorded | MoHRE ([research 04](../research/04-uae-regulation-and-governance.md)) |
+| Zone schedule | TWL zone → work/rest and water per hour; WBGT-based fallback schedule when TWL is unavailable | Sharjah CoP 33; ACGIH screening ([research 02](../research/02-heat-stress-science-and-standards.md)) |
 | Acclimatisation | NIOSH 20%/day cap for new workers; 50/60/80/100% for returning; > 14 days off resets | NIOSH 2016; Sharjah CoP 33 |
 | No lone work | Buffer and withdrawal zones require pairs | Sharjah CoP 33 |
 | Warning levels | Green/yellow/amber/red from the worst of: zone, PSI band, water deficit, acclimatisation cap | Dubai flag colours + PSI bands |
 | Red flag | Confusion, collapse, PSI ≥ 9, Tc ≥ 39.5 → emergency workflow | OSHA first aid |
-| Governance | G1–G7 from [research 04](../../research/04-uae-regulation-and-governance.md) | Challenge text |
+| Governance | G1–G7 from [research 04](../research/04-uae-regulation-and-governance.md) | Challenge text |
 
 **Precedence:** red flag > rules > approved plan > agent suggestion. A warning can be raised by an agent's observation (e.g., a worker says "I feel dizzy"), but never lowered by one.
 
@@ -335,7 +335,7 @@ heatline/
   packages/{contracts,climate,sim,rules,agents,eval}/src + test/
   data/{scenario/saadiyat-2025-08-01.json, weather/abu-dhabi-2025-08.json, rules/*.json, i18n/*.json}
   docs/{implementation-plan.md, architecture.md, governance.md, evaluation.md, backtest-report.md, demo-script.md}
-  research/            copy of ../research at submission time (sources, data, evidence)
+  research/            sources, weather data and evidence documents
   scripts/{backtest.ts, eval-planner.ts, eval-guardian.ts, wbgt-golden.py}
 ```
 

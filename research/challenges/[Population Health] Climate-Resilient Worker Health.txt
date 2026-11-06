@@ -1,0 +1,18 @@
+The challenge 
+
+How might we protect workers exposed to extreme heat and other climate-related occupational risks through earlier warning, personalized prevention and safer operational decisions? 
+
+The problem
+
+Extreme heat and other climate-related hazards are recurring occupational risks for outdoor and industrial workers, particularly in construction, logistics and industrial operations. Risk is dynamic: the same environmental conditions can have different effects depending on workload, clothing and protective equipment, acclimatization, hydration, health status and prior exposure. Heat strain can develop quietly and deteriorate quickly, while supervisors often have only general thresholds rather than person- or crew-level information.
+
+A technology-enabled response could combine environmental sensing, operational context and, where freely consented and clinically appropriate, wearable or physiological signals. But worker protection must come before productivity optimization. Poorly calibrated alerts can be ignored; over-collection can become intrusive surveillance; and individual risk data could be misused in employment decisions. The challenge is to provide a robust early warning and a safer operational action that works in realistic field conditions and preserves worker rights.
+
+Desired outcome
+
+Dynamic heat-risk assessment. Combine environmental conditions with workload, shift context and optional consented worker signals to estimate rising individual or crew risk.
+Clear, graded warnings. Deliver timely, multilingual alerts with simple severity levels and safe action such as hydration, rest, cooling, work-intensity reduction, shift change, or clinical escalation.
+Worker-first governance. Use informed consent, data minimization and strict access rules; prohibit disciplinary or unrelated employment use of individual health data.
+Field-ready operation. Demonstrate performance under realistic heat, connectivity, battery, dust and protective-equipment conditions, with a safe fallback when sensors or networks fail.
+Supervisor decision support. Provide crew- and site-level views that help plan breaks, rotation and task timing without exposing unnecessary individual clinical detail.
+Safety and productivity measures. Be able to report alert lead time, false-alarm rate, adherence to recommended controls, heat-related symptoms or incidents, emergency escalations, compliance and lost work time.

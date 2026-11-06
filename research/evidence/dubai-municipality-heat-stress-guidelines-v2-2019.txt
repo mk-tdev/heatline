@@ -1,0 +1,715 @@
+     Dubai Municipality
+Health and Safety Department
+
+     Technical Guidelines for
+Management of Heat Stress at Work
+
+        DM-HSD-GU38-MHSW2
+
+
+
+
+          OPEN DATA / ‫ﺑﻴﺎﻧﺎت ﻣﻔﺘﻮﺣﺔ‬
+               Organization Unit:         Health & Safety Department           :‫اﻟﻮﺣﺪة اﻟﺘﻨﻈﻴﻤﻴﺔ‬
+                                     Technical Guidelines for Management of
+               Document title:                                                    :‫ﻋﻨﻮان اﻟﻮﺛﻴﻘﺔ‬
+                                              Heat Stress at Work
+               Doc Ref.                     DM-HSD-GU38-MHSW2                       :‫رﻗﻢ اﻟﻮﺛﻴﻘﺔ‬
+
+
+
+
+                                                CONTENTS
+
+                                                                                                      Page number
+
+ 1.      INTRODUCTION                                                                                     3
+ 2.      PURPOSE                                                                                          3
+ 3.      SCOPE                                                                                            3
+ 4.      DEFINITION                                                                                       4
+ 5.      GUIDELINES                                                                                       5
+         A.    Factors to be considered during Hazard Identification and Risk Assessment                  5
+         B.    Heat Index, Risk level and Control Approach                                                6
+         C.    Controls to reduce effects of heat stress on workers while working in hot                  7
+               environment
+         D.    Training and Awareness                                                                     11
+         E.    Emergency Preparedness                                                                     12
+         F.    Monitoring                                                                                 12
+ 6.      REFERENCES                                                                                       12
+
+
+ ANNEX A          HEAT INDEX                                                                              13
+ ANNEX B          HEAT STRESS CHECKLIST                                                                   14
+
+
+
+
+      Issue Date: 08.10.2019                                                                  V 2.0
+                                             OPEN DATA / ‫ﺑﻴﺎﻧﺎت ﻣﻔﺘﻮﺣﺔ‬
+Superseded Issue Date: April 2010                                                          Page 2 of 15
+               Organization Unit:          Health & Safety Department              :‫اﻟﻮﺣﺪة اﻟﺘﻨﻈﻴﻤﻴﺔ‬
+                                     Technical Guidelines for Management of
+               Document title:                                                        :‫ﻋﻨﻮان اﻟﻮﺛﻴﻘﺔ‬
+                                               Heat Stress at Work
+               Doc Ref.                      DM-HSD-GU38-MHSW2                             :‫رﻗﻢ اﻟﻮﺛﻴﻘﺔ‬
+
+
+
+     1. INTRODUCTION
+     The Emirate of Dubai is geographically located in the Middle East region and has hot weather conditions
+     during the summer season. The most vulnerable group to this condition are the manufacturing, service
+     industries and the construction sector, yet these activities cannot be stopped due to the economic and
+     social considerations. There are certain measures that can be taken to prevent any unwanted heat related
+     illnesses and accidents resulting at work while performing work in such conditions.
+
+
+     Federal Law No.8 (UAE Labor Code), Ministerial Order No. 32 of 1982 and Dubai Municipality Local Order
+     61 of 1991 clearly emphasizes the role of employers to take every necessary precaution for the protection
+     of their workers and ensure their safety from any occupational illnesses or potential work accidents. The
+     employer shall also develop appropriate control measures to improve work conditions for their workers
+     and thereby provide them with a healthy work environment.
+
+
+     2. PURPOSE
+     The purpose of this technical guideline is to provide guidance in protecting the health of the worker while
+     working in hot environment. This document entail the factors to be considered during risk assessment,
+     controls to minimize risk of heat stress, training requirements, emergency preparedness and monitoring
+     the effectiveness of the control measures for further improvements.
+
+
+     Employers having their work activities which can result in heat illnesses shall conduct heat stress risk
+     assessment based on the above approach and make all reasonably practical efforts in developing and
+     implementing appropriate controls, as suggested further in these guidelines.
+
+
+     The role of supervisor or foreman or person who is in charge of the task team (being the front line
+     supervisors) is critical in preventing heat stress impact on the workers’ health during the hot environment.
+
+
+     3. SCOPE
+     This technical guideline, shall apply to all commercial and industrial establishments, public or government
+     institutions, including construction-related project sites in the emirate of Dubai.
+
+
+     4. DEFINITION
+     Unless the context otherwise requires, the following terms shall be deemed to mean the definitions hereby
+     assigned to them.
+
+
+     Issue Date: 08.10.2019                                                                         V 2.0
+                                              OPEN DATA / ‫ﺑﻴﺎﻧﺎت ﻣﻔﺘﻮﺣﺔ‬
+Superseded Issue Date: April 2010                                                               Page 3 of 15
+               Organization Unit:          Health & Safety Department             :‫اﻟﻮﺣﺪة اﻟﺘﻨﻈﻴﻤﻴﺔ‬
+                                     Technical Guidelines for Management of
+               Document title:                                                       :‫ﻋﻨﻮان اﻟﻮﺛﻴﻘﺔ‬
+                                              Heat Stress at Work
+               Doc Ref.                      DM-HSD-GU38-MHSW2                         :‫رﻗﻢ اﻟﻮﺛﻴﻘﺔ‬
+
+
+     Heat Stroke
+     Heat Stroke occurs when a person’s body temperature regulation system fails and the body temperature
+     rises to critical levels.
+     The symptoms of heat stroke are confusion, irrational behavior, loss of consciousness, convulsions, hot
+     dry skin and high body temperature (41ºC/105.8ºF). If the body temperature is high, it can result in death
+     if left untreated.
+     Heat stroke is a medical emergency and needs immediate treatment by a medical professional.
+
+
+     Heat Exhaustion
+     Heat Exhaustion is caused by loss of body water and salt through excessive sweating.
+     The symptoms of heat exhaustion are heavy sweating and a high pulse rate. This is a preliminary stage for
+     a heat stroke.
+
+
+     Heat Cramp
+     Muscle spasms or involuntary jerk due to salt imbalance resulting to replace salt lost with sweat. This is a
+     preliminary stage leading to Heat exhaustion.
+     The symptoms of heat cramps are muscle pain and muscle cramps.
+
+
+     Heat Stress
+     Heat stress is when the heat regulating mechanism of the body fails, resulting in increased body
+     temperature above 37ºC and affecting the individual’s physiological processes, resulting in strain on the
+     body.
+
+
+     Heat Rashes
+     Prickly heat is a condition where the skin that is persistently wetted by unevaporated sweat leads to
+     formation of red papules. These papules may become infected if left untreated and disappears after
+     returning back to a cool environment.
+
+
+     Acclimatization
+     Acclimatization or acclimation is the process wherein the individual body organs adjusts to a gradual
+     change in its environment (for example, change in humidity or temperature) enabling it to maintain
+     performance across a range of environmental conditions.
+
+
+
+
+     Issue Date: 08.10.2019                                                                     V 2.0
+                                             OPEN DATA / ‫ﺑﻴﺎﻧﺎت ﻣﻔﺘﻮﺣﺔ‬
+Superseded Issue Date: April 2010                                                            Page 4 of 15
+               Organization Unit:           Health & Safety Department               :‫اﻟﻮﺣﺪة اﻟﺘﻨﻈﻴﻤﻴﺔ‬
+                                      Technical Guidelines for Management of
+               Document title:                                                          :‫ﻋﻨﻮان اﻟﻮﺛﻴﻘﺔ‬
+                                                Heat Stress at Work
+               Doc Ref.                       DM-HSD-GU38-MHSW2                           :‫رﻗﻢ اﻟﻮﺛﻴﻘﺔ‬
+
+
+     Minimum duration for an individual to get acclimatized with the changed environmental conditions is
+     around 7-8 days but full acclimatization may last up to 14 days or more depending on different factors
+     related to the person, such as increased risk of heat illness due to certain medical conditions or medical
+     treatment or the environment.
+
+
+     5. GUIDELINES
+     A. Factors to be considered during Hazard Identification and Risk Assessment
+     Working in hot environments can result in heat related illnesses and may result in serious injuries to
+     workers. To prevent such illnesses, injuries and incidents at work place, employers whose work activities
+     are in the hot environments whether indoor or outdoor, shall conduct a hazard identification and risk
+     assessment prior to starting of the work. Following risk factors shall be considered while conducting the
+     risk assessment:
+         i.   Environment factors:
+              •    Such as ambient air temperature, air movement and relative humidity can all affect an
+                   individual’s response to hot environments.
+        ii.   Job factors:
+              •    Work load - performing more or less tasks in hot environment by the individual worker
+              •    Types of work – heavy work (more strenuous work) in hot weather, dealing with hazardous
+                   substances, working at heights or in confined spaces and any other such works, which can
+                   aggravate the risk while performing the work in hot conditions.
+              •    Use of personal protective equipment. Non-breathable garments block the evaporation and
+                   can aggravate the heat stress in the worker.
+       iii.   Personnel factors:
+              •    Obesity, poor physical conditions/not physically fit, health problems, previous illnesses, heart
+                   disease /high blood pressure and medications, alcohol consumption, lack or insufficient rest,
+                   food intake, age factors and lack of acclimatization.
+
+
+
+
+     Issue Date: 08.10.2019                                                                        V 2.0
+                                               OPEN DATA / ‫ﺑﻴﺎﻧﺎت ﻣﻔﺘﻮﺣﺔ‬
+Superseded Issue Date: April 2010                                                               Page 5 of 15
+               Organization Unit:                 Health & Safety Department               :‫اﻟﻮﺣﺪة اﻟﺘﻨﻈﻴﻤﻴﺔ‬
+                                             Technical Guidelines for Management of
+               Document title:                                                                :‫ﻋﻨﻮان اﻟﻮﺛﻴﻘﺔ‬
+                                                      Heat Stress at Work
+               Doc Ref.                             DM-HSD-GU38-MHSW2                           :‫رﻗﻢ اﻟﻮﺛﻴﻘﺔ‬
+
+
+     B. Heat Index, Risk Level and Control Approach
+     Heat stress risk level can be assessed quickly from the following table and accordingly control strategies
+     shall be adopted at the work place by the employer:
+
+
+        Heat Index                  Risk Level                                   Control Approach
+
+        Up to 34 ºC           Low risk (caution)                          Basic heat safety and planning
+
+        35 to 39 ºC               Moderate                    Implement planned controls and create awareness
+
+        40 to 45 ºC                   High                   Additional controls as planned with more awareness
+
+     46 ºC and above              Very high           Enhanced controls as planned with enhanced awareness control
+
+
+     Heat Index
+     The heat index (HI) is an index that combines air temperature and relative humidity in an attempt in
+     determining the equivalent human-perceived temperature.
+
+
+     Higher the heat index hotter the weather feels, since sweat readily does not evaporate and cools the skin.
+     The heat index is the better measure than the air temperature alone for estimating the risk to workers
+     from environmental heat sources (For heat index chart, refer to Annex A).
+
+
+     Employers shall ensure that they have sufficient instruments such as dry and wet bulb globe thermometers
+     or are using properly calibrated instruments to measure temperature and relative humidity. Precautions
+     shall be taken while placing these instruments on a surface which shall not affect the actual readings due
+     to the local surface temperature or environment.
+
+
+     C. Controls to reduce effects of heat stress on workers while working in hot environment
+     Below proposed controls shall be adapted (as practicable) at the work place to reduce heat stress illnesses
+     and injuries at work:
+
+
+     Acclimatization
+     Individuals who are not given enough time to adjust with the hot environments are more likely to
+     experience heat related disorders. Therefore it is advisable to give an individual sufficient time to get
+     acclimatized to higher environmental temperatures to gradually get exposed to heat conditions.
+
+
+
+
+     Issue Date: 08.10.2019                                                                                V 2.0
+                                                     OPEN DATA / ‫ﺑﻴﺎﻧﺎت ﻣﻔﺘﻮﺣﺔ‬
+Superseded Issue Date: April 2010                                                                     Page 6 of 15
+               Organization Unit:          Health & Safety Department              :‫اﻟﻮﺣﺪة اﻟﺘﻨﻈﻴﻤﻴﺔ‬
+                                     Technical Guidelines for Management of
+               Document title:                                                        :‫ﻋﻨﻮان اﻟﻮﺛﻴﻘﺔ‬
+                                               Heat Stress at Work
+               Doc Ref.                      DM-HSD-GU38-MHSW2                          :‫رﻗﻢ اﻟﻮﺛﻴﻘﺔ‬
+
+
+     Acclimatization is mostly required for individuals who are working first time in a hot environment or have
+     joined work in such hot environments after a long gap (which may be due to an illness or been on long
+     vacation) or have been working earlier in cold environment for a long time and now are scheduled for
+     working in hot environment. Accordingly, it is recommended that employer shall prepare a plan for such
+     workers to get acclimatized before putting them on a task in hot environment.
+
+
+     Work and rest scheduling
+     To prevent working in hot weather for extended periods, worker should be permitted to distribute the
+     workload evenly over the day and incorporate work and rest cycles wherever possible.
+
+
+     Work or rest cycles give the person’s body an opportunity to get rid of excess heat, slow down the
+     generation of internal body heat, heart rate and provide better blood circulation to the skin.
+
+
+     For evaluating an appropriate work/rest schedule, following criteria shall be considered:
+     Rest period can be increased and work period can be decreased based on one or all of the below mentioned
+     condition:
+         •    As the temperature rises
+         •    As the humidity increases
+         •    When there is no air movement
+         •    When protective equipment is worn, this may aggravate the body heat.
+         •    When performing heavier or strenuous work
+         •    When working under the direct sun.
+
+
+     Accordingly, the Ministry of Human Resources and Emiratization has issued regulations restricting the
+     working hours schedule during summer in UAE.
+     All employers shall adhere to this regulation in addition to the other required controls measures as needed
+     to perform the work based on their risk assessment.
+
+
+     Waiver of this regulation is exclusively controlled by Ministry of Human Resources and Emiratization.
+
+
+     Worker should spend the rest periods of the cycle in a cool place such as in lightly air conditioned
+     room/place or in well ventilated full shed /shelter to maintain the core body temperature within the
+     acceptable limits that is, less than or equal to 38.5 ºC for acclimatized and less than or equal to 38 ºC for
+     acclimatized workers
+
+
+     Issue Date: 08.10.2019                                                                      V 2.0
+                                              OPEN DATA / ‫ﺑﻴﺎﻧﺎت ﻣﻔﺘﻮﺣﺔ‬
+Superseded Issue Date: April 2010                                                             Page 7 of 15
+                Organization Unit:          Health & Safety Department              :‫اﻟﻮﺣﺪة اﻟﺘﻨﻈﻴﻤﻴﺔ‬
+                                      Technical Guidelines for Management of
+                Document title:                                                         :‫ﻋﻨﻮان اﻟﻮﺛﻴﻘﺔ‬
+                                                Heat Stress at Work
+                Doc Ref.                     DM-HSD-GU38-MHSW2                            :‫رﻗﻢ اﻟﻮﺛﻴﻘﺔ‬
+
+
+     Shelter/Shade
+     Shade is one of the most primary heat stress controls for hot climate. Radiant heat load can be reduced
+     to a minimum 10 ºC, when working in shades than under direct sunlight.
+
+
+     Also, shaded break area shall be kept cooler than the normal work area to facilitate quicker recovery from
+     the effects of heat. As mentioned above 10-15 ºC difference in temperature needs to be maintained
+     between the work area and the break area.
+
+
+     Provision for cool drinking water and salt replenishment drink at hot work locations
+     Due to excessive sweating, substantial loss of water and salt from the body leads to dehydration and heat
+     illnesses in the individuals while working in hot weather. Considering this, the employer shall ensure that
+     sufficient cool drinking water for the workers while working in hot weather is made available closer to their
+     workplace. Workers should drink sufficient drinking water (so that they don’t feel thirsty) and salt
+     replenishment drink/ electrolyte (sequence recommended is a glass of water every hour and after two
+     glass of water one glass of salt replenishment fluid/electrolyte as a minimum).
+
+
+     Ventilation
+     Increasing airflow through a work area such as installing fans and air conditioning (as practicable) shall
+     help in increasing the evaporation rate and cooling of the workers.
+
+
+     In case of working in confined space, such work place needs to be evaluated to ensure proper ventilation
+     is present throughout the workspace if required. Cool air should be supplied near to the workers. This
+     may require relocation of the air movement and the opening/closing of man ways as the work progresses
+     to ensure proper air distribution.
+
+
+     Work Practices
+     Where practical, mechanical assistance should be used to reduce the physical requirements of the job and
+     thus reducing the metabolic rate. (For example, using of carts or trolleys than physically lifting and carrying
+     the materials).
+     Split the job tasks between workers proportionally so that strenuous work load to a single individual is
+     avoided.
+     Schedule heavy work in the cooler period of the day rather than continuously working during the hot
+     weather.
+
+
+
+     Issue Date: 08.10.2019                                                                        V 2.0
+                                              OPEN DATA / ‫ﺑﻴﺎﻧﺎت ﻣﻔﺘﻮﺣﺔ‬
+Superseded Issue Date: April 2010                                                               Page 8 of 15
+               Organization Unit:           Health & Safety Department             :‫اﻟﻮﺣﺪة اﻟﺘﻨﻈﻴﻤﻴﺔ‬
+                                      Technical Guidelines for Management of
+               Document title:                                                        :‫ﻋﻨﻮان اﻟﻮﺛﻴﻘﺔ‬
+                                                Heat Stress at Work
+               Doc Ref.                       DM-HSD-GU38-MHSW2                         :‫رﻗﻢ اﻟﻮﺛﻴﻘﺔ‬
+
+
+     Another method is employee’s job rotation, in this case task team can be divided in two teams while one
+     team is working and the other team can take rest and prevent heat stress.
+     Also, it is recommended to work in pairs (buddy system) while performing work in hot environment or
+     under direct sunlight. This will help in identifying early warning signs of heat stress in his co-worker.
+
+
+     Personal Protective Equipment
+     Three variables that are insulation, permeability and ventilation associated with clothing alters the thermal
+     balance. Cotton clothing provides most of these three variables.
+
+
+     Coverall (clothes) should be made of thin cotton (that eases evaporation), loose fitting, light in weight and
+     color (that reflects heat). Clothes should be regularly washed to remove the sweat and salt which can
+     irritate the skin and lead to further infection.
+
+
+     Long sleeved shirts and trousers are recommended. However, while allowing such long sleeved shirts and
+     loose fitting clothes, care should be exercised that safety aspects at works are not compromised. A hardhat
+     should be worn to protect the head, neck and face from direct sun light. Tinted safety glasses can reduce
+     the damage to the eyes.
+
+
+     In certain situations, personal protective equipment (e.g. face masks, impermeable fire protective clothing)
+     must be worn which can control heat stress by not allowing sweat to evaporate. Special working practices
+     may need to be adopted.
+
+
+     Commutation of workers in hot weather
+     It is recommended that during hot weather conditions, commutation of workers to work location and back
+     to their accommodation shall be done through air-conditioned buses. This will help in reducing the heat
+     stress effect to the workers during traveling and then continuing work in hot weather.
+
+
+     Medical Screening of employees
+     Worker’s individual health status is one of the major factors aggravating heat stress at work while working
+     in hot environment. Workers with illness like high blood pressure, heart and kidney related illness,
+     diabetics, obesity and other illnesses are more vulnerable to serious impact of heat stress. Accordingly,
+     employer shall ensure medical screening of the workers prior to employing them for working in hot
+     environment and maintain records of such screening.
+
+
+
+     Issue Date: 08.10.2019                                                                      V 2.0
+                                               OPEN DATA / ‫ﺑﻴﺎﻧﺎت ﻣﻔﺘﻮﺣﺔ‬
+Superseded Issue Date: April 2010                                                             Page 9 of 15
+               Organization Unit:          Health & Safety Department             :‫اﻟﻮﺣﺪة اﻟﺘﻨﻈﻴﻤﻴﺔ‬
+                                     Technical Guidelines for Management of
+               Document title:                                                       :‫ﻋﻨﻮان اﻟﻮﺛﻴﻘﺔ‬
+                                              Heat Stress at Work
+               Doc Ref.                     DM-HSD-GU38-MHSW2                           :‫رﻗﻢ اﻟﻮﺛﻴﻘﺔ‬
+
+
+     It is recommended that the person with such illnesses shall not be allowed to work in hot weather.
+     However, if it is essential then all required support shall be provided on consultation with an approved
+     medical professional.
+
+
+     Communicating Heat Stress Risk levels
+     Notifying workers on changing heat stress risk levels while at work is very important to reduce the impact
+     of heat stress. Timely notification to the workers regarding changing heat index due to changes in hot
+     weather conditions/ environment shall help in taking adequate/ defined protective measures such as
+     stopping the work/taking rest in suitable cool shelters. The delay in notification or unawareness could lead
+     to increase number of heat stress illness incidents and accidents due to ill health status while at work.
+
+
+     This communication could be done through telecommunication/mobile messaging or using flag system
+     (erecting different color flags such as red for very high risk, amber for high risk, yellow for medium risk
+     and green for low or no risk situation) based on the risk level mentioned above.
+
+
+     This communication system is applicable where multiple teams are working at different and distant
+     locations and single source of monitoring of heat stress is used.
+     It is also recommended that if different areas are affected with different environment and the heat stress
+     effect could be varying in these locations then each area should be provided with a separate measuring
+     instrument for knowing and communicating the heat stress risk levels.
+
+
+     D. Training and Awareness
+     Managers, supervisors, contractors and employees and all must be trained to recognize symptoms of heat
+     stress prior to performing the work in potentially heat stress situations. Training must include signs and
+     symptoms of heat stroke, heat exhaustion, and heat cramps etc. Training must also include work rest
+     schedules, water replenishments requirements, flagging system or other communication system related
+     to heat index, emergency preparedness, hygiene practices, dietary control, wearing of suitable PPE’s while
+     at work and overall idea of heat stress management program.
+     Special training session to be conducted prior to start of summer season and shall be periodically repeated
+     during the season.
+
+
+     This awareness can also be given through induction trainings conducted in the organization on joining of
+     the new staff and key aspects of the heat stress program shall be repeated through every day safety tool
+     box talks as a reminder to the work force.
+
+     Issue Date: 08.10.2019                                                                      V 2.0
+                                             OPEN DATA / ‫ﺑﻴﺎﻧﺎت ﻣﻔﺘﻮﺣﺔ‬
+Superseded Issue Date: April 2010                                                            Page 10 of 15
+               Organization Unit:           Health & Safety Department                :‫اﻟﻮﺣﺪة اﻟﺘﻨﻈﻴﻤﻴﺔ‬
+                                       Technical Guidelines for Management of
+               Document title:                                                              :‫ﻋﻨﻮان اﻟﻮﺛﻴﻘﺔ‬
+                                                Heat Stress at Work
+               Doc Ref.                       DM-HSD-GU38-MHSW2                               :‫رﻗﻢ اﻟﻮﺛﻴﻘﺔ‬
+
+
+     In industries where hot work is part of the routine work, special training shall be conducted prior to start
+     of the work and then refresher training to be imparted periodically to keep the heat stress management
+     awareness during the course of workers employment in the organization. The periodicity of the training
+     could be biyearly or yearly as suitable to the organization.
+
+
+     Awareness on self-assessment of heat stress illnesses:
+     Creating awareness on self-identification of heat stress impact will help in reducing risk of serious heat
+     stress illnesses among the workers.
+     Making worker aware of heat stress illness symptoms as detailed below by small training sessions (may
+     be periodical) shall help in reducing heat stress illness cases within the work organizations.
+                     Heat Illness                Symptoms
+                     Heat stroke                 Red, hot, dry skin or excessive sweating
+                                                 Very high body temperature
+                                                 Confusion
+                                                 Fainting
+                     Heat Exhaustion             Cool, moist skin
+                                                 Heavy sweating
+                                                 Headache
+                                                 Nausea or vomiting
+                                                 Dizziness
+                                                 Light headedness
+                                                 Weakness
+                                                 Thirst
+                                                 Irritability
+                                                 Fast heart heat
+                     Heat Cramp                  Muscle spasms
+                                                 Pain
+                                                 Usually in abdomen, arms or legs
+                     Heat Rash                   Clusters of red bumps on skin
+                                                 Often appears on neck, Upper chest, folds of skin
+
+
+     Another way to identify heat stress illness is by creating awareness on the change of urine colour due to
+     heat illness. On knowing this information workers can seek further medical help for their own care and
+     get rid of adverse effects due to heat stress.
+
+
+
+     Issue Date: 08.10.2019                                                                            V 2.0
+                                               OPEN DATA / ‫ﺑﻴﺎﻧﺎت ﻣﻔﺘﻮﺣﺔ‬
+Superseded Issue Date: April 2010                                                                  Page 11 of 15
+               Organization Unit:          Health & Safety Department             :‫اﻟﻮﺣﺪة اﻟﺘﻨﻈﻴﻤﻴﺔ‬
+                                     Technical Guidelines for Management of
+               Document title:                                                       :‫ﻋﻨﻮان اﻟﻮﺛﻴﻘﺔ‬
+                                                Heat Stress at Work
+               Doc Ref.                     DM-HSD-GU38-MHSW2                          :‫رﻗﻢ اﻟﻮﺛﻴﻘﺔ‬
+
+
+     E. Emergency Preparedness
+     All employers shall ensure to deal with all kinds of heat emergencies, which may occur in their premises (if
+     heat stress related work activities are being performed).
+     As part of emergency preparedness, it is recommended that, employers shall have suitable
+     arrangement/coordination with in-house/nearby medical facility which has provision of appropriate
+     number of professionals (paramedic and/or doctor) and ambulance.
+     Employers shall also maintain required number of competent first aider(s) to support any medical
+     emergencies as per UAE’s/Dubai’s applicable legislations/requirements.
+     As mentioned in the controls above, there should be air-conditioned room as part of the clinical support
+     to treat persons exposed to heat stress.
+     Please remember to dial – 998 (Dubai Ambulance) or 999 in case of any kind of emergencies.
+
+
+     F. Monitoring
+     Organization may conduct periodic inspections / audits to verify the implementation of heat stress
+     program in their work premises. As overall preparedness employers are recommended to use summary
+     checklist (refer to Annex B) to ensure required preparedness prior to start of the work in hot weather.
+
+
+     6. REFERENCES
+     Canada - Canadian Centre for Occupational Health and Safety
+     Euro Weather - Heat Index Source: Heat and Discomfort Index
+     United States of America - Occupational Health and Safety Administration (OSHA) Heat Index Guide
+     United Arab Emirates - Federal Law No. 8 (UAE Labor Law)
+     United Arab Emirates - Ministerial Order No. 32 of 1982
+     Dubai Municipality - Local Order 61 of 1991
+
+
+
+
+     Issue Date: 08.10.2019                                                                     V 2.0
+                                             OPEN DATA / ‫ﺑﻴﺎﻧﺎت ﻣﻔﺘﻮﺣﺔ‬
+Superseded Issue Date: April 2010                                                           Page 12 of 15
+                             Organization Unit:                    Health & Safety Department                  :‫اﻟﻮﺣﺪة اﻟﺘﻨﻈﻴﻤﻴﺔ‬
+                                                           Technical Guidelines for Management of
+                             Document title:                                                                       :‫ﻋﻨﻮان اﻟﻮﺛﻴﻘﺔ‬
+                                                                      Heat Stress at Work
+                             Doc Ref.                               DM-HSD-GU38-MHSW2                                :‫رﻗﻢ اﻟﻮﺛﻴﻘﺔ‬
+
+
+
+ANNEX A: HEAT INDEX
+
+
+                                                                                 Relative Humidity
+                               25%   30%      35%    40%     45%     50%   55%      60%   65%    70%   75%   80%   85%    90%       95%   100%
+
+                       42˚      48      50     52     55      57      59    62      64    66     68     71   73     75     77       80     82
+
+                       41˚      46      48     51     53      55      57    59      61    64     66     68   70     72     74       76     79
+
+                       40˚      45      47     49     51      53      55    57      59    61     63     65   67     69     71       73     75
+
+                       39˚      43      45     47     49      51      53    55      57    59     61     63   65     66     68       70     72
+
+                       38˚      42      44     45     47      49      51    53      55    56     59     60   62     64     66       67     69
+
+                       37˚      40      42     44     45      47      49    51      52    54     56     58   59     61     63       65     66
+
+                       36˚      39      40     42     44      45      47    49      50    52     54     55   57     59     60       62     63
+
+                       35˚      37      39     40     42      44      45    47      48    50     51     53   54     56     58       59     61
+
+                       34˚      36      37     39     40      42      43    45      46    48     49     51   52     54     55       57     58
+     Temperature, ˚C
+
+
+
+
+                       33˚      34      36     37     39      40      41    43      44    46     47     48   50     51     53       54     55
+
+                       32˚      33      34     36     37      38      40    41      42    44     45     46   48     49     50       52     53
+
+                       31˚      32      33     34     35      37      38    39      40    42     43     44   45     47     48       49     50
+
+                       30˚      30      32     33     34      35      36    37      39    40     41     42   43     45     46       47     48
+
+                       29˚      29      30     31     32      33      35    36      37    38     39     40   41     42     43       45     46
+
+                       28˚      28      29     30     31      32      33    34      35    36     37     38   39     40     41       42     43
+
+                       27˚      27      27     28     29      30      31    32      33    34     35     36   37     38     39       40     41
+
+                       26˚      26      26     27     28      29      30    31      32    33     34     34   35     36     37       38     39
+
+                       25˚      25      25     26     27      27      28    29      30    31     32     33   34     34     35       35     37
+
+                       24˚      24      24     24     25      26      27    28      28    29     30     31   32     33     33       34     35
+
+                       23˚      23      23     23     24      25      25    26      27    28     28     29   30     31     32       32     33
+
+                       22˚      22      22     22     22      23      24    25      25    26     27     27   28     29     30       30     31
+
+
+ Legend:
+    Up to 29˚C                          No discomfort
+    From 30 to 34˚C                     Slight discomfort sensation
+    From 35 to 39˚C                     Strong discomfort. Caution: limit the heaviest physical activities
+    From 40 to 45˚C                     Strong indisposition sensation. Danger: Avoid efforts
+    From 46 to 53˚C                     Serious danger: stop all physical activities
+    Over 54˚C                           Death danger: imminent heat stroke
+
+
+    URINE CHART: Monitor Your Hydration Levels: A good indicator of dehydration is if your urine is
+    unusually dark in color.
+
+
+
+
+     Issue Date: 08.10.2019                                                                                                     V 2.0
+                                                                     OPEN DATA / ‫ﺑﻴﺎﻧﺎت ﻣﻔﺘﻮﺣﺔ‬
+Superseded Issue Date: April 2010                                                                                         Page 13 of 15
+               Organization Unit:                   Health & Safety Department                       :‫اﻟﻮﺣﺪة اﻟﺘﻨﻈﻴﻤﻴﺔ‬
+                                               Technical Guidelines for Management of
+               Document title:                                                                          :‫ﻋﻨﻮان اﻟﻮﺛﻴﻘﺔ‬
+                                                         Heat Stress at Work
+               Doc Ref.                                 DM-HSD-GU38-MHSW2                                   :‫رﻗﻢ اﻟﻮﺛﻴﻘﺔ‬
+
+
+
+ANNEX B: HEAT STRESS CHECKLIST
+
+
+                         Heat Stress Checklist: Check This Guide Before Starting Work Each Day:
+
+          Workplace                 Have you conducted workplace assessment related to heat stress?                        ☐
+          Assessment
+                                    Based on the assessment have you placed all the applicable controls at the
+          related to Heat                                                                                                  ☐
+          Stress                    workplace?
+
+                                    Is there plenty of cool drinking water and/or electrolyte replacement drink
+          Water and/or                                                                                                     ☐
+                                    located as close as possible to the workers?
+          Hydration Drink
+                                    Are coolers refilled throughout the day?                                               ☐
+
+          Shade/                    Is there shade/welfare facilities available for breaks and if workers need to
+                                                                                                                           ☐
+          Welfare Facilities        recover?
+
+                                    Do workers know the:                                                                   ☐
+
+                                    Common signs and symptoms of heat illness?                                             ☐
+
+                                    Proper precautions to prevent heat illness?                                            ☐
+          Training
+                                    Importance of acclimatization?                                                         ☐
+
+                                    Importance of drinking water frequently (even when they are not thirsty)?              ☐
+
+                                    Steps to take in case of emergency?                                                    ☐
+
+                                    Is work being supervised by competent person when working near heat
+                                                                                                                           ☐
+          Supervision               related sources?
+
+                                    Have you conducted periodic inspections daily or monthly?                              ☐
+
+                                    Does everyone know who to notify if there is an emergency?                             ☐
+
+          Emergencies               Can workers explain their location if they need to call an ambulance?                  ☐
+
+                                    Does everyone know who will provide first aid?                                         ☐
+                                    Drink water (1 cup every 20 min.) and Hydration drink(1 cup, 2-3 times a
+                                                                                                                           ☐
+                                    day)
+
+                                    Wear lightweight clothing made of breathable fabric                                    ☐
+
+                                    Rest in the shade                                                                      ☐
+          Worker Reminders
+                                    Watch yourself and your coworkers                                                      ☐
+
+                                    Report heat symptoms early                                                             ☐
+
+                                    Know what to do in an emergency                                                        ☐
+
+
+
+
+     Issue Date: 08.10.2019                                                                                          V 2.0
+                                                        OPEN DATA / ‫ﺑﻴﺎﻧﺎت ﻣﻔﺘﻮﺣﺔ‬
+Superseded Issue Date: April 2010                                                                                Page 14 of 15
+               Organization Unit:            Health & Safety Department            :‫اﻟﻮﺣﺪة اﻟﺘﻨﻈﻴﻤﻴﺔ‬
+                                        Technical Guidelines for Management of
+               Document title:                                                        :‫ﻋﻨﻮان اﻟﻮﺛﻴﻘﺔ‬
+                                                 Heat Stress at Work
+               Doc Ref.                        DM-HSD-GU38-MHSW2                        :‫رﻗﻢ اﻟﻮﺛﻴﻘﺔ‬
+
+
+
+
+                                    For any further information, please contact:
+                                          Health and Safety Department
+                                                Dubai Municipality
+                                                     Tel: 800900
+                                                Safety@dm.gov.ae
+
+
+
+
+     Issue Date: 08.10.2019                                                                      V 2.0
+                                                OPEN DATA / ‫ﺑﻴﺎﻧﺎت ﻣﻔﺘﻮﺣﺔ‬
+Superseded Issue Date: April 2010                                                            Page 15 of 15
+
