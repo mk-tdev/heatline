@@ -1,3 +1,4 @@
+import { HeroShift } from './HeroShift';
 // A cinematic invitation into the fictional site. Generated imagery is illustrative.
 import { BrandMark } from './BrandMark';
 import { useEffect, useMemo, useState } from 'react';
@@ -24,9 +25,6 @@ export function Intro({ onStart, onEvidence }: { onStart: (scenario: string, mod
   return (
     <div className={`welcome ${motion ? 'motion-on' : 'motion-off'}`}>
       <section className="welcome-hero" aria-label="Welcome to Heatline">
-        <img className="hero-landscape" src="/images/saadiyat-hero.jpg" alt="Illustrated coastal construction site with cranes, shaded rest areas and the turquoise sea" fetchPriority="high" />
-        <div className="hero-shade" />
-        <div className="sun-wash" aria-hidden="true" />
         <nav className="welcome-nav" aria-label="Main navigation">
           <a className="welcome-brand" href="#"><BrandMark /> Heatline</a>
           <div className="welcome-nav-links"><button onClick={choose}>The experiences</button><button onClick={onEvidence}>The evidence</button></div>
@@ -37,13 +35,11 @@ export function Intro({ onStart, onEvidence }: { onStart: (scenario: string, mod
           <h1>The heat doesn’t<br />stop at three.</h1>
           <p className="hero-description">The midday break is over. The people building tomorrow still need protecting. Step onto their site—and see what one better decision can change.</p>
           <div className="hero-actions"><button className="hero-start" onClick={() => onStart('afternoon-pour', 'story')}><span className="play-glyph" aria-hidden="true">▶</span> Step into the site</button><button className="hero-secondary" onClick={choose}>Explore the scenarios <span aria-hidden="true">↓</span></button></div>
-          <p className="mobile-notice">Best explored on a bigger screen. The 3D simulator supports desktop and laptop only; you can explore the stories and evidence here.</p>
           <p className="hero-footnote">A playable 3D experience. Historical weather. Human decisions.</p>
         </div>
-        <div className="site-beacon beacon-deck" aria-hidden="true"><span /><div>Level 12 deck<small>Shade changes the plan</small></div></div>
-        <div className="site-beacon beacon-rest" aria-hidden="true"><span /><div>People first<small>Rest. Recover. Return.</small></div></div>
+        <HeroShift />
+        <p className="mobile-notice">The interactive simulator supports desktop and laptop. Explore the scenarios and evidence on any screen.</p>
         <div className="hero-shift"><span className="shift-clock">15:00</span><div><strong>The break is over.</strong><span>20 workers. Three crews. One afternoon.</span></div><button onClick={() => setMotion(!motion)} aria-pressed={!motion} aria-label={motion ? 'Pause ambient animation' : 'Enable ambient animation'}>{motion ? 'Ⅱ' : '▷'}</button></div>
-        <span className="image-credit">AI-generated site illustration</span>
       </section>
 
       <main className="welcome-content">

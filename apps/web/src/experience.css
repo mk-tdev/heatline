@@ -197,3 +197,142 @@
 @media (max-width: 1023px), (hover: none) and (pointer: coarse) {
   .mobile-notice { display: block; max-width: 420px; padding: 12px 15px; border: 1px solid #ffffff40; border-radius: 14px; background: #0b353f99; color: #ecf8f4; font-size: 12px; line-height: 1.65; }
 }
+
+/* Explicit interaction states keep the shared button reset out of the landing page. */
+.welcome .hero-secondary { padding: 15px 20px; border-radius: 30px; border: 1px solid #ffffff50; background: #123c4b55; }
+.welcome .hero-secondary:hover:not(:disabled), .welcome .hero-secondary:focus-visible { color: #123c4b; background: #e6f3ef; border-color: #e6f3ef; }
+.welcome .hero-start:hover:not(:disabled) { background: #fff; color: #183b46; }
+.welcome .experience-actions { gap: 8px; flex-wrap: wrap; }
+.welcome .experience-actions button { min-height: 42px; padding: 11px 14px; border-radius: 12px; border: 1px solid #35697125; color: #204f58; background: #ffffff70; }
+.welcome .experience-actions button:first-child { background: #1c5960; color: #fff; border-color: #1c5960; }
+.welcome .experience-actions button:hover:not(:disabled) { color: #123e46; background: #d9eae6; border-color: #789e9f; }
+.welcome .experience-actions button:first-child:hover:not(:disabled) { color: #fff; background: #123e46; }
+.welcome button:focus-visible { outline: 3px solid #e7ad55; outline-offset: 4px; }
+
+/* Independent panel rails leave the 3D canvas mounted and fully interactive. */
+@media (min-width: 961px) {
+  .app { --operations-width: 300px; --guardian-width: 282px; grid-template-columns: var(--operations-width) minmax(0,1fr) var(--guardian-width); }
+  .app.operations-collapsed { --operations-width: 54px; }
+  .app.guardian-collapsed { --guardian-width: 54px; }
+  .app .story-card { width: min(530px, calc(100% - var(--operations-width) - var(--guardian-width) - 68px)); left: calc(50% + (var(--operations-width) - var(--guardian-width)) / 2); }
+  .app .views, .app .branch-tag { left: calc(50% + (var(--operations-width) - var(--guardian-width)) / 2); }
+  .app.operations-collapsed .console, .app.guardian-collapsed .phone-wrap { padding: 10px 7px; align-self: start; overflow: hidden; }
+  .operations-collapsed .console .panel-title, .guardian-collapsed .phone-wrap .panel-title { display: none; }
+}
+@media (min-width: 961px) and (max-width: 1200px) {
+  .app:not(.operations-collapsed) { --operations-width: 270px; }
+  .app:not(.guardian-collapsed) { --guardian-width: 250px; }
+}
+.app .panel-heading { gap: 6px; align-items: flex-start; }
+.app .panel-heading h2 { font-size: 16px; }
+.app .panel-toggle { flex: 0 0 34px; height: 34px; padding: 0; font-size: 26px; line-height: 1; background: #ffffff85; border: 1px solid #fff9; color: #275765; }
+.app .panel-toggle:hover:not(:disabled) { background: white; color: #123e46; }
+.panel-rail-label { display: block; writing-mode: vertical-rl; margin: 18px auto 12px; font-size: 12px; font-weight: 600; letter-spacing: .3px; color: #214e5b; }
+@media (max-width: 960px) { .panel-rail-label { writing-mode: horizontal-tb; margin: 12px 0 0; } }
+
+/* A single choreographed construction vignette: lift, delivery, heat, recovery. */
+.hero-vignette { position: absolute; top: 18%; right: 3%; width: 44%; max-width: 620px; color: #effaf5; border-radius: 28px; border: 1px solid #e8fff65c; background: linear-gradient(140deg,#164a5bb8,#143d4980); box-shadow: 0 30px 80px #092f3e44,inset 0 1px 0 #ffffff30; backdrop-filter: blur(18px); overflow: hidden; }
+.vignette-heading { padding: 22px 24px 0; display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.vignette-heading > span { font-size: 13px; font-weight: 550; }
+.vignette-heading i { display: inline-block; width: 6px; height: 6px; background: #ffc367; border-radius: 50%; margin-right: 8px; }
+.vignette-heading small { font-size: 10px; color: #d2e8e4; }
+.hero-vignette svg { display: block; width: 100%; overflow: visible; }
+.vignette-caption { height: 70px; position: relative; margin: 0 24px; }
+.shift-phase { position: absolute; inset: 4px 0 auto; display: flex; align-items: center; gap: 12px; }
+.shift-phase strong { font-size: 15px; font-weight: 550; display: block; }
+.shift-phase small { font-size: 11px; color: #d0e7e3; margin-top: 6px; }
+.phase-dot { width: 9px; height: 9px; border-radius: 50%; background: #ffc367; flex-shrink: 0; box-shadow: 0 0 0 6px #ffc36718; }
+.phase-shade { opacity: 0; }.phase-shade .phase-dot { background: #adf1c8; }
+.vignette-progress { height: 3px; background: #ffffff15; }.vignette-progress span { display: block; height: 100%; width: 100%; background: #bce8d9; transform-origin: left; }
+.vignette-lift { animation: shift-lift 14s ease-in-out infinite; }
+.vignette-truck { animation: shift-truck 14s ease-in-out infinite; }
+.vignette-heat { animation: shift-heat 14s ease-in-out infinite; }
+.vignette-worker { transform-box: fill-box; translate: 0 0; animation: shift-worker 14s ease-in-out infinite; }
+.worker-1 { animation-delay: .3s; }.worker-2 { animation-delay: .6s; }
+.vignette-route { animation: shift-route 14s linear infinite; }
+.phase-heat { animation: shift-caption 14s linear infinite; }.phase-shade { animation: shift-caption-shade 14s linear infinite; }
+.vignette-progress span { animation: shift-progress 14s linear infinite; }
+@keyframes shift-lift { 0%,100% { transform: translateX(0); } 25%,40% { transform: translateX(-40px); } 65%,85% { transform: translateX(15px); } }
+@keyframes shift-truck { 0% { transform: translate(-45px,-21px); opacity: 0; } 10%,40% { transform: translate(18px,8px); opacity: 1; } 65%,100% { transform: translate(100px,46px); opacity: 0; } }
+@keyframes shift-heat { 0%,100% { opacity: .2; transform: translateY(0); } 30%,48% { opacity: 1; transform: translateY(-12px); } 65%,90% { opacity: 0; transform: translateY(-20px); } }
+@keyframes shift-worker { 0%,40%,100% { translate: 0 0; } 65%,90% { translate: 80px 28px; } }
+@keyframes shift-route { 0%,40%,95%,100% { opacity: 0; } 50%,85% { opacity: 1; stroke-dashoffset: -30; } }
+@keyframes shift-caption { 0%,44% { opacity: 1; transform: translateY(0); } 50%,94% { opacity: 0; transform: translateY(5px); } 100% { opacity: 1; transform: translateY(0); } }
+@keyframes shift-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.motion-off .hero-vignette * { animation-play-state: paused; }
+@media (min-width: 961px) { .hero-copy { max-width: 49%; margin-left: 6%; }.hero-copy h1 { font-size: clamp(56px,5.8vw,90px); }.hero-description { max-width: 420px; }.hero-actions { gap: 12px; } }
+@media (max-width: 960px) { .hero-vignette { display: none; } }
+@media (prefers-reduced-motion: reduce) { .hero-vignette * { animation: none !important; }.vignette-progress span { transform: scaleX(1); }.phase-shade { opacity: 0; } }
+
+@keyframes shift-caption-shade { 0%,44%,100% { opacity: 0; transform: translateY(5px); } 50%,94% { opacity: 1; transform: translateY(0); } }
+
+.welcome .hero-secondary { transition: none; }
+.welcome .welcome-nav-links button:hover:not(:disabled) { color: #fff; background: #ffffff18; }
+.welcome .hero-shift button:hover:not(:disabled) { color: #173b45; background: #e6f3ef; }
+.vignette-cable { transform-origin: 258px 58px; animation: shift-cable 14s ease-in-out infinite; }
+.vignette-load { animation: shift-load 14s ease-in-out infinite; }
+@keyframes shift-cable { 0%,100% { transform: scaleY(1); } 25%,65% { transform: scaleY(.5); } 85% { transform: scaleY(1); } }
+@keyframes shift-load { 0%,100% { transform: translateY(0); } 25%,65% { transform: translateY(-38.5px); } 85% { transform: translateY(0); } }
+
+@media (min-width: 961px) and (max-width: 1200px) { .hero-vignette { width: 41%; right: 3%; top: 22%; } }
+
+/* The entire hero is one animated site, with copy layered into its quiet sky. */
+.welcome-hero { min-height: 820px; height: min(980px, 100dvh); background: #183f50; }
+.welcome-hero .hero-vignette { display: block; position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; border: 0; border-radius: 0; box-shadow: none; backdrop-filter: none; background: none; overflow: hidden; z-index: -1; }
+.hero-vignette > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hero-vignette::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg,#1236459c,transparent 58%),linear-gradient(0deg,#123644e6,transparent 20%); pointer-events: none; }
+.welcome-hero .welcome-nav { position: relative; z-index: 2; }
+.welcome-hero .hero-copy { margin: 40px 0 160px 6%; max-width: 51%; }
+.welcome-hero .hero-copy h1 { font-size: clamp(56px,5.7vw,86px); }
+.welcome-hero .hero-description { max-width: 440px; }
+.welcome-hero .hero-footnote { max-width: none; }
+.welcome-hero .hero-shift { bottom: 28px; width: min(510px,46%); left: 6%; }
+.hero-vignette .vignette-caption { position: absolute; bottom: 24px; right: 5%; width: 36%; height: 90px; margin: 0; z-index: 1; }
+.panorama-label { font-size: 10px; display: block; color: #c9dfda; margin-bottom: 16px; }
+.hero-vignette .shift-phase { top: 29px; }
+.hero-vignette .vignette-progress { position: absolute; bottom: 0; left: 0; right: 0; z-index: 1; }
+.panorama-water { animation: panorama-water 8s ease-in-out infinite alternate; }
+.panorama-boat { animation: panorama-boat 40s linear infinite; }
+.panorama-birds { animation: panorama-birds 24s linear infinite; }
+.panorama-traffic { animation: panorama-traffic 18s linear infinite; }
+.panorama-hoist { animation: panorama-hoist 12s ease-in-out infinite; }
+.panorama-palm { transform-box: fill-box; transform-origin: bottom center; animation: panorama-palm 6s ease-in-out infinite alternate; }
+@keyframes panorama-water { to { transform: translateX(24px); opacity: .45; } }
+@keyframes panorama-boat { from { transform: translateX(-150px); } to { transform: translateX(570px); } }
+@keyframes panorama-birds { from { transform: translateX(-150px); } to { transform: translateX(500px); } }
+@keyframes panorama-traffic { 0% { translate: -260px 58px; } 35% { translate: 280px -58px; } 100% { translate: 1380px 39px; } }
+@keyframes panorama-hoist { 0%,15%,100% { translate: 0 100px; } 45%,65% { translate: 0 -35px; } }
+@keyframes panorama-palm { from { rotate: -3deg; } to { rotate: 4deg; } }
+@media (min-width: 701px) and (max-width: 1023px) {
+  .welcome-hero .hero-copy { margin-top: 42px; max-width: 65%; }.welcome-hero .hero-copy h1 { font-size: 58px; }
+  .welcome-hero > .mobile-notice { position: absolute; bottom: 140px; left: 6%; width: 37%; font-size: 11px; }
+  .welcome-hero .hero-vignette > svg { width: 125%; left: -25%; }
+}
+@media (max-width: 700px) {
+  .welcome-hero { display: flex; flex-direction: column; height: auto; min-height: 0; background: linear-gradient(#153e50,#315e6b); overflow: hidden; }
+  .welcome-hero .welcome-nav { width: 100%; padding: 22px 6%; gap: 12px; }
+  .welcome-hero .welcome-nav-links { display: none; }
+  .welcome-hero .hero-copy { order: 0; max-width: none; margin: 24px 6% 0; }
+  .welcome-hero .location-line { font-size: 11px; margin-bottom: 18px; }
+  .welcome-hero .hero-copy h1 { font-size: clamp(42px,10.8vw,68px); letter-spacing: -2px; margin-bottom: 22px; }
+  .welcome-hero .hero-description { font-size: 13px; line-height: 1.7; max-width: 470px; }
+  .welcome-hero .hero-actions { flex-wrap: wrap; gap: 9px; margin-top: 24px; }
+  .welcome-hero .hero-actions button { padding: 13px 14px; font-size: 11px; min-height: 44px; }
+  .welcome-hero .play-glyph { margin-right: 6px; }.welcome-hero .hero-secondary span { padding-left: 4px; }
+  .welcome-hero .hero-footnote { font-size: 10px; margin: 15px 0 0; }
+  .welcome-hero .hero-vignette { position: relative; inset: auto; z-index: 0; height: clamp(390px,104vw,620px); width: 100%; flex-shrink: 0; margin-top: 8px; }
+  .hero-vignette::after { background: linear-gradient(0deg,#244f60,transparent 28%),linear-gradient(#285261,transparent 15%); }
+  .hero-vignette .vignette-caption { right: auto; left: 6%; bottom: 12px; width: 88%; height: 79px; }
+  .hero-vignette .shift-phase strong { font-size: 14px; }.hero-vignette .shift-phase small { font-size: 10px; }
+  .hero-vignette .vignette-progress { left: 6%; right: 6%; }
+  .welcome-hero > .mobile-notice { margin: 18px 6% 0; max-width: none; background: #153d4b55; font-size: 11px; }
+  .welcome-hero .hero-shift { position: relative; inset: auto; width: auto; margin: 22px 6% 26px; padding-top: 18px; gap: 15px; }
+  .welcome-hero .hero-shift div > span { font-size: 10px; }.welcome-hero .shift-clock { font-size: 30px; }
+}
+@media (prefers-reduced-motion: reduce) { .hero-vignette * { animation: none !important; } }
+
+.welcome-hero .hero-vignette { background: linear-gradient(#153e50,#638f95); }
+@media (max-width: 700px) {
+  .welcome-hero { background: #153e50; }
+  .hero-vignette::after { background: linear-gradient(0deg,#244f60,transparent 28%); }
+}

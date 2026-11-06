@@ -2,6 +2,14 @@
 
 Updated 7 November 2026. The section below supersedes older milestone claims.
 
+## Current presentation and device support
+
+- Full-width SVG construction panorama with crane lifts, traffic, an elevator, workers, coastal motion, and cooling areas; pause and reduced-motion support.
+- Responsive landing page with phone and tablet layouts. The interactive 3D simulator remains desktop/laptop only (minimum 1024px window), with a mobile entry notice.
+- Glass side panels minimize independently, leaving the scene and replay state intact. Padded landing actions have explicit readable hover states.
+- New sun-and-H logo and favicon; detailed instanced crane structures and a construction lift with floor dwell times.
+- README includes screenshots, a judge-friendly walkthrough, architecture, setup, and the scientific evidence boundary.
+
 ## Scientific credibility and daylight UI
 
 - Independent NIOSH rolling-hour REL/RAL exposure screening in plan review, replay and the evidence report; demonstration WBGT bands explicitly do not establish TWL equivalence or UAE compliance.

@@ -29,6 +29,8 @@ export function App({ scenarioId, startMode, onBrief, onEvidence }: { scenarioId
   const [active, setActive] = useState<Branch['id']>('original');
   const branch = active === 'plan' && planBranch ? planBranch : original;
 
+  const [operationsCollapsed, setOperationsCollapsed] = useState(false);
+  const [guardianCollapsed, setGuardianCollapsed] = useState(false);
   const [mode, setMode] = useState<Mode>(startMode);
   const [minute, setMinute] = useState(scenario.start);
   const [playing, setPlaying] = useState(false);
@@ -269,7 +271,7 @@ export function App({ scenarioId, startMode, onBrief, onEvidence }: { scenarioId
   const featured = FEATURED.map((id) => scenario.workers.find((w) => w.id === id)!);
 
   return (
-    <div className={`app mode-${mode}`}>
+    <div className={`app mode-${mode}${operationsCollapsed ? ' operations-collapsed' : ''}${guardianCollapsed ? ' guardian-collapsed' : ''}`}>
       <header className="topbar">
         <div className="brand">
           <BrandMark /> Heatline <small>{scenario.title}</small>
@@ -357,15 +359,18 @@ export function App({ scenarioId, startMode, onBrief, onEvidence }: { scenarioId
       </main>
 
       <aside className="console">
-        <div className="panel-heading"><div><h2>Site operations</h2><p>Crew needs, not individual health data</p></div></div>
+        <div className="panel-heading"><div className="panel-title"><h2>Site operations</h2><p>Crew needs, not individual health data</p></div><button className="panel-toggle" onClick={() => setOperationsCollapsed(!operationsCollapsed)} aria-expanded={!operationsCollapsed} aria-controls="operations-content" aria-label={operationsCollapsed ? 'Expand site operations' : 'Minimize site operations'} title={operationsCollapsed ? 'Expand site operations' : 'Minimize site operations'}>{operationsCollapsed ? '›' : '‹'}</button></div>
+        {operationsCollapsed && <span className="panel-rail-label">Site operations{showDecision ? ' · Decision waiting' : ''}{flags.length ? ' · Action needed' : ''}</span>}
+        <div id="operations-content" hidden={operationsCollapsed}>
         <RedFlags flags={flags} />
         {showDecision && <DecisionCard clock={formatClock(DECISION_AT)} state={decision} onAsk={ask} onApprove={approve} onKeep={keep} setAsk={(s) => setDecision((d) => ({ ...d, ask: s }))} />}
         <NoorBrief brief={brief} loading={briefLoading} />
         <details className="panel-section" open><summary>Crew overview <span>{crews.length} crews</span></summary><CrewCards crews={crews} /></details>
         <details className="panel-section"><summary>Shift activity</summary><SiteLog events={branch.run.events} minute={minute} /></details>
+        </div>
       </aside>
 
-      <Phone workers={featured} selected={selected} onSelect={setSelected} ctx={gctx} message={shownMessage} loading={guardianLoading} stale={false} offline={!record.networkUp} />
+      <Phone collapsed={guardianCollapsed} onToggle={() => setGuardianCollapsed(!guardianCollapsed)} workers={featured} selected={selected} onSelect={setSelected} ctx={gctx} message={shownMessage} loading={guardianLoading} stale={false} offline={!record.networkUp} />
 
       <footer className="timeline">
         <button className="play" onClick={() => !showDecision && !beat && setPlaying((p) => !p)} disabled={showDecision || !!beat}>

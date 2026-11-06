@@ -20,6 +20,8 @@ const ACTION_TEXT: Record<string, string> = {
 const RTL = new Set(['ar', 'ur']);
 
 export function Phone({
+  collapsed,
+  onToggle,
   workers,
   selected,
   onSelect,
@@ -29,6 +31,8 @@ export function Phone({
   stale,
   offline,
 }: {
+  collapsed: boolean;
+  onToggle: () => void;
   workers: WorkerProfile[];
   selected: string;
   onSelect: (id: string) => void;
@@ -41,7 +45,9 @@ export function Phone({
 }) {
   return (
     <aside className="phone-wrap">
-      <div className="panel-heading"><div><h2>Worker guardian</h2><p>Private preview · synthetic worker</p></div><span className="privacy-dot" aria-label="Private view" /></div>
+      <div className="panel-heading"><div className="panel-title"><h2>Worker guardian</h2><p>Private preview · synthetic worker</p></div><button className="panel-toggle" onClick={onToggle} aria-expanded={!collapsed} aria-controls="guardian-content" aria-label={collapsed ? 'Expand worker guardian' : 'Minimize worker guardian'} title={collapsed ? 'Expand worker guardian' : 'Minimize worker guardian'}>{collapsed ? '‹' : '›'}</button></div>
+      {collapsed && <span className="panel-rail-label">Worker guardian</span>}
+      <div id="guardian-content" hidden={collapsed}>
       <div className="tabs">
         {workers.map((w) => (
           <button key={w.id} className={w.id === selected ? 'active' : ''} onClick={() => onSelect(w.id)}>
@@ -99,6 +105,7 @@ export function Phone({
           <br />
           Guardian: {message ? sourceLabel(message) : '—'} · warning level set by the rules engine
         </small>
+      </div>
       </div>
     </aside>
   );
