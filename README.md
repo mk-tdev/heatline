@@ -23,6 +23,7 @@ The midday break is over. A concrete truck is on its way. One worker is new to t
 | Experience | What you can do |
 | --- | --- |
 | **Walk into the afternoon** | Explore the 3D tower, crane, construction lift, rebar yard, shaded rest areas, and site gate. |
+| **Explore on foot** | Open a separate playground: walk the site, ride the construction lift to level 12, and rotate the crane, trolley and hook. The running shift is unchanged. |
 | **Make room for the scene** | Minimize either glass side panel independently and switch between named camera views. |
 | **Hear the worker’s side** | Preview multilingual guidance for six featured characters, including sensor-free fallback guidance. |
 | **Plan with Omar** | Ask for a revised shift, inspect the policy checks and independent exposure screen, then choose whether to run it. |
@@ -69,6 +70,12 @@ A short path through the demo:
 Guardian, Noor, Omar and multilingual speech are enabled in the live deployment. Functional checks on **7 November 2026** confirmed model-generated responses, a checked planner result and valid speech audio.
 
 Vercel hosts the web app and API functions. GitHub pushes to `main` deploy the production project automatically; other branches receive preview deployments. The deployment works in rules-only mode without an API key. To enable model-backed assistants and speech, configure `OPENAI_API_KEY` and optional model settings in Vercel project environment variables, then redeploy.
+
+### Explore on foot — just for fun
+
+Inside a scenario, click **Explore on foot**. Use **WASD** to walk, **Shift** to move faster, and drag to look; arrow keys also turn and walk. Approach the lift or crane base and press **E**, or use the on-screen shortcuts. Ride to level 12 and step onto the roof; in the crane, use **A/D** to rotate, **W/S** for the trolley, and **Q/E** for the hook. **Esc** returns to your shift.
+
+This is a disposable copy of the visible site. Exploration has its own camera and machinery state, makes no assistant calls, and cannot modify workers, plans, outcomes or playback controls. The original simulation keeps its normal playback and decision pauses underneath.
 
 ## 🎤 Present Heatline
 
@@ -136,7 +143,7 @@ npm run build       # Production web build
 npm run backtest    # Regenerate the August experiment and sensitivity variants
 ```
 
-The test suite currently contains **86 tests**. The backtest covers **31 days × 3 windows × 4 policies**, plus five sensitivity variants: **2,232 simulated shift-policy runs**. These are simulation results, not field-validation results.
+The test suite currently contains **90 tests**. The backtest covers **31 days × 3 windows × 4 policies**, plus five sensitivity variants: **2,232 simulated shift-policy runs**. These are simulation results, not field-validation results.
 
 The production build currently emits a large-bundle advisory for the 3D client. This remains a performance improvement opportunity.
 

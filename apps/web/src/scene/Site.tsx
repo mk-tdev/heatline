@@ -1,7 +1,7 @@
 // The 3D scene: the district, Saadiyat Tower, its people and the light of a real afternoon.
 // Engine coordinates are metres with x east and y north; see common.ts for the mapping.
 
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { MinuteRecord, Plan, Scenario, Zone } from '@heatline/contracts';
@@ -13,6 +13,7 @@ import { SiteA } from './SiteA';
 import { Person, lookFor, poseFor } from './Person';
 import { CameraRig, type CameraView } from './CameraRig';
 import { toScene } from './common';
+import { WorksiteExplore } from './WorksiteExplore';
 import type { Line } from '../dialogue';
 
 export const CREW_COLOURS: Record<string, string> = { A: '#4c9be8', B: '#f08a24', C: '#2fb39a' };
@@ -38,6 +39,7 @@ export interface SiteProps {
 const labelPoint = (zone: Zone) => (zone.id === 'facade' ? toScene(zone.at.x - 7, zone.at.y, 31) : zone.id === 'deck' ? toScene(zone.at.x, zone.at.y, zone.height + 9) : toScene(zone.at.x, zone.at.y, zone.height + 7));
 
 export function Site(props: SiteProps) {
+  const [playground, setPlayground] = useState<SiteProps | null>(null);
   const labelled = useMemo(() => props.scenario.zones.filter((z) => z.kind === 'outdoor' || z.kind === 'elevated'), [props.scenario]);
   useEffect(() => {
     for (const z of labelled) anchors.set(`z-${z.id}`, { point: labelPoint(z), lift: 0 });
@@ -45,11 +47,13 @@ export function Site(props: SiteProps) {
   }, [labelled]);
   return (
     <>
-      <Canvas shadows camera={{ position: [260, 120, 260], fov: 38, near: 1, far: 4000 }} gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}>
+      <Canvas frameloop={playground ? 'never' : 'always'} shadows camera={{ position: [260, 120, 260], fov: 38, near: 1, far: 4000 }} gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}>
         <SceneContents {...props} />
         <LabelProjector />
         <CameraRig view={props.view} revision={props.viewRevision} />
       </Canvas>
+      <button className="explore-entry" onClick={() => setPlayground(structuredClone(props))}>Explore on foot <span>Walk · lift · crane</span></button>
+      {playground && <WorksiteExplore onClose={() => setPlayground(null)}><SceneContents {...playground} sandbox /></WorksiteExplore>}
       <div className="labels" style={{ visibility: props.showLabels ? 'visible' : 'hidden' }}>
         {labelled.map((z) => {
           const c = props.record.zones.find((x) => x.zone === z.id)!;
@@ -91,7 +95,7 @@ export function Site(props: SiteProps) {
   );
 }
 
-function SceneContents({ scenario, record, plan, pourProgress, pourActive, truckOnSite, truckLeaves, dust, selectedWorker, redFlagWorkers }: SiteProps) {
+function SceneContents({ scenario, record, plan, pourProgress, pourActive, truckOnSite, truckLeaves, dust, selectedWorker, redFlagWorkers, sandbox = false }: SiteProps & { sandbox?: boolean }) {
   const env = record.env;
   const sunDir = useMemo(() => {
     const az = (env.sunAzimuth * Math.PI) / 180;
@@ -127,12 +131,13 @@ function SceneContents({ scenario, record, plan, pourProgress, pourActive, truck
         return (
           <Person
             key={w.id}
+            anchor={!sandbox}
             id={w.id}
             target={spot.at}
             facing={spot.facing}
             look={lookFor(w.id, i, role, w.crew)}
             pose={atBus ? 'stand' : poseFor(t.activity, t.zone)}
-            spawn={spawnFor(scenario, i)}
+            spawn={sandbox ? undefined : spawnFor(scenario, i)}
             selected={w.id === selectedWorker}
             redFlag={redFlagWorkers.includes(w.id)}
             crewColour={CREW_COLOURS[w.crew] ?? '#888'}

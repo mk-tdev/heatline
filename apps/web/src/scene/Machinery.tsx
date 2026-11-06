@@ -1,8 +1,9 @@
 // Illustrative machinery; ambient motion does not model crane operations or worker transport.
-import { useLayoutEffect, useMemo, useRef } from 'react';
+import { useContext, useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { toScene } from './common';
+import { PlaygroundContext } from './explorationState';
 
 type Point = [number, number, number];
 type Member = [Point, Point];
@@ -44,7 +45,9 @@ function mastMembers(height: number, radius: number, step: number): Member[] {
   }
   return out;
 }
-export function Crane({ at, height, jib, turn = 0 }: { at: THREE.Vector3; height: number; jib: number; turn?: number }) {
+export function Crane({ at, height, jib, turn = 0, operable = false }: { at: THREE.Vector3; height: number; jib: number; turn?: number; operable?: boolean }) {
+  const controls = useContext(PlaygroundContext);
+  const playground = operable ? controls : null;
   const slew=useRef<THREE.Group>(null), trolley=useRef<THREE.Group>(null), cable=useRef<THREE.Mesh>(null), hook=useRef<THREE.Group>(null);
   const mast=useMemo(()=>mastMembers(height,.9,3),[height]);
   const boom=useMemo(()=>{
@@ -60,9 +63,9 @@ export function Crane({ at, height, jib, turn = 0 }: { at: THREE.Vector3; height
   const stays=useMemo<Member[]>(()=>[[[0,8,0],[jib*.72,2.6,0]],[[0,8,0],[-jib*.29,2.6,0]],[[0,2.6,0],[0,8,0]]],[jib]);
   useFrame(({clock})=>{
     const t=window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:clock.elapsedTime*.08;
-    const length=height*(.25+.12*(1+Math.sin(t)));
-    if(slew.current) slew.current.rotation.y=turn+Math.sin(t*.35)*.25;
-    if(trolley.current) trolley.current.position.x=jib*(.52+.12*Math.sin(t*.6));
+    const length=playground?.cable ?? height*(.25+.12*(1+Math.sin(t)));
+    if(slew.current) slew.current.rotation.y=playground?.slew ?? turn+Math.sin(t*.35)*.25;
+    if(trolley.current) trolley.current.position.x=playground?.trolley ?? jib*(.52+.12*Math.sin(t*.6));
     if(cable.current) {cable.current.position.y=-length/2;cable.current.scale.y=length;}
     if(hook.current) hook.current.position.y=-length;
   });
@@ -90,6 +93,7 @@ export function Crane({ at, height, jib, turn = 0 }: { at: THREE.Vector3; height
   </group>;
 }
 export function Hoist() {
+  const playground = useContext(PlaygroundContext);
   const cage=useRef<THREE.Group>(null);
   const mast=useMemo(()=>mastMembers(44,.4,1.75),[]);
   const frame=useMemo<Member[]>(()=>{
@@ -108,7 +112,7 @@ export function Hoist() {
     const t=window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:clock.elapsedTime;
     const stops=[0,3,6,9,12,9,6,3,0];
     const leg=Math.floor(t/12)%8, phase=Math.max(0,(t%12-4)/8), ease=phase*phase*(3-2*phase);
-    if(cage.current) cage.current.position.y=.4+(stops[leg]!+(stops[leg+1]!-stops[leg]!)*ease)*3.5;
+    if(cage.current) cage.current.position.y=playground?.lift ?? .4+(stops[leg]!+(stops[leg+1]!-stops[leg]!)*ease)*3.5;
   });
   return <group position={toScene(42,9)}>
     <Box at={[1,.15,0]} size={[5,.3,4.2]} color="#aaa99e"/>

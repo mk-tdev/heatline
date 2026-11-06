@@ -19,7 +19,7 @@ export function SiteA({ scenario, minute, plan, pourProgress, pourActive, truckO
       <Tower scenario={scenario} pourProgress={pourProgress} />
       <Scaffold />
       <Hoist />
-      <Crane at={toScene(50, 34)} height={62} jib={58} turn={2.6} />
+      <Crane operable at={toScene(50, 34)} height={62} jib={58} turn={2.6} />
       <RebarYard yard={zones.get('yard')!} />
       <Materials />
       <Shelter at={zones.get('shelter')!} />
