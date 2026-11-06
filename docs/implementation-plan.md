@@ -25,7 +25,7 @@ Deadlines: registration closes **10 Nov**; prototype due **20 Nov** per Hack2ski
 
 The release candidate must pass all of these, checked by tests or a recorded rehearsal:
 
-1. The 15:00–18:00 shift of **1 Aug 2025** plays end to end from real weather, in under 4 minutes at default speed.
+1. The 15:00–18:00 shift of **19 Aug 2025** plays end to end from real weather, in under 4 minutes at default speed.
 2. Every warning level is produced by the rules engine; the model never sets or lowers a level (test).
 3. The supervisor channel never receives an individual physiological value outside a logged red-flag event (property test over random runs).
 4. A rule-breaking plan is refused with the rule cited, revised at most once, and an approved plan changes crew positions and exposure.
@@ -59,7 +59,9 @@ data/               Scenario JSON, weather JSON (copied from research/data), rul
 | `server` | Own sessions, serialise commands, stream agent turns, hold credentials | Accept client-authored state |
 | `web` | Render, collect commands, show provenance ("what they saw") | Invent outcomes; treat animation as state |
 
-## 4. Scenario specification: "Saadiyat Tower, 1 August 2025"
+## 4. Scenario specification: "Saadiyat Tower, 19 August 2025"
+
+**Status: implemented in M1** (`data/scenario/saadiyat-tower.json`, `packages/sim`). 19 August replaced 1 August after a scan of all 31 days: 1 August was so humid that every zone stayed high-risk all afternoon, leaving no decision to make. On 19 August the deck is high-risk at 15:30 and a shade tent or a later start changes what is lawful.
 
 ### Site
 
@@ -67,7 +69,7 @@ A 14-storey reinforced-concrete frame under construction, about 120 × 80 m, ori
 
 | Zone | Exposure | Notes |
 | --- | --- | --- |
-| Rebar yard (ground, east) | Sun; enters the tower's shadow progressively after ~15:30 | Shadow computed from real sun azimuth/elevation |
+| Rebar yard (ground, east) | Sun; enters the tower's shadow mid-afternoon | Shadow ray-marched from the real sun azimuth/elevation |
 | Level 12 deck | Full sun, more wind | No shade until a tent is placed |
 | West façade scaffold | Sun from early afternoon | Work at height: escalations take longer |
 | Rest cabin (AC) | Cooled | Capacity 8 |
@@ -83,8 +85,8 @@ A 14-storey reinforced-concrete frame under construction, about 120 × 80 m, ori
 | --- | --- | --- | --- |
 | Anwar | B · deck | Bengali | Day 2 on site (unacclimatised), heavy work |
 | Ravi | A · rebar | Hindi | Third summer; wearable battery 6% at 15:00 |
-| Suresh | B · deck (lead) | Malayalam | Acclimatised; tends to skip breaks to finish the pour |
-| Bilal | C · façade | Urdu | Acclimatised; the red-flag case at 16:20 in the default run |
+| Suresh | B · deck (lead) | Malayalam | Acclimatised; skips breaks and pushes through strain warnings to finish the pour; starts 1.3 L short of water; the red-flag case |
+| Bilal | C · façade | Urdu | Acclimatised; starts the afternoon short of water |
 | Joel | C · façade | Tagalog (stretch) / English | Acclimatised |
 | Ahmed | Foreman | Arabic | Relays approved plans |
 
@@ -92,19 +94,29 @@ A 14-storey reinforced-concrete frame under construction, about 120 × 80 m, ori
 
 | Time | Event |
 | --- | --- |
-| 15:00 | Midday ban ends; crews return. Real weather for 1 Aug 2025 (humid sea-breeze day) |
-| 15:30 | Concrete truck arrives for the Level 12 pour (pour must continue ~60 min once started) |
+| 15:00 | Midday ban ends; crews return. Real weather for 19 Aug 2025 (humid sea-breeze afternoon) |
+| 15:30 | Concrete truck arrives for the Level 12 pour (45 min of pour work, at least 5 on the deck at all times; paced work) |
 | 15:40 | Ravi's wearable battery dies |
 | 16:05–16:15 | Site Wi-Fi outage (worker phones keep running cached rules) |
-| 16:20 | Bilal's strain crosses the red-flag threshold **if** no intervention reduced his exposure |
-| 16:45 | Dust surge: humidity up, direct sun down for 25 minutes |
+| 16:43 | Suresh shows confusion **if** the original pour plan is approved (engine outcome) |
+| 17:20 | Dust surge: humidity up, direct sun down for 25 minutes |
 | 18:00 | Shift ends; debrief |
 
-Bilal's 16:20 event is an *outcome* of the engine, not a script: in branches where Crew C rotated earlier, it does not happen. The default-run golden test asserts it does.
+Suresh's red flag is an *outcome* of the engine, not a script: in the branch where the rotation is approved, it does not happen. `tests/engine.test.ts` asserts both.
 
 ### Golden comparison fixture
 
-Decision at 15:10: **A** approve the pour as booked with Crew B intact; **B** approve the planner's rotation (Anwar to Crew A in shadow, Crew B halves on 20/40, shade tent at the hoist, pour at 15:45). Expected: B has fewer worker-minutes at PSI ≥ 7, no unacclimatised exposure over cap, a later pour finish, and zero rule violations. Exact numbers are frozen once the coefficients are final (section 5).
+Decision at 15:10, both branches under Heatline warnings: **A** keep the original schedule; **B** approve the rules planner's plan (tents on the deck and yard; Anwar to light indoor duties; pour crew of 15 including borrowed crew-A workers on 20/40 rotation; water to the zone requirement).
+
+| Measure (frozen snapshot) | A · original | B · protective plan |
+| --- | --- | --- |
+| Worker-minutes at PSI ≥ 7 | 190 | 69 |
+| Worker-minutes at PSI ≥ 9 | 52 | 0 |
+| Red flags | 1 (Suresh, 16:43; cooling at 16:44) | 0 |
+| Rule-violation episodes | 80 | 11 (all before 15:10) |
+| Pour | 15:38–17:06 | 15:30–16:15 |
+
+The protective plan finishes the pour *earlier*, because the original schedule stops the pour for every break, but it costs far more rest minutes elsewhere on site.
 
 ## 5. Environment and physiology model
 
@@ -131,7 +143,7 @@ State per worker: core temperature `Tc`, heart rate `HR`, water deficit `D` (L),
 - **Red flag:** Tc ≥ 39.5 °C or PSI ≥ 9 sustained 3 min triggers symptoms (confusion), with seeded per-worker variation.
 - **Signals:** featured workers with wearables emit HR (with noise, dropouts) and an estimated Tc (with lag and error), so the guardian works from *imperfect* signals, as it would in reality.
 
-Coefficients (`k_*`, `c_*`, `W0`, τ) are chosen so that: an acclimatised worker doing moderate work at WBGT 28 °C stays below PSI 5 for 60 min; heavy work at WBGT 34 °C without rest reaches PSI ≥ 7 within 30–50 min; unacclimatised workers reach thresholds ~30% sooner; a 20-minute AC rest lowers Tc by ~0.4–0.6 °C. These targets are documented with the test that enforces them (`packages/sim/test/calibration.test.ts`). The model is **illustrative**, not validated physiology; the UI and docs say so.
+Coefficients (`k_*`, `c_*`, `W0`, τ) are chosen so that: an acclimatised worker doing moderate work at WBGT 28 °C stays below PSI 5 for 60 min; heavy work at WBGT 34 °C without rest reaches PSI ≥ 7 within 30–50 min; unacclimatised workers reach thresholds ~30% sooner; a 20-minute AC rest lowers Tc by ~0.4–0.6 °C. These targets are documented with the test that enforces them (`tests/physiology.test.ts`). The model is **illustrative**, not validated physiology; the UI and docs say so.
 
 ## 6. Rules engine
 
@@ -149,7 +161,7 @@ Rule tables live in `data/rules/*.json`, each row with a `source` field pointing
 
 **Precedence:** red flag > rules > approved plan > agent suggestion. A warning can be raised by an agent's observation (e.g., a worker says "I feel dizzy"), but never lowered by one.
 
-**Plan validation** checks every proposed assignment minute by minute over the horizon: zone exposure vs schedule, acclimatisation caps, pairs, water access ≥ required L/h, ban window, cabin capacity, crew size for the pour (min 6 on deck while pouring). Output: `{ ok, violations: [{ rule, worker?, crew?, at, detail }] }`.
+**Plan validation** checks every proposed assignment minute by minute over the horizon: zone exposure vs schedule, acclimatisation caps, pairs, water access ≥ required L/h, ban window, cabin capacity, crew size for the pour (min 5 on deck while pouring). Output: `{ ok, violations: [{ rule, worker?, crew?, at, detail }] }`.
 
 ## 7. Agents
 
@@ -282,12 +294,12 @@ Cut order overall (last cut first): forecast mode → Tagalog/Malayalam audio �
 
 | Time | Show | Say |
 | --- | --- | --- |
-| 0:00 | Site at 15:00, shadow sweeping, top bar | "1 August 2025, Saadiyat. Real weather. The midday break just ended. WBGT is still 34 degrees." |
+| 0:00 | Site at 15:00, shadow sweeping, top bar | "19 August 2025, Saadiyat. Real weather. The midday break just ended. WBGT is still 34 degrees." |
 | 0:15 | Anwar's phone, Bengali voice | "Anwar is on his second day. His guardian tells him, in Bengali, to rest now. Only he sees his heart rate." |
 | 0:35 | Noor's crew request; supervisor asks "Can we still pour at 15:30?" | "I see crews, not people's bodies. That line is enforced in code." |
 | 0:55 | Omar's tool steps; plan refused (unacclimatised worker in buffer zone), revised, approved | "The planner can propose anything. The rules decide what's allowed." |
 | 1:25 | Wearable dies, Wi-Fi drops: warnings continue in rules-only mode | "Field-ready means it still works when the battery and the network don't." |
-| 1:45 | (In the as-played branch) Bilal's red flag: escalation, cooling steps | "A red flag is the one time his name reaches me, and he can see that it did." |
+| 1:45 | (In the as-played branch) Suresh's red flag at 16:43: escalation, cooling a minute later | "A red flag is the one time his name reaches me, and he can see that it did." |
 | 2:05 | Rewind to 15:10, side by side | "Same afternoon, one decision changed. Fewer minutes in danger, no red flag, the pour 25 minutes later." |
 | 2:35 | Back-test report | "Across all 31 days of August, in simulation: warning lead time and false alarms, measured." |
 | 2:55 | Forecast mode for tomorrow | "And tomorrow's plan, for any site." |

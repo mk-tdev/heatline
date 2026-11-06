@@ -1,0 +1,30 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`golden comparison: 19 Aug 2025, decision at 15:10 > matches the frozen outcome summary 1`] = `
+{
+  "asPlayed": {
+    "minutesPsi7": 190,
+    "minutesPsi9": 52,
+    "peakCoreC": 39.01,
+    "pour": [
+      "15:38",
+      "17:06",
+    ],
+    "redFlags": 1,
+    "unacclimatisedOverCapMin": 0,
+    "violationEpisodes": 80,
+  },
+  "changed": {
+    "minutesPsi7": 69,
+    "minutesPsi9": 0,
+    "peakCoreC": 38.51,
+    "pour": [
+      "15:30",
+      "16:15",
+    ],
+    "redFlags": 0,
+    "unacclimatisedOverCapMin": 0,
+    "violationEpisodes": 11,
+  },
+}
+`;
