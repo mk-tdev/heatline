@@ -27,6 +27,7 @@ import {
   safetyPrompt,
   toLevers,
   type CrewSummary,
+  LANGUAGE_NAMES,
   type GuardianContext,
   type LeverArgs,
   type PlannerWorld,
@@ -35,6 +36,8 @@ import {
 const PORT = Number(process.env.HEATLINE_API_PORT) || 8787;
 const MODEL = process.env.OPENAI_MODEL || 'gpt-6-luna';
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({ maxRetries: 1 }) : null;
+const TTS_MODEL = process.env.HEATLINE_MODEL_TTS || 'gpt-4o-mini-tts';
+const TTS_VOICE = process.env.HEATLINE_TTS_VOICE || 'coral';
 
 // ---- Input schemas: the projected contexts, nothing more ---------------------------------
 
@@ -240,6 +243,28 @@ async function planner(input: z.infer<typeof PlannerInput>, res: ServerResponse)
   }
 }
 
+// ---- Voice: read the guardian's message aloud (for workers who can't read the screen) ----------
+
+const SpeakInput = z.strictObject({ text: z.string().min(1).max(300), language: Language });
+const speechCache = new Map<string, Buffer>();
+
+async function speak(text: string, language: z.infer<typeof Language>): Promise<Buffer> {
+  const key = `${language}|${text}`;
+  const hit = speechCache.get(key);
+  if (hit) return hit;
+  const audio = await openai!.audio.speech.create({
+    model: TTS_MODEL,
+    voice: TTS_VOICE,
+    input: text,
+    instructions: `Speak in ${LANGUAGE_NAMES[language]}, calmly and clearly, like a kind older colleague on a hot building site. Not rushed, not alarming.`,
+    response_format: 'mp3',
+  });
+  const buf = Buffer.from(await audio.arrayBuffer());
+  if (speechCache.size > 200) speechCache.delete(speechCache.keys().next().value!);
+  speechCache.set(key, buf);
+  return buf;
+}
+
 // ---- HTTP ---------------------------------------------------------------------------------
 
 createServer(async (req, res) => {
@@ -255,6 +280,14 @@ createServer(async (req, res) => {
       const parsed = SafetyInput.safeParse(await readJson(req));
       if (!parsed.success) return send(res, 400, { error: 'invalid crew summaries' });
       return send(res, 200, await safety(parsed.data.clock, parsed.data.crews as CrewSummary[]));
+    }
+    if (req.method === 'POST' && url.pathname === '/api/speak') {
+      if (!openai) return send(res, 503, { error: 'voice needs an OpenAI key' });
+      const parsed = SpeakInput.safeParse(await readJson(req));
+      if (!parsed.success) return send(res, 400, { error: 'invalid speech request' });
+      const audio = await speak(parsed.data.text, parsed.data.language);
+      res.writeHead(200, { 'content-type': 'audio/mpeg', 'cache-control': 'no-store', 'content-length': audio.length });
+      return res.end(audio);
     }
     if (req.method === 'POST' && url.pathname === '/api/planner') {
       const parsed = PlannerInput.safeParse(await readJson(req));

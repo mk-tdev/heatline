@@ -8,10 +8,12 @@ import type { MinuteRecord, Plan, Scenario, Zone } from '@heatline/contracts';
 import { heatZone } from '@heatline/rules';
 import { LabelProjector, anchors } from './labels';
 import { World } from './World';
+import { Life } from './Life';
 import { SiteA } from './SiteA';
 import { Person, lookFor, poseFor } from './Person';
 import { CameraRig, type CameraView } from './CameraRig';
 import { toScene } from './common';
+import type { Line } from '../dialogue';
 
 export const CREW_COLOURS: Record<string, string> = { A: '#4c9be8', B: '#f08a24', C: '#2fb39a' };
 const ZONE_CHIP: Record<string, string> = { unrestricted: '#3aa76d', low: '#b8c43a', medium: '#e8a33d', high: '#e5484d' };
@@ -23,12 +25,14 @@ export interface SiteProps {
   pourProgress: number;
   pourActive: boolean;
   truckOnSite: boolean;
+  truckLeaves: number;
   dust: boolean;
   selectedWorker: string;
   redFlagWorkers: string[];
   view: CameraView;
   viewRevision: number;
   showLabels: boolean;
+  speech?: Line[];
 }
 
 const labelPoint = (zone: Zone) => (zone.id === 'facade' ? toScene(zone.at.x - 7, zone.at.y, 31) : zone.id === 'deck' ? toScene(zone.at.x, zone.at.y, zone.height + 9) : toScene(zone.at.x, zone.at.y, zone.height + 7));
@@ -68,12 +72,26 @@ export function Site(props: SiteProps) {
               {w.name}
             </div>
           ))}
+        {(props.speech ?? []).map((l) => {
+          const who = props.scenario.workers.find((w) => w.id === l.speaker);
+          return (
+            <div key={l.id} id={`lbl-say-${l.speaker}`} className="say" style={{ display: 'none' }}>
+              <div className="say-bubble">
+                <div className="say-native" dir="auto" lang={l.language}>
+                  {l.native}
+                </div>
+                {l.language !== 'en' && <div className="say-english">{l.english}</div>}
+                <div className="say-who">{who?.name ?? l.speaker}</div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </>
   );
 }
 
-function SceneContents({ scenario, record, plan, pourProgress, pourActive, truckOnSite, dust, selectedWorker, redFlagWorkers }: SiteProps) {
+function SceneContents({ scenario, record, plan, pourProgress, pourActive, truckOnSite, truckLeaves, dust, selectedWorker, redFlagWorkers }: SiteProps) {
   const env = record.env;
   const sunDir = useMemo(() => {
     const az = (env.sunAzimuth * Math.PI) / 180;
@@ -89,6 +107,8 @@ function SceneContents({ scenario, record, plan, pourProgress, pourActive, truck
   const zones = useMemo(() => new Map(scenario.zones.map((z) => [z.id, z])), [scenario]);
 
   const spots = useMemo(() => layoutPeople(scenario, record, zones), [scenario, record, zones]);
+  // In the last minutes of the shift everyone walks to the labour bus (except anyone in first aid).
+  const homeTime = record.minute >= scenario.end - 6;
 
   return (
     <>
@@ -97,11 +117,13 @@ function SceneContents({ scenario, record, plan, pourProgress, pourActive, truck
       <hemisphereLight args={['#fff1dc', '#b8925c', dust ? 0.75 : 0.55]} />
       <SunLight direction={sunDir} colour={sunColour} intensity={dust ? 1.1 : 2.7} />
       <World />
-      <SiteA scenario={scenario} minute={record.minute} plan={plan} pourProgress={pourProgress} pourActive={pourActive} truckOnSite={truckOnSite} />
+      <Life />
+      <SiteA scenario={scenario} minute={record.minute} plan={plan} pourProgress={pourProgress} pourActive={pourActive} truckOnSite={truckOnSite} truckLeaves={truckLeaves} />
       {scenario.workers.map((w, i) => {
         const t = record.truth.find((x) => x.worker === w.id)!;
         const role = w.id === 'ahmed' ? 'foreman' : w.id === 'suresh' ? 'lead' : 'worker';
-        const spot = spots.get(w.id)!;
+        const atBus = homeTime && t.zone !== 'first-aid';
+        const spot = atBus ? { at: toScene(54 + (i % 10) * 0.9, -56 - Math.floor(i / 10) * 1.1), facing: Math.PI } : spots.get(w.id)!;
         return (
           <Person
             key={w.id}
@@ -109,10 +131,10 @@ function SceneContents({ scenario, record, plan, pourProgress, pourActive, truck
             target={spot.at}
             facing={spot.facing}
             look={lookFor(w.id, i, role, w.crew)}
-            pose={poseFor(t.activity, t.zone)}
+            pose={atBus ? 'stand' : poseFor(t.activity, t.zone)}
+            spawn={spawnFor(scenario, i)}
             selected={w.id === selectedWorker}
             redFlag={redFlagWorkers.includes(w.id)}
-            labelled={w.featured}
             crewColour={CREW_COLOURS[w.crew] ?? '#888'}
           />
         );
@@ -171,6 +193,12 @@ function SunLight({ direction, colour, intensity }: { direction: THREE.Vector3; 
       />
     </>
   );
+}
+
+/** Everyone starts the shift under the shade shelter (it is just after the midday break) and walks out. */
+function spawnFor(scenario: Scenario, index: number) {
+  const shelter = scenario.zones.find((z) => z.id === 'shelter')!;
+  return toScene(shelter.at.x - 6 + (index % 7) * 2, shelter.at.y - 3 + Math.floor(index / 7) * 2.5);
 }
 
 /** Where each person stands, sits or lies this minute, given their zone and what they are doing. */

@@ -2,7 +2,8 @@
 // second tower going up, a finished residential block across the road, villas, palms, the sea
 // and distant cultural-district silhouettes. Static scenery only; nothing here is simulated.
 
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { PALETTE, rand, toScene } from './common';
 
@@ -402,6 +403,15 @@ function Vehicles() {
 export function Crane({ at, height, jib, turn = 0 }: { at: THREE.Vector3; height: number; jib: number; turn?: number }) {
   const mast = useMemo(() => Array.from({ length: Math.floor(height / 3) }, (_, i) => i), [height]);
   const yellow = PALETTE.steelYellow;
+  const slew = useRef<THREE.Group>(null);
+  const hook = useRef<THREE.Group>(null);
+  const seed = useMemo(() => at.x * 0.13, [at]);
+  // A slow lift cycle: the jib slews back and forth while the load rises and falls on the hook.
+  useFrame(({ clock }) => {
+    const t = clock.elapsedTime * 0.06 + seed;
+    if (slew.current) slew.current.rotation.y = turn + Math.sin(t) * 0.9;
+    if (hook.current) hook.current.position.y = -height * 0.55 + (Math.sin(t * 2.3) + 1) * height * 0.22;
+  });
   return (
     <group position={at}>
       <mesh position={[0, 0.6, 0]} castShadow receiveShadow>
@@ -422,7 +432,7 @@ export function Crane({ at, height, jib, turn = 0 }: { at: THREE.Vector3; height
           <meshStandardMaterial color={yellow} />
         </mesh>
       ))}
-      <group position={[0, height, 0]} rotation-y={turn}>
+      <group ref={slew} position={[0, height, 0]} rotation-y={turn}>
         <mesh position={[0, 1.2, 0]} castShadow>
           <boxGeometry args={[2.4, 2.4, 2.4]} />
           <meshStandardMaterial color="#e9e4d6" />
@@ -443,14 +453,20 @@ export function Crane({ at, height, jib, turn = 0 }: { at: THREE.Vector3; height
           <boxGeometry args={[0.5, 8, 0.5]} />
           <meshStandardMaterial color={yellow} />
         </mesh>
-        <mesh position={[jib * 0.62, -10, 0]}>
-          <boxGeometry args={[0.04, 24, 0.04]} />
-          <meshStandardMaterial color="#333" />
-        </mesh>
-        <mesh position={[jib * 0.62, -22.3, 0]} castShadow>
-          <boxGeometry args={[0.8, 0.8, 0.8]} />
-          <meshStandardMaterial color="#e5484d" />
-        </mesh>
+        <group ref={hook} position={[jib * 0.62, -height * 0.4, 0]}>
+          <mesh position={[0, height * 0.2, 0]}>
+            <boxGeometry args={[0.04, height * 0.4, 0.04]} />
+            <meshStandardMaterial color="#333" />
+          </mesh>
+          <mesh castShadow>
+            <boxGeometry args={[0.8, 0.8, 0.8]} />
+            <meshStandardMaterial color="#e5484d" />
+          </mesh>
+          <mesh position={[0, -1.2, 0]} castShadow>
+            <boxGeometry args={[1, 0.5, 6]} />
+            <meshStandardMaterial color="#7a4a30" metalness={0.4} />
+          </mesh>
+        </group>
       </group>
     </group>
   );

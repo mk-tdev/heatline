@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { dialogueFor } from './dialogue';
 import { crewSummaries, guardianContext, redFlagDisclosures, type GuardianMessage, type SafetyBrief } from '@heatline/agents';
 import { dubaiFlag } from '@heatline/climate';
 import { formatClock } from '@heatline/contracts';
@@ -50,6 +51,7 @@ export function App({ scenarioId, startMode, onBrief, onEvidence }: { scenarioId
   }, []);
 
   // ---- Story beats -----------------------------------------------------------------------------
+  const dialogue = useMemo(() => dialogueFor(world.scenario, branch.run, active === 'plan' && planBranch ? 'plan' : 'original'), [world.scenario, branch.run, active, planBranch]);
   const ctx = useMemo(() => ({ branch: active, run: branch.run }), [active, branch.run]);
   const beatTimes = useMemo(() => BEATS.map((b) => ({ beat: b, at: b.at(ctx) })).filter((x): x is { beat: Beat; at: number } => x.at !== null), [ctx, BEATS]);
 
@@ -256,7 +258,9 @@ export function App({ scenarioId, startMode, onBrief, onEvidence }: { scenarioId
   const finished = branch.run.pourFinishedAt;
   const pourProgress = started === null || minute < started ? 0 : finished !== null && minute >= finished ? 1 : Math.min(0.97, (minute - started) / (finished ? finished - started : scenario.pour.durationMin * 1.5));
   const pourActive = started !== null && minute >= started && (finished === null || minute < finished);
-  const truckOnSite = minute >= scenario.pour.truckArrives - 2 && (finished === null || minute < finished + 8);
+  // The truck leaves after the pour, or straight away if no pour starts within 20 minutes of it arriving.
+  const truckLeaves = finished !== null ? finished + 3 : started !== null ? scenario.end : scenario.pour.truckArrives + 20;
+  const truckOnSite = minute >= scenario.pour.truckArrives - 2 && minute < truckLeaves + 3 && (started !== null || minute < scenario.pour.truckArrives + 20);
   const dust = scenario.weatherModifiers.some((m) => minute >= m.from && minute < m.to);
   const env = record.env;
   const flag = dubaiFlag(env.heatIndex);
@@ -332,9 +336,11 @@ export function App({ scenarioId, startMode, onBrief, onEvidence }: { scenarioId
           pourProgress={pourProgress}
           pourActive={pourActive}
           truckOnSite={truckOnSite}
+          truckLeaves={truckLeaves}
           dust={dust}
           selectedWorker={selected}
           redFlagWorkers={flags.map((f) => f.worker)}
+          speech={dialogue.filter((l) => minute >= l.minute && minute < l.minute + 3).slice(-4)}
           view={view}
           viewRevision={viewRevision}
           showLabels

@@ -19,7 +19,7 @@ export interface Look {
   tablet?: boolean;
 }
 
-export type Pose = 'work-heavy' | 'work-moderate' | 'work-light' | 'rest' | 'cooling';
+export type Pose = 'work-heavy' | 'work-moderate' | 'work-light' | 'rest' | 'cooling' | 'stand';
 
 export function poseFor(activity: Activity, zone: string): Pose {
   if (zone === 'first-aid') return 'cooling';
@@ -29,7 +29,33 @@ export function poseFor(activity: Activity, zone: string): Pose {
   return 'work-light';
 }
 
-export function Person({ id, target, look, pose, facing = 0, selected, redFlag, labelled, crewColour }: { id: string; target: THREE.Vector3; look: Look; pose: Pose; facing?: number; selected: boolean; redFlag: boolean; labelled: boolean; crewColour: string }) {
+export function Person({
+  id,
+  target,
+  spawn,
+  look,
+  pose,
+  facing = 0,
+  selected = false,
+  redFlag = false,
+  anchor = true,
+  crewColour,
+  ring = true,
+}: {
+  id: string;
+  target: THREE.Vector3;
+  /** where the figure first appears; it then walks to `target` */
+  spawn?: THREE.Vector3;
+  look: Look;
+  pose: Pose;
+  facing?: number;
+  selected?: boolean;
+  redFlag?: boolean;
+  /** register a screen anchor (labels and speech bubbles) */
+  anchor?: boolean;
+  crewColour?: string;
+  ring?: boolean;
+}) {
   const root = useRef<THREE.Group>(null);
   const hips = useRef<THREE.Group>(null);
   const torso = useRef<THREE.Group>(null);
@@ -45,10 +71,15 @@ export function Person({ id, target, look, pose, facing = 0, selected, redFlag, 
   const heading = useRef(facing);
 
   useEffect(() => {
-    if (!labelled || !root.current) return;
+    if (!anchor || !root.current) return;
     anchors.set(`w-${id}`, { object: root.current, lift: 2.3 });
-    return () => void anchors.delete(`w-${id}`);
-  }, [id, labelled]);
+    anchors.set(`say-${id}`, { object: root.current, lift: 2.9 });
+    return () => {
+      anchors.delete(`w-${id}`);
+      anchors.delete(`say-${id}`);
+    };
+  }, [id, anchor]);
+  const start = useMemo(() => (spawn ?? target).clone(), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useFrame(({ clock }, dt) => {
     const g = root.current;
@@ -113,6 +144,16 @@ export function Person({ id, target, look, pose, facing = 0, selected, redFlag, 
       set(torso, 0.25);
       set(armL, -0.9 + s * 0.15);
       set(armR, -0.8 - s * 0.15);
+    } else if (pose === 'stand') {
+      // Standing and waiting, a slight shift of weight.
+      const s = Math.sin(t * 0.7);
+      set(legL, s * 0.04);
+      set(legR, -s * 0.04);
+      set(kneeL);
+      set(kneeR);
+      set(torso, 0.02);
+      set(armL, 0.05);
+      set(armR, Math.sin(t * 0.3) > 0.8 ? -1.2 : 0.05);
     } else if (pose === 'rest') {
       // Seated on a bench, a bottle of water now and then.
       set(legL, -1.45);
@@ -147,11 +188,13 @@ export function Person({ id, target, look, pose, facing = 0, selected, redFlag, 
   const reflective = mat('#e6e8ea', { metalness: 0.6, roughness: 0.3 });
 
   return (
-    <group ref={root} position={target}>
-      <mesh rotation-x={-Math.PI / 2} position={[0, 0.04, 0]}>
-        <ringGeometry args={[0.5, selected ? 0.82 : 0.66, 28]} />
-        <meshBasicMaterial color={selected ? '#ffffff' : crewColour} transparent opacity={selected ? 0.95 : 0.75} />
-      </mesh>
+    <group ref={root} position={start}>
+      {ring && (
+        <mesh rotation-x={-Math.PI / 2} position={[0, 0.04, 0]}>
+          <ringGeometry args={[0.5, selected ? 0.82 : 0.66, 28]} />
+          <meshBasicMaterial color={selected ? '#ffffff' : (crewColour ?? '#888')} transparent opacity={selected ? 0.95 : 0.75} />
+        </mesh>
+      )}
       <group ref={hips} position={[0, 0.95, 0]}>
         {/* Legs: thigh → knee → shin → boot */}
         {(

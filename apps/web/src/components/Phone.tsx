@@ -4,6 +4,7 @@
 import type { GuardianContext, GuardianMessage } from '@heatline/agents';
 import { LANGUAGE_NAMES } from '@heatline/agents';
 import type { WorkerProfile } from '@heatline/contracts';
+import { useEffect, useRef, useState } from 'react';
 import type { AgentSource } from '../model';
 import { sourceLabel } from './Console';
 
@@ -65,6 +66,7 @@ export function Phone({
           {message ? message.message : <span className="muted">…</span>}
           {loading && <span className="spinner" />}
         </div>
+        {message && !stale && <Listen text={message.message} language={ctx.language} />}
         {message && <div className={`english${stale ? ' stale' : ''}`}>{stale ? 'Updating… ' : ''}{message.english}</div>}
         <div className="readings">
           <div>
@@ -96,5 +98,44 @@ export function Phone({
         </small>
       </div>
     </aside>
+  );
+}
+
+/** Reads the guardian's message aloud in the worker's language (OpenAI text-to-speech via the server). */
+function Listen({ text, language }: { text: string; language: string }) {
+  const [state, setState] = useState<'idle' | 'loading' | 'playing' | 'off'>('idle');
+  const audio = useRef<HTMLAudioElement | null>(null);
+  useEffect(
+    () => () => {
+      audio.current?.pause();
+      setState((s) => (s === 'off' ? s : 'idle'));
+    },
+    [text],
+  );
+  if (state === 'off') return null;
+  const play = async () => {
+    if (state === 'playing') {
+      audio.current?.pause();
+      return setState('idle');
+    }
+    setState('loading');
+    try {
+      const res = await fetch('/api/speak', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text, language }) });
+      if (!res.ok) return setState(res.status === 503 ? 'off' : 'idle');
+      const url = URL.createObjectURL(await res.blob());
+      audio.current?.pause();
+      const a = new Audio(url);
+      audio.current = a;
+      a.onended = () => (setState('idle'), URL.revokeObjectURL(url));
+      await a.play();
+      setState('playing');
+    } catch {
+      setState('idle');
+    }
+  };
+  return (
+    <button className="listen" onClick={play} disabled={state === 'loading'} title="Read the message aloud, for workers who can't read the screen">
+      {state === 'loading' ? '… preparing voice' : state === 'playing' ? '■ Stop' : '🔊 Listen'}
+    </button>
   );
 }

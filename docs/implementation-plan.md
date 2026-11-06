@@ -256,6 +256,7 @@ Each role has a deterministic fallback: template warnings in all languages (pre-
 
 - Written warnings: EN, AR, HI, UR, BN, ML. Templates are translated once and frozen; model-phrased warnings are checked by script detection and a back-translation eval (section 9).
 - Spoken: OpenAI `gpt-4o-mini-tts`; target EN, AR, HI, UR live (listed languages). Bengali and Malayalam are not in OpenAI's speech language list: test them in M0; if quality is poor, show the written warning and play a short pre-recorded tone plus the worker's name. Cache audio by text hash.
+- Implemented 7 Nov: `/api/speak` plus a Listen button on the phone, with an in-memory cache keyed by language and text. On-site speech bubbles (`dialogue.ts`) show what people say in their own language with English underneath, driven by engine events.
 - Supervisor voice orders: `gpt-transcribe` (EN), transcript editable before sending.
 - Native-speaker review of the template set before the demo is recorded (ask contacts; record who reviewed).
 

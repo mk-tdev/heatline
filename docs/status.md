@@ -61,9 +61,17 @@ Decision recorded: the zone thresholds are a WBGT proxy for TWL (configurable, d
 - Live checks: Omar refused to pour on 1 Aug and planned the 11:30 stair-core pour to finish before 12:30 on 12 Aug. All four stories verified in the browser with no console errors.
 - Tests: **72**.
 
+## A living place and people who talk (7 Nov, team feedback: "feels isolated")
+
+- Neighbourhood around the site: traffic on both roads, pedestrians, apartments with shaded parking, shops, a mosque, the phase-2 tower crew at work, gulls over the shore; cranes slew and carry loads.
+- The concrete mixer drives in from the east road and leaves after the pour (or is sent back). Workers start the shift under the shade shelter and walk to the labour bus in the last six minutes.
+- Speech bubbles (`apps/web/src/dialogue.ts`): authored lines per scenario plus lines driven by engine events (truck, tents, pour start and finish, network down, dust, dead batteries, red flags, crews acknowledging rest). Each bubble is in the speaker's language with English underneath. These are draft translations and need native-speaker review.
+- 🔊 Listen on the worker's phone: `/api/speak` (OpenAI `gpt-4o-mini-tts`, `HEATLINE_MODEL_TTS`, voice `HEATLINE_TTS_VOICE`, cached in memory) reads the guardian message aloud. A Malayalam request returned audio in 2.7 s, but nobody has listened to check the quality yet. The button hides when there is no key.
+- Verified in the browser: Ahmed's opening line, and Biju shouting to Suresh at the 16:43 red flag with Ahmed calling for first aid. No console errors. Tests: **72**.
+
 ## Next
 
 1. Agent evals (30 planner runs, 60 guardian messages) recorded under `docs/eval/`.
 2. Any-decision rewind with split-screen replay; debrief agent citing events.
 3. Back-test harness and report page (31 days × windows × policies).
-4. Voice (`gpt-4o-mini-tts`), forecast mode, field failure visuals, deployment.
+4. Native-speaker check of the bubble lines and spoken Bengali/Malayalam; forecast mode, field failure visuals, deployment.
