@@ -1,5 +1,7 @@
 # Heatline implementation plan
 
+> Historical planning record. Current evidence, limitations and corrected metrics are in [scientific-basis.md](scientific-basis.md) and [status.md](status.md). Earlier “lawful”, TWL-proxy, 86% detection and safety claims below are superseded.
+
 Planning date: 6 November 2026 (Abu Dhabi time). Concept: [`research/06-heatline-concept.md`](../research/06-heatline-concept.md). Evidence: [`research/`](../research/README.md).
 
 Deadlines: registration closes **10 Nov**; prototype due **20 Nov** per Hack2skill (one report says 15 Nov). **Internal release candidate: 15 Nov, 20:00 GST. Submission: 19 Nov.** Everything after 15 Nov is polish, video and documents.

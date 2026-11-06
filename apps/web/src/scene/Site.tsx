@@ -59,7 +59,7 @@ export function Site(props: SiteProps) {
               <span className="zone-dot" style={{ background: ZONE_CHIP[hz] }} />
               <strong>{z.label}</strong>
               <span>
-                WBGT {c.wbgt.toFixed(1)}°C · {hz} risk
+                Est. WBGT {c.wbgt.toFixed(1)}°C · {hz} risk
                 {c.shaded ? ' · shade' : ''}
               </span>
             </div>

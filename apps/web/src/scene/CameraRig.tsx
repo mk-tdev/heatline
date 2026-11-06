@@ -43,7 +43,7 @@ export function CameraRig({ view, revision }: { view: CameraView; revision: numb
     if (flying.current) {
       const v = VIEWS[view];
       destination.current.copy(v.from).normalize().multiplyScalar(v.distance).add(v.target);
-      const k = Math.min(1, dt * 1.6);
+      const k = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : Math.min(1, dt * 1.6);
       c.target.lerp(v.target, k);
       camera.position.lerp(destination.current, k);
       if (camera.position.distanceTo(destination.current) < 0.05) flying.current = false;

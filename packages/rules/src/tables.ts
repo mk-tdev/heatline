@@ -1,3 +1,6 @@
+// DEMONSTRATION POLICY ONLY. No TWL is measured or computed here. WBGT bands are
+// scenario assumptions, not TWL equivalents, NIOSH limits, or UAE compliance criteria.
+// Independent NIOSH exposure screening lives in sim/screening.ts.
 // Rule tables. Every row names its source in research/. Values marked ASSUMPTION are
 // Heatline's configurable defaults, not regulatory text.
 
@@ -12,12 +15,12 @@ export const SOURCES = {
   dubaiFlags: 'Dubai Municipality heat-stress guideline v2.0 (2019) flag colours — research/02',
   psi: 'Moran et al. (1998) PSI bands — research/02 "Physiological strain"',
   proxy:
-    'ASSUMPTION: WBGT thresholds standing in for measured TWL. Chosen so the zones align with ACGIH light-work screening limits (31–32.5 °C WBGT). Configure per site; replace with measured TWL in a pilot.',
+    'DEMONSTRATION ASSUMPTION: WBGT scenario bands only. No equivalence to TWL or regulatory compliance is established. Work/rest defaults borrow the structure of published TWL guidance, not its validity for these WBGT bands.',
 } as const;
 
 /**
- * Heat zone from the WBGT at a work location. Proxy for the TWL zones (see SOURCES.proxy):
- * TWL > 220 unrestricted, 140–220 low, 115–140 medium, < 115 high.
+ * Demonstration band from WBGT at a work location.
+ * These are not TWL zones; see SOURCES.proxy and docs/scientific-basis.md.
  */
 export const ZONE_WBGT_THRESHOLDS = { low: 28, medium: 30.5, high: 32.5 } as const;
 

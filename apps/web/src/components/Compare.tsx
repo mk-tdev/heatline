@@ -6,6 +6,8 @@ import type { Branch } from '../model';
 const rowsFor = (at: number): { label: string; get: (b: Branch) => string | number; better: 'lower' | 'higher' | 'none' }[] => [
   { label: 'Worker-minutes at high strain (PSI ≥ 7)', get: (b) => b.metrics.minutesPsi7, better: 'lower' },
   { label: 'Worker-minutes at severe strain (PSI ≥ 9)', get: (b) => b.metrics.minutesPsi9, better: 'lower' },
+  { label: 'NIOSH screen: hourly windows above limit', get: (b) => `${b.screen.exceededWindows} / ${b.screen.assessedWindows}`, better: 'none' },
+  { label: 'Largest hourly WBGT exceedance', get: (b) => `${b.screen.maxExcessC.toFixed(1)} °C`, better: 'none' },
   { label: 'Red flags', get: (b) => b.metrics.redFlags, better: 'lower' },
   { label: 'Minutes to cooling after a red flag', get: (b) => (b.metrics.minutesToCooling.length ? b.metrics.minutesToCooling.join(', ') : '—'), better: 'none' },
   { label: `Rule-violation episodes after ${formatClock(at)}`, get: (b) => b.run.violations.filter((v) => v.minute >= at).length, better: 'lower' },
@@ -24,7 +26,7 @@ export function Compare({ a, b, onClose, onWatch, title, decisionAt }: { a: Bran
             <strong>
               Rewind · {title}, decision at {formatClock(decisionAt)}
             </strong>
-            <small>Same weather, same people, same events. One decision changed. Simulation outcomes from a teaching model, not clinical predictions.</small>
+            <small>Same weather, same people, same events. One decision changed. Simulation outcomes from a teaching model, not clinical predictions. NIOSH screening uses rolling 60-minute exposure; the first 59 minutes lack prior history. It is not UAE compliance certification.</small>
           </div>
           <button onClick={onClose}>Close</button>
         </header>

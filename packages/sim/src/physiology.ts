@@ -58,6 +58,7 @@ export interface PhysiologyInputs {
   acclimatisationDay: number;
   deficitL: number;
   susceptibility: number;
+  heatScale?: number;
 }
 
 export function steadyStateCore(p: PhysiologyInputs): number {
@@ -65,7 +66,7 @@ export function steadyStateCore(p: PhysiologyInputs): number {
   return (
     COEFF.baseCoreC +
     COEFF.metabolic * (m / 100 - METABOLIC_W.rest / 100) +
-    COEFF.environment * Math.max(0, p.wbgt - COEFF.wbgtOnset) * (m / 300) +
+    (p.heatScale ?? 1) * COEFF.environment * Math.max(0, p.wbgt - COEFF.wbgtOnset) * (m / 300) +
     COEFF.dehydration * p.deficitL +
     COEFF.unacclimatised * (1 - acclimatisation(p.acclimatisationDay)) +
     p.susceptibility

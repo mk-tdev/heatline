@@ -117,11 +117,11 @@ export function DecisionCard({
         <span className="avatar omar">O</span>
         <div>
           <strong>{clock} · Decision</strong>
-          <small>Omar plans; the rules decide what is allowed; you approve.</small>
+          <small>Review a simulated plan. Policy checks are not a safety certification.</small>
         </div>
       </header>
       <div className="ask">
-        <textarea value={state.ask} onChange={(e) => setAsk(e.target.value)} rows={2} disabled={state.running} />
+        <textarea aria-label="Ask the planning assistant" value={state.ask} onChange={(e) => setAsk(e.target.value)} rows={2} disabled={state.running} />
         <button onClick={onAsk} disabled={state.running || !state.ask.trim()}>
           {state.running ? 'Omar is working…' : 'Ask Omar'}
         </button>
@@ -140,10 +140,11 @@ export function DecisionCard({
       {final && (
         <div className={`plan ${final.check.ok ? 'ok' : 'refused'}`}>
           <div className="plan-head">
-            <strong>{final.check.ok ? 'Plan passes every rule' : 'Plan refused by the rules'}</strong>
+            <strong>{final.check.ok ? 'Passes demonstration policy' : 'Plan refused by the rules'}</strong>
             <small>{final.source === 'model' ? `by ${final.model}` : `rules-only (${final.reason})`}</small>
           </div>
           <p>{final.rationale}</p>
+          {final.check.exposureScreen && <p className="science-note"><b>Independent NIOSH screen</b><br />{final.check.exposureScreen.exceededWindows} of {final.check.exposureScreen.assessedWindows} rolling worker-hour windows exceed the screening limit (maximum {final.check.exposureScreen.maxExcessC.toFixed(1)} °C above). Full-shift screen includes pre-decision exposure; first 59 minutes lack prior history. {final.check.exposureScreen.exceededWindows > 0 ? 'Further controls and professional review are needed before real work.' : 'Passing this screen does not certify safety.'}</p>}
           <ul className="levers">
             <li>Tents: {(final.check.plan.tents.map((t) => `${t.zone} at ${formatClock(t.readyAt)}`).join(', ')) || 'none'}</li>
             <li>Pour: {final.check.plan.pourStart === null ? 'not today' : `starts ${formatClock(final.check.plan.pourStart)}`}</li>
@@ -151,13 +152,13 @@ export function DecisionCard({
           </ul>
           {final.check.forecast && (
             <div className="forecast">
-              <span>Forecast to the end of the shift</span>
+              <span>Teaching-model outcome to shift end</span>
               <b>{final.check.forecast.minutesPsi7}</b> high-strain worker-min · <b>{final.check.forecast.redFlags}</b> red flags · pour {final.check.forecast.pourStart ?? '—'}–{final.check.forecast.pourFinish ?? '—'}
             </div>
           )}
           <div className="buttons">
             <button className="primary" onClick={onApprove} disabled={!final.check.ok}>
-              Approve plan
+              Run this simulated plan
             </button>
             <button onClick={onKeep}>Keep original schedule</button>
           </div>

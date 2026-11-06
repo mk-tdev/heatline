@@ -43,6 +43,8 @@ export type Policy = 'baseline' | 'site-flags' | 'heatline';
 
 export interface RunOptions {
   policy: Policy;
+  /** Stress-test assumptions, not measured uncertainty intervals. Truth and observer vary separately. */
+  uncertainty?: { truthCoreOffsetC?: number; truthHeatScale?: number; wearableBiasC?: number; observationWbgtBiasC?: number };
   decisions?: Decision[];
   /** reuse a prepared environment (back-test runs many policies on one day) */
   environment?: SiteEnvironment;
@@ -162,7 +164,7 @@ export function runShift(scenario: Scenario, options: RunOptions): RunResult {
       const shaded = zoneKind !== 'cabin' && condition.shaded;
       const inputs = { activity, wbgt, inCabin: zoneKind === 'cabin', inShade: shaded, acclimatisationDay: w.acclimatisationDay };
 
-      s.core = stepCore(s.core, { ...inputs, deficitL: s.deficit, susceptibility: w.susceptibility });
+      s.core = stepCore(s.core, { ...inputs, deficitL: s.deficit, susceptibility: w.susceptibility + (options.uncertainty?.truthCoreOffsetC ?? 0), heatScale: options.uncertainty?.truthHeatScale });
       s.coreHistory.push(s.core);
       const drink = p.drinkPerMin;
       s.deficit = Math.max(0, s.deficit + sweatRateLph(activity, wbgt) / 60 - drink);
@@ -199,7 +201,11 @@ export function runShift(scenario: Scenario, options: RunOptions): RunResult {
         symptomatic: s.symptomatic,
       });
 
-      const obs = observe(w, s, inputs, activity, zone, minute, scenario.seed);
+      const obs = observe(w, s, { ...inputs, wbgt: inputs.wbgt + (options.uncertainty?.observationWbgtBiasC ?? 0) }, activity, zone, minute, scenario.seed);
+      if (obs.source === 'wearable') {
+        obs.estCoreC += options.uncertainty?.wearableBiasC ?? 0;
+        obs.estPsi = psi(obs.estCoreC, obs.heartRate!);
+      }
       observed.push(obs);
       const warning = evaluateWarning({
         observation: obs,

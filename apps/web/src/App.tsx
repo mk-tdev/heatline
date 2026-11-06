@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { dialogueFor } from './dialogue';
-import { crewSummaries, guardianContext, redFlagDisclosures, type GuardianMessage, type SafetyBrief } from '@heatline/agents';
+import { fallbackGuardianMessage, crewSummaries, guardianContext, redFlagDisclosures, type GuardianMessage, type SafetyBrief } from '@heatline/agents';
 import { dubaiFlag } from '@heatline/climate';
 import { formatClock } from '@heatline/contracts';
 import { Site } from './scene/Site';
@@ -117,38 +117,37 @@ export function App({ scenarioId, startMode, onBrief, onEvidence }: { scenarioId
   const lastBrief = useRef(-1);
   useEffect(() => {
     const slot = minute === DECISION_AT ? DECISION_AT : Math.floor((minute - scenario.start) / 20) * 20 + scenario.start;
-    const key = slot * 10 + (active === 'plan' ? 1 : 0);
+    const key = slot * 10 + (active === 'plan' ? 1 : 0) + (record.networkUp ? 0 : 2);
     if (key === lastBrief.current || briefLoading) return;
     lastBrief.current = key;
     setBriefLoading(true);
     const at = formatClock(minute);
-    askSafety(at, crews)
+    askSafety(at, crews, !record.networkUp)
       .then((b) => setBrief({ ...b, clock: at }))
       .catch(() => {})
       .finally(() => setBriefLoading(false));
-  }, [minute, crews, active, scenario.start, briefLoading, DECISION_AT]);
+  }, [minute, crews, active, scenario.start, briefLoading, DECISION_AT, record.networkUp]);
 
   // ---- Guardian: the selected worker's phone, refreshed when their level or action changes ---
   const gctx = useMemo(() => guardianContext(scenario, record, selected), [scenario, record, selected]);
   const [messages, setMessages] = useState<Record<string, GuardianMessage & AgentSource>>({});
   const [guardianLoading, setGuardianLoading] = useState(false);
-  const guardianKey = `${active}:${selected}:${gctx.level}:${gctx.action}`;
+  const guardianKey = `${active}:${selected}:${gctx.level}:${gctx.action}:${record.networkUp}`;
   const pending = useRef(new Set<string>());
   useEffect(() => {
     if (messages[guardianKey] || pending.current.has(guardianKey)) return;
     pending.current.add(guardianKey);
     setGuardianLoading(true);
-    askGuardian(gctx)
+    askGuardian(gctx, !record.networkUp)
       .then((m) => setMessages((all) => ({ ...all, [guardianKey]: m })))
       .catch(() => {})
       .finally(() => {
         pending.current.delete(guardianKey);
         setGuardianLoading(pending.current.size > 0);
       });
-  }, [guardianKey, gctx, messages]);
-  const lastMessage = useRef<(GuardianMessage & AgentSource) | null>(null);
-  if (messages[guardianKey]) lastMessage.current = messages[guardianKey]!;
-  const shownMessage = messages[guardianKey] ?? (lastMessage.current && guardianKey.startsWith(`${active}:${selected}:`) ? lastMessage.current : null);
+  }, [guardianKey, gctx, messages, record.networkUp]);
+  // A current local action is always available; never display another worker's stale message.
+  const shownMessage = messages[guardianKey] ?? { ...fallbackGuardianMessage(gctx), source: 'rules' as const };
 
   // ---- Decision and story control ------------------------------------------------------------
   const resume = useCallback(() => {
@@ -244,7 +243,7 @@ export function App({ scenarioId, startMode, onBrief, onEvidence }: { scenarioId
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.code !== 'Space' || e.target instanceof HTMLTextAreaElement) return;
+      if (e.code !== 'Space' || (e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement || e.target instanceof HTMLButtonElement)) return;
       e.preventDefault();
       if (beat && !beat.decision && !beat.ending) continueStory();
       else if (!showDecision && !beat) setPlaying((p) => !p);
@@ -279,7 +278,7 @@ export function App({ scenarioId, startMode, onBrief, onEvidence }: { scenarioId
           <small>{longDate(scenario.date)} · real weather</small>
         </div>
         <div className="stat">
-          <span>WBGT sun / shade</span>
+          <span>Estimated WBGT sun / shade</span>
           <b>
             {env.wbgtSun.toFixed(1)} / {env.wbgtShade.toFixed(1)}°C
           </b>
@@ -304,9 +303,9 @@ export function App({ scenarioId, startMode, onBrief, onEvidence }: { scenarioId
           <span>Site network</span>
           <b className={record.networkUp ? '' : 'bad'}>{record.networkUp ? 'up' : 'down · phones on local rules'}</b>
         </div>
-        <div className={`ai ${ai.ai ? 'on' : ''}`}>{ai.ai ? `AI: ${ai.model}` : 'AI off · rules only'}</div>
+        <div className={`ai ${ai.ai ? 'on' : ''}`}>{ai.ai ? 'Assistant connected' : 'Local guidance'}</div>
         <div className="top-actions">
-          <button onClick={() => setShowCompare(true)} disabled={!planBranch}>
+          <button onClick={() => { setPlaying(false); setShowCompare(true); }} disabled={!planBranch}>
             Compare
           </button>
           <button
@@ -353,18 +352,19 @@ export function App({ scenarioId, startMode, onBrief, onEvidence }: { scenarioId
             </button>
           ))}
         </div>
-        {beat && mode === 'story' && <StoryCard beat={beat} ctx={ctx} metrics={branch.metrics} onContinue={continueStory} onDecideAgain={decideAgain} onCompare={() => setShowCompare(true)} onExplore={explore} canCompare={!!planBranch} decisionAt={DECISION_AT} />}
+        {beat && mode === 'story' && <StoryCard beat={beat} ctx={ctx} metrics={branch.metrics} onContinue={continueStory} onDecideAgain={decideAgain} onCompare={() => { setPlaying(false); setShowCompare(true); }} onExplore={explore} canCompare={!!planBranch} decisionAt={DECISION_AT} />}
       </main>
 
       <aside className="console">
+        <div className="panel-heading"><div><h2>Site operations</h2><p>Crew needs, not individual health data</p></div></div>
         <RedFlags flags={flags} />
         {showDecision && <DecisionCard clock={formatClock(DECISION_AT)} state={decision} onAsk={ask} onApprove={approve} onKeep={keep} setAsk={(s) => setDecision((d) => ({ ...d, ask: s }))} />}
         <NoorBrief brief={brief} loading={briefLoading} />
-        <CrewCards crews={crews} />
-        <SiteLog events={branch.run.events} minute={minute} />
+        <details className="panel-section" open><summary>Crew overview <span>{crews.length} crews</span></summary><CrewCards crews={crews} /></details>
+        <details className="panel-section"><summary>Shift activity</summary><SiteLog events={branch.run.events} minute={minute} /></details>
       </aside>
 
-      <Phone workers={featured} selected={selected} onSelect={setSelected} ctx={gctx} message={shownMessage} loading={guardianLoading} stale={!messages[guardianKey]} />
+      <Phone workers={featured} selected={selected} onSelect={setSelected} ctx={gctx} message={shownMessage} loading={guardianLoading} stale={false} offline={!record.networkUp} />
 
       <footer className="timeline">
         <button className="play" onClick={() => !showDecision && !beat && setPlaying((p) => !p)} disabled={showDecision || !!beat}>
@@ -379,6 +379,7 @@ export function App({ scenarioId, startMode, onBrief, onEvidence }: { scenarioId
         </div>
         <div className="track">
           <input
+            aria-label="Shift time"
             type="range"
             min={scenario.start}
             max={scenario.end - 1}
@@ -401,7 +402,7 @@ export function App({ scenarioId, startMode, onBrief, onEvidence }: { scenarioId
             ))}
           </div>
         </div>
-        <small className="disclaimer">Teaching physiology model, real ERA5 weather, published UAE rules. Not clinical advice.</small>
+        <small className="disclaimer">Synthetic workers · historical weather. Demonstration policy, not safety certification.</small>
       </footer>
 
       {showCompare && planBranch && <Compare a={original} b={planBranch} onClose={() => setShowCompare(false)} onWatch={watch} title={scenario.title} decisionAt={DECISION_AT} />}

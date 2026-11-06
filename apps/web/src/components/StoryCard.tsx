@@ -33,7 +33,7 @@ export function StoryCard({ beat, ctx, metrics, onContinue, onDecideAgain, onCom
       )}
       <div className="buttons">
         {beat.decision ? (
-          <span className="hint">← Ask Omar in the panel on the left, then approve his plan or keep the original schedule.</span>
+          <button className="primary" onClick={() => { document.querySelector<HTMLTextAreaElement>('.ask textarea')?.focus(); document.querySelector('.decision')?.scrollIntoView({ block: 'nearest' }); }}>Review the plan in Site operations</button>
         ) : beat.ending ? (
           <>
             <button className="primary" onClick={onDecideAgain}>

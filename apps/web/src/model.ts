@@ -4,7 +4,8 @@
 import template from '../../../data/scenario/saadiyat-tower.json';
 import weather from '../../../data/weather/abu-dhabi-2025-08.json';
 import type { Decision, Minute, Plan, RunResult, Scenario } from '@heatline/contracts';
-import { buildCatalogScenario, createEnvironment, runMetrics, runShift, type OpenMeteoHourly, type RunMetrics, type ScenarioTemplate, type SiteEnvironment } from '@heatline/sim';
+import { screenExposure, type ExposureScreen, buildCatalogScenario, createEnvironment, runMetrics, runShift, type OpenMeteoHourly, type RunMetrics, type ScenarioTemplate, type SiteEnvironment } from '@heatline/sim';
+import { fallbackGuardianMessage, fallbackSafetyBrief } from '@heatline/agents';
 import type { CrewSummary, GuardianContext, GuardianMessage, PlanCheck, SafetyBrief } from '@heatline/agents';
 
 export const FEATURED = ['anwar', 'suresh', 'ravi', 'ahmed', 'bilal', 'joel'] as const;
@@ -24,12 +25,13 @@ export interface Branch {
   label: string;
   run: RunResult;
   metrics: RunMetrics;
+  screen: ExposureScreen;
   plan?: Plan;
 }
 
 export function runBranch(world: World, id: Branch['id'], label: string, decisions: Decision[] = [], plan?: Plan): Branch {
   const run = runShift(world.scenario, { policy: 'heatline', environment: world.environment, decisions });
-  return { id, label, run, metrics: runMetrics(world.scenario, run), plan };
+  return { id, label, run, metrics: runMetrics(world.scenario, run), screen: screenExposure(world.scenario, run), plan };
 }
 
 // ---- API ------------------------------------------------------------------------------------
@@ -50,16 +52,22 @@ export async function health(): Promise<Health> {
 
 export type AgentSource = { source: 'model' | 'rules'; model?: string; ms?: number };
 
-export async function askGuardian(ctx: GuardianContext): Promise<GuardianMessage & AgentSource> {
-  const r = await fetch('/api/guardian', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(ctx) });
-  if (!r.ok) throw new Error(`guardian ${r.status}`);
-  return (await r.json()) as GuardianMessage & AgentSource;
+export async function askGuardian(ctx: GuardianContext, offline = false): Promise<GuardianMessage & AgentSource> {
+  if (offline || ctx.action === 'emergency') return { ...fallbackGuardianMessage(ctx), source: 'rules' };
+  try {
+    const r = await fetch('/api/guardian', { method: 'POST', signal: AbortSignal.timeout(8000), headers: { 'content-type': 'application/json' }, body: JSON.stringify(ctx) });
+    if (!r.ok) throw new Error(`guardian ${r.status}`);
+    return (await r.json()) as GuardianMessage & AgentSource;
+  } catch { return { ...fallbackGuardianMessage(ctx), source: 'rules' }; }
 }
 
-export async function askSafety(clock: string, crews: CrewSummary[]): Promise<SafetyBrief & AgentSource> {
-  const r = await fetch('/api/safety', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ clock, crews }) });
-  if (!r.ok) throw new Error(`safety ${r.status}`);
-  return (await r.json()) as SafetyBrief & AgentSource;
+export async function askSafety(clock: string, crews: CrewSummary[], offline = false): Promise<SafetyBrief & AgentSource> {
+  if (offline) return { ...fallbackSafetyBrief(crews), source: 'rules' };
+  try {
+    const r = await fetch('/api/safety', { method: 'POST', signal: AbortSignal.timeout(8000), headers: { 'content-type': 'application/json' }, body: JSON.stringify({ clock, crews }) });
+    if (!r.ok) throw new Error(`safety ${r.status}`);
+    return (await r.json()) as SafetyBrief & AgentSource;
+  } catch { return { ...fallbackSafetyBrief(crews), source: 'rules' }; }
 }
 
 export type PlannerEvent =

@@ -1,6 +1,18 @@
 # Heatline status
 
-Updated 6 November 2026 (GST).
+Updated 7 November 2026. The section below supersedes older milestone claims.
+
+## Scientific credibility and daylight UI
+
+- Independent NIOSH rolling-hour REL/RAL exposure screening in plan review, replay and the evidence report; demonstration WBGT bands explicitly do not establish TWL equivalence or UAE compliance.
+- Corrected advance-warning accounting: 3,608 / 4,449 episodes (81%), 207 simultaneous, 634 missed. Median lead among detected episodes 37 minutes; false-alert fraction 361 / 3,580 (10%). Old 86% / 36-minute figures below are historical.
+- Five sensitivity variants recorded; combined adverse assumptions reduce advance detection to 2,439 / 4,219 (58%). These are stress tests, not confidence intervals.
+- Sensor-free body temperatures suppressed; hydration qualitative; emergency text fixed with no oral-fluid instruction. Browser-local messages survive failed model calls.
+- Daylight white/slate/blue panels, collapsible crew/activity sections, clearer private-worker preview, responsive stacked layout and keyboard focus styling. 3D scene retained.
+- Verification: 82 tests and TypeScript pass; production build passes (large 3D bundle warning remains). Desktop and 390px browser layouts, plan execution, replay comparison and evidence report checked.
+- See [scientific basis](scientific-basis.md) for assumptions and external validation still required. The physiology model remains unvalidated; no real-world safety certification is claimed.
+
+## Historical milestone log
 
 ## Decisions
 

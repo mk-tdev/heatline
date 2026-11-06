@@ -28,7 +28,8 @@ Rules:
 - Write in the worker's language (given), plus an English version.
 - At most two short sentences. Use the worker's first name. Plain words a tired person can follow.
 - Always state the action given. Never weaken it, never add a different action, never say it is optional.
-- For "emergency": tell them to stop, sit in the shade or the first-aid room, that help is coming, and to drink small sips if they can.
+- For "emergency": use the fixed emergency template. Never advise oral fluids for a confused or unconscious person.
+- This is a synthetic training scenario. Do not describe estimated body temperature or water deficit as measurements. Do not quote those values to the worker.
 - No diagnosis, no medicine, no blame. Do not mention their supervisor or employer.
 - Mention a number only if it appears in the context (minutes, litres).`;
 
@@ -37,7 +38,7 @@ export function guardianPrompt(ctx: GuardianContext): string {
     `Worker: ${ctx.name}, language: ${LANGUAGE_NAMES[ctx.language]}, ${ctx.acclimatised ? 'used to the heat' : `day ${ctx.daysOnSite} on site, not yet used to the heat`}.`,
     `Time ${ctx.clock}. Place: ${ctx.placeLabel}, WBGT ${ctx.wbgt} °C.${ctx.ppe ? ` Wearing a ${ctx.ppe}, which traps heat (counts as +${ctx.clothingAdjustC} °C).` : ''}`,
     `Warning level: ${ctx.level}. Reasons: ${ctx.reasons.join(', ') || 'none'}. Action to give: ${ctx.action}.`,
-    `Their own readings (${ctx.source === 'wearable' ? 'from their wearable' : 'estimated, no wearable'}): body temperature about ${ctx.estCoreC} °C${ctx.heartRate ? `, heart rate ${ctx.heartRate}` : ''}, water deficit about ${ctx.waterDeficitL} L, ${ctx.minutesWorkedWithoutRest} minutes worked without a rest.`,
+    `Synthetic training estimates, not measurements (${ctx.source === 'wearable' ? 'from their wearable' : 'estimated, no wearable'}): body temperature about ${ctx.estCoreC} °C${ctx.heartRate ? `, heart rate ${ctx.heartRate}` : ''}, water deficit about ${ctx.waterDeficitL} L, ${ctx.minutesWorkedWithoutRest} minutes worked without a rest.`,
   ].join('\n');
 }
 
@@ -89,13 +90,13 @@ const TEMPLATES: Record<WarningAction, Record<Language, string>> = {
     tl: '{name}, wala nang trabaho sa init ngayong araw. Pumunta sa tool store para sa trabaho sa loob.',
   },
   emergency: {
-    en: '{name}, stop now and sit down. Help is coming. Sip water slowly.',
-    ar: '{name}، توقف الآن واجلس. المساعدة في الطريق. اشرب الماء ببطء.',
-    hi: '{name}, अभी रुकें और बैठ जाएँ। मदद आ रही है। धीरे-धीरे पानी पिएँ।',
-    ur: '{name}، ابھی رکیں اور بیٹھ جائیں۔ مدد آ رہی ہے۔ آہستہ آہستہ پانی پئیں۔',
-    bn: '{name}, এখনই থামুন এবং বসে পড়ুন। সাহায্য আসছে। ধীরে ধীরে পানি পান করুন।',
-    ml: '{name}, ഇപ്പോൾ നിർത്തി ഇരിക്കുക. സഹായം വരുന്നു. പതുക്കെ വെള്ളം കുടിക്കുക.',
-    tl: '{name}, huminto ngayon at umupo. Paparating na ang tulong. Uminom ng tubig nang dahan-dahan.',
+    en: '{name}, stop now and sit down. Help is coming. Call for first aid now.',
+    ar: '{name}، توقف الآن واجلس. المساعدة في الطريق. اطلب الإسعافات الأولية الآن.',
+    hi: '{name}, अभी रुकें और बैठ जाएँ। मदद आ रही है। अभी प्राथमिक सहायता बुलाएँ।',
+    ur: '{name}، ابھی رکیں اور بیٹھ جائیں۔ مدد آ رہی ہے۔ ابھی ابتدائی طبی امداد بلائیں۔',
+    bn: '{name}, এখনই থামুন এবং বসে পড়ুন। সাহায্য আসছে। এখনই প্রাথমিক চিকিৎসার সাহায্য ডাকুন।',
+    ml: '{name}, ഇപ്പോൾ നിർത്തി ഇരിക്കുക. സഹായം വരുന്നു. ഉടൻ പ്രഥമശുശ്രൂഷയ്ക്കായി വിളിക്കുക.',
+    tl: '{name}, huminto ngayon at umupo. Paparating na ang tulong. Tumawag ng first aid ngayon.',
   },
 };
 

@@ -130,7 +130,7 @@ function world(scenarioId: string, effectiveAt: number, unavailable: string[]): 
 
 async function guardian(ctx: GuardianContext) {
   const t0 = performance.now();
-  if (!openai) return { ...fallbackGuardianMessage(ctx), source: 'rules', ms: 0 };
+  if (!openai || ctx.action === 'emergency') return { ...fallbackGuardianMessage(ctx), source: 'rules', ms: 0 };
   try {
     const response = await withTimeout(15_000, (signal) =>
       openai.responses.parse(

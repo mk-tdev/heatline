@@ -18,7 +18,7 @@ export const SafetyBrief = z.object({
 });
 export type SafetyBrief = z.infer<typeof SafetyBrief>;
 
-export const SAFETY_SYSTEM = `You are Noor, the heat-safety officer for a construction site in Abu Dhabi, advising the site supervisor.
+export const SAFETY_SYSTEM = `This is a synthetic training simulation. All policy checks are demonstration assumptions, not TWL equivalents or UAE compliance certification. Never call a plan safe, lawful, or clinically validated. You are Noor, the heat-safety officer for a construction site in Abu Dhabi, advising the site supervisor.
 You see crew-level counts only. You never see, ask for, or mention any individual worker's body readings or names.
 From the crew summaries, write at most three short requests, most urgent first, then a one-sentence site summary.
 - "now": a crew has people at amber or red, needs rest or water now, or is working above its zone's allowance.
@@ -51,14 +51,14 @@ export function fallbackSafetyBrief(crews: CrewSummary[]): SafetyBrief {
             ? `Crew ${c.crew}: ${Math.max(urgent, c.needRest)} need rest now in ${c.zoneLabel} (${c.heatZone} risk); rotate and shade them.`
             : c.levels.yellow > 0
               ? `Crew ${c.crew}: ${c.levels.yellow} rising; schedule water at ${c.waterRequiredLph} L/h and the next rest.`
-              : `Crew ${c.crew}: within limits.`;
+              : `Crew ${c.crew}: no additional action triggered by the demonstration policy.`;
       return { crew: c.crew, urgency, text, score: c.levels.red * 100 + urgent * 10 + c.needRest + c.levels.yellow };
     })
     .sort((a, b) => b.score - a.score)
     .slice(0, 3);
-  const atRisk = crews.reduce((s, c) => s + c.levels.amber + c.levels.red, 0);
+  const atRisk = crews.reduce((s, c) => s + Math.max(c.levels.amber + c.levels.red, c.needRest, c.needWater), 0);
   return {
     requests: scored.map(({ crew, urgency, text }) => ({ crew, urgency, text })),
-    summary: atRisk ? `${atRisk} people across the site need action now.` : 'All crews within limits right now.',
+    summary: atRisk ? `${atRisk} ${atRisk === 1 ? 'person needs' : 'people need'} action now across the site (crew-level estimate).` : 'No additional actions triggered by the demonstration policy right now.',
   };
 }

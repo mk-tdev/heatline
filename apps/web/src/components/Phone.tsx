@@ -15,7 +15,7 @@ const ACTION_TEXT: Record<string, string> = {
   'rest-shade': 'Rest in the shade',
   'rest-cabin': 'Rest in the cool cabin',
   'stop-work': 'No more heat work today',
-  emergency: 'Stop · help is coming',
+  emergency: 'Stop work · call first aid now',
 };
 const RTL = new Set(['ar', 'ur']);
 
@@ -27,6 +27,7 @@ export function Phone({
   message,
   loading,
   stale,
+  offline,
 }: {
   workers: WorkerProfile[];
   selected: string;
@@ -36,9 +37,11 @@ export function Phone({
   loading: boolean;
   /** the message shown is from an earlier warning state while a new one is written */
   stale: boolean;
+  offline: boolean;
 }) {
   return (
     <aside className="phone-wrap">
+      <div className="panel-heading"><div><h2>Worker guardian</h2><p>Private preview · synthetic worker</p></div><span className="privacy-dot" aria-label="Private view" /></div>
       <div className="tabs">
         {workers.map((w) => (
           <button key={w.id} className={w.id === selected ? 'active' : ''} onClick={() => onSelect(w.id)}>
@@ -66,20 +69,20 @@ export function Phone({
           {message ? message.message : <span className="muted">…</span>}
           {loading && <span className="spinner" />}
         </div>
-        {message && !stale && <Listen text={message.message} language={ctx.language} />}
+        {message && !stale && !offline && <Listen text={message.message} language={ctx.language} />}
         {message && <div className={`english${stale ? ' stale' : ''}`}>{stale ? 'Updating… ' : ''}{message.english}</div>}
         <div className="readings">
           <div>
-            <span>Body temp</span>
-            <b>{ctx.estCoreC.toFixed(1)}°C</b>
+            <span>Body temperature</span>
+            <b>{ctx.source === 'wearable' ? `${ctx.estCoreC.toFixed(1)}°C` : 'Not measured'}</b>
           </div>
           <div>
-            <span>Heart rate</span>
+            <span>Simulated heart rate</span>
             <b>{ctx.heartRate ?? '—'}</b>
           </div>
           <div>
-            <span>Water short</span>
-            <b>{ctx.waterDeficitL.toFixed(1)} L</b>
+            <span>Hydration estimate</span>
+            <b>{ctx.waterDeficitL >= 1 ? 'Needs attention' : 'Keep drinking'}</b>
           </div>
           <div>
             <span>Worked</span>
@@ -88,11 +91,11 @@ export function Phone({
         </div>
         {ctx.ppe && (
           <div className="ppe">
-            Wearing: {ctx.ppe} · counts as +{ctx.clothingAdjustC}°C of heat
+            Wearing: {ctx.ppe} · WBGT clothing adjustment +{ctx.clothingAdjustC}°C
           </div>
         )}
         <small className="muted">
-          {ctx.source === 'wearable' ? 'Readings from their wearable' : 'No wearable signal: estimated from conditions and work'} · {ctx.placeLabel}, {ctx.wbgt.toFixed(1)}°C
+          {ctx.source === 'wearable' ? 'Simulated wearable; body temperature is an estimate' : 'No sensor: exposure-based guidance, not body measurements'} · {ctx.placeLabel}, {ctx.wbgt.toFixed(1)}°C
           <br />
           Guardian: {message ? sourceLabel(message) : '—'} · warning level set by the rules engine
         </small>

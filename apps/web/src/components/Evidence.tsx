@@ -10,10 +10,11 @@ const pct = (a: number, b: number) => (b ? `${Math.round((100 * a) / b)}%` : '�
 const fmt = (n: number) => n.toLocaleString('en-GB');
 
 const MEASURES: { label: string; get: (t: PolicyTotals) => number; lowerIsBetter: boolean; hint: string }[] = [
-  { label: 'Red flags (heat-illness symptoms)', get: (t) => t.redFlags, lowerIsBetter: true, hint: 'incidents' },
+  { label: 'Simulated red-flag events', get: (t) => t.redFlags, lowerIsBetter: true, hint: 'incidents' },
   { label: 'Worker-minutes at severe strain (PSI ≥ 9)', get: (t) => t.workerMinutesPsi9, lowerIsBetter: true, hint: 'exposure' },
   { label: 'Worker-minutes at high strain (PSI ≥ 7)', get: (t) => t.workerMinutesPsi7, lowerIsBetter: true, hint: 'exposure' },
-  { label: 'Rule-violation episodes', get: (t) => t.violationEpisodes, lowerIsBetter: true, hint: 'compliance' },
+  { label: 'Rule-violation episodes', get: (t) => t.violationEpisodes, lowerIsBetter: true, hint: 'demonstration policy' },
+  { label: 'NIOSH screening exceedances', get: (t) => t.nioshExceededWindows, lowerIsBetter: true, hint: `${fmt(r.totals['heatline-plan'].nioshAssessedWindows)} overlapping windows per policy; first 59 min excluded` },
   { label: 'Rest worker-minutes', get: (t) => t.restWorkerMinutes, lowerIsBetter: false, hint: 'lost work time (the cost)' },
   { label: 'Pours completed', get: (t) => t.poursFinished, lowerIsBetter: false, hint: 'productivity' },
 ];
@@ -27,7 +28,7 @@ export function Evidence({ onClose }: { onClose: () => void }) {
       <div className="evidence">
         <header>
           <div>
-            <strong>August 2025 evidence report</strong>
+            <strong>August 2025 simulation evidence</strong>
             <small>
               {r.days} days × {r.windows.length} shift windows ({r.windows.map((x) => x.label).join(', ')}) × {r.policies.length} policies = {shifts} shifts per policy, 20 workers each. Real ERA5 weather for Saadiyat.
             </small>
@@ -35,11 +36,12 @@ export function Evidence({ onClose }: { onClose: () => void }) {
           <button onClick={onClose}>Close</button>
         </header>
 
+        <p className="science-note">Synthetic workers, historical gridded weather and an illustrative physiology model. These are scenario experiments, not measured health outcomes. A plan can pass the demonstration policy and still exceed an independent exposure screen.</p>
         <section className="ev-kpis">
           <div>
             <b>{pct(w.detected, w.episodes)}</b>
             <span>
-              of {fmt(w.episodes)} high-strain episodes warned in advance (amber or red within 60 min before)
+              of {fmt(w.episodes)} high-strain episodes warned in advance (amber or red 1–60 min before)
             </span>
           </div>
           <div>
@@ -49,7 +51,7 @@ export function Evidence({ onClose }: { onClose: () => void }) {
           <div>
             <b>{pct(w.falseAlarms, w.warningOnsets)}</b>
             <span>
-              false alarms: {fmt(w.falseAlarms)} of {fmt(w.warningOnsets)} amber warnings not followed by high strain within an hour
+              false-alert fraction: {fmt(w.falseAlarms)} of {fmt(w.warningOnsets)} assessable amber/red onsets without high strain within an hour
             </span>
           </div>
           <div>
@@ -122,10 +124,16 @@ export function Evidence({ onClose }: { onClose: () => void }) {
           </tbody>
         </table>
 
+        <h4>Sensitivity to unvalidated assumptions</h4>
+        <p className="science-note">Each variant repeats all 93 shifts with the same policies. Perturbations are engineering stress tests, not confidence intervals. The observer and simulated truth still share a model family; independent field validation remains outstanding.</p>
+        <table><thead><tr><th>Assumption tested</th><th>Advance warnings</th><th>False-alert fraction</th><th>Red flags: baseline / plan</th></tr></thead><tbody>
+          {r.sensitivity?.map((s) => <tr key={s.label}><td>{s.label}<small>{s.assumptions}</small></td><td>{pct(s.detected, s.episodes)}<small>{s.detected} / {s.episodes}</small></td><td>{pct(s.falseAlarms, s.warningOnsets)}<small>{s.falseAlarms} / {s.warningOnsets}</small></td><td>{s.baselineRedFlags} / {s.planRedFlags}</td></tr>)}
+        </tbody></table>
         <div className="ev-notes">
+          <p><b>Accounting.</b> {w.simultaneous} episodes were warned only at onset; {w.missed} had no warning by onset. {w.leftCensored} workers already had high strain at shift start and are excluded from detection. {w.rightCensored} warning onsets lack an outcome and a full follow-up hour and are excluded from the false-alert denominator. Lead-time statistics include detected episodes only; episodes are not independent workers.</p>
+          <p><b>Independent screen.</b> Rolling 60-minute mean WBGT (including clothing adjustment and rest location) and mean metabolic workload are compared with NIOSH REL/RAL curves. The first 59 minutes have insufficient prior exposure history. This is occupational screening on synthetic inputs, not UAE compliance certification. <a href="https://www.cdc.gov/niosh/docs/2016-106/pdfs/2016-106.pdf" target="_blank" rel="noreferrer">NIOSH criteria</a>.</p>
           <p>
-            <b>What this shows.</b> Per-worker warnings alone cut high-strain exposure most, but people who push through warnings still get hurt; an approved plan that enforces rotation, shade and water removes the red flags. Safety has a cost:
-            rest time rises, and on {r.totals['heatline-plan'].shifts - r.totals['heatline-plan'].poursFinished} shifts no lawful pour start existed.
+            <b>What this shows.</b> In this model, scheduled shade, rotation and rest reduce simulated strain. The default protective-plan runs produce {r.totals['heatline-plan'].redFlags} red flags, with more rest and {r.totals['heatline-plan'].shifts - r.totals['heatline-plan'].poursFinished} shifts without a completed pour. This does not establish injury prevention or permission to work.
           </p>
           <p>
             <b>How it is measured.</b> Lead time and false alarms come from runs with no intervention, comparing the warning system (which sees only noisy wearables or estimates) against the simulation’s true strain. {r.note}

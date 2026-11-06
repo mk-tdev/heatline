@@ -7,7 +7,18 @@ import { runBacktest, type OpenMeteoHourly, type ScenarioTemplate } from '@heatl
 
 const t0 = performance.now();
 const report = runBacktest(template as ScenarioTemplate, weather as OpenMeteoHourly);
-mkdirSync('data/backtest', { recursive: true });
+report.sensitivity = [];
+for (const variant of [
+  { label: 'Higher heat response', assumptions: 'Truth heat coefficient +25%; observer unchanged', uncertainty: { truthHeatScale: 1.25 } },
+  { label: 'Lower heat response', assumptions: 'Truth heat coefficient −25%; observer unchanged', uncertainty: { truthHeatScale: 0.75 } },
+  { label: 'Wearable under-reading', assumptions: 'All wearable core estimates −0.3 °C', uncertainty: { wearableBiasC: -0.3 } },
+  { label: 'Exposure underestimated', assumptions: 'Environment-only estimator WBGT −2 °C', uncertainty: { observationWbgtBiasC: -2 } },
+  { label: 'Combined adverse assumptions', assumptions: 'Truth +0.2 °C, heat response +25%, wearable −0.3 °C, estimator WBGT −2 °C', uncertainty: { truthCoreOffsetC: 0.2, truthHeatScale: 1.25, wearableBiasC: -0.3, observationWbgtBiasC: -2 } },
+]) {
+  const r = runBacktest(template as ScenarioTemplate, weather as OpenMeteoHourly, 31, variant.uncertainty);
+  report.sensitivity.push({ label: variant.label, assumptions: variant.assumptions, detected: r.warning.detected, episodes: r.warning.episodes, falseAlarms: r.warning.falseAlarms, warningOnsets: r.warning.warningOnsets, baselineRedFlags: r.totals['no-action'].redFlags, planRedFlags: r.totals['heatline-plan'].redFlags });
+}
+mkdirSync('data/backtest' , { recursive: true });
 writeFileSync('data/backtest/august-2025.json', JSON.stringify(report, null, 1));
 const median = (xs: number[]) => (xs.length ? [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)] : null);
 console.log(`Back-test: ${report.days} days × ${report.windows.length} windows × ${report.policies.length} policies in ${((performance.now() - t0) / 1000).toFixed(1)} s`);

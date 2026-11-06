@@ -33,15 +33,15 @@ export function Intro({ onStart, onEvidence }: { onStart: (scenario: string, mod
           </div>
           <h1>The midday break covers two and a half hours. The heat doesn’t stop at three.</h1>
           <p className="lede">
-            A live digital twin of a construction site on Saadiyat Island, Abu Dhabi, driven by real August 2025 weather. Every worker has a guardian that warns them in their own language. The supervisor sees crews, never bodies, plans with an assistant whose
-            proposals are checked against UAE heat rules, and can rewind the shift to see what a different decision would have changed.
+            A replayable training simulation of a construction site on Saadiyat Island, Abu Dhabi, driven by real August 2025 weather. Every worker has a guardian that warns them in their own language. The supervisor sees crews, never bodies, plans with an assistant whose
+            proposals are checked against a labelled demonstration policy, and can rewind the shift to see what a different decision would have changed.
           </p>
         </header>
 
         <section className="intro-grid">
           <div className="intro-card">
             <h2>Why it matters</h2>
-            <p>In August 2025 near Saadiyat, the wet-bulb globe temperature stayed at or above 31 °C on every day from noon to 6 pm. The midday break (12:30–15:00) removes about 2½ of those hours. The rest has to be managed person by person, crew by crew.</p>
+            <p>In August 2025 near Saadiyat, our weather-based estimate of wet-bulb globe temperature stayed at or above 31 °C on every day from noon to 6 pm. The midday break (12:30–15:00) removes about 2½ of those hours. The rest has to be managed person by person, crew by crew.</p>
           </div>
           <div className="intro-card">
             <h2>Your role</h2>
@@ -53,7 +53,7 @@ export function Intro({ onStart, onEvidence }: { onStart: (scenario: string, mod
           <div className="intro-card">
             <h2>What it covers</h2>
             <p>Dynamic heat-risk assessment · graded multilingual warnings · worker-first data governance · field-ready fallback · supervisor decision support · safety and productivity measures across a whole month.</p>
-            <button onClick={onEvidence}>Open the August evidence report →</button>
+            <button onClick={onEvidence}>Explore the simulation evidence</button>
           </div>
         </section>
 
@@ -110,7 +110,7 @@ export function Intro({ onStart, onEvidence }: { onStart: (scenario: string, mod
             ))}
           </div>
           <small className="fictional">
-            Characters are fictional. Weather, UAE rules and heat-stress standards are real; the body model is a teaching simulation, not clinical advice. {ai ? 'AI assistants are live.' : 'AI is unavailable: running on rules only.'}
+            Characters are fictional. Historical weather drives a teaching model. Demonstration rules are not UAE compliance certification; see the evidence report for independent screening and limitations. {ai ? 'AI assistants are live.' : 'AI is unavailable: running on rules only.'}
           </small>
         </section>
       </div>

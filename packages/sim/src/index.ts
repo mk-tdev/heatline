@@ -6,3 +6,5 @@ export { runMetrics, type RunMetrics } from './metrics';
 export * as physiology from './physiology';
 export { SCENARIOS, scenarioSpec, buildCatalogScenario, type ScenarioSpec } from './catalog';
 export { runBacktest, warningPerformance, WINDOWS, POLICIES, type BacktestReport, type BacktestPolicy, type PolicyTotals, type WarningPerformance } from './backtest';
+
+export { nioshLimitC, screenExposure, type ExposureScreen } from './screening';

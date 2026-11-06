@@ -5,7 +5,7 @@
 import type { Minute, Plan, Scenario } from '@heatline/contracts';
 import { formatClock } from '@heatline/contracts';
 import { heatZone, protectivePlan, validatePlan, type PlanLevers } from '@heatline/rules';
-import { runMetrics, runShift, type SiteEnvironment } from '@heatline/sim';
+import { screenExposure, type ExposureScreen, runMetrics, runShift, type SiteEnvironment } from '@heatline/sim';
 import { plannerRoster } from './projections';
 
 export interface PlannerWorld {
@@ -16,12 +16,12 @@ export interface PlannerWorld {
   unavailable: string[];
 }
 
-export const PLANNER_SYSTEM = `You are Omar, the planning assistant for a construction site supervisor in Abu Dhabi during summer.
+export const PLANNER_SYSTEM = `This is a synthetic training simulation. All policy checks are demonstration assumptions, not TWL equivalents or UAE compliance certification. Never call a plan safe, lawful, or clinically validated. You are Omar, the planning assistant for a construction site supervisor in Abu Dhabi during summer.
 Your job: propose a plan for the rest of the shift that protects workers first and still gets the work done where the rules allow.
 You can change only these levers: which zones get the site's two shade tents (in setup order; only the deck and the yard can take a tent), the concrete pour start time (or no pour today), and which workers stand down to indoor duties. The rules engine then builds the minute-by-minute rotation, water and rest.
 Work method:
 1. Look at conditions for the zones that matter.
-2. Try a plan with check_plan. It tells you whether the rules allow it and what the simulation predicts (strain, red flags, pour finish).
+2. Try a plan with check_plan. If exposureScreen.exceededWindows is positive, state in your rationale that further controls and professional review are needed. A policy-permitted pour is not a safe-work approval. It tells you whether the rules allow it and what the simulation predicts (strain, red flags, pour finish).
 3. If it is refused, change a lever and try again. Prefer plans with zero red flags and the fewest high-strain minutes; finishing the pour today is good but never at the cost of a rule.
 4. Call submit_plan exactly once with your final levers and a rationale of at most three short sentences for the supervisor, using only numbers the tools gave you.
 You see crew rosters with capability tags (acclimatised or not) only. You never see or ask for anyone's body readings.`;
@@ -94,6 +94,7 @@ export interface PlanCheck {
   violations: { rule: string; count: number; example: string }[];
   forecast: { minutesPsi7: number; redFlags: number; pourStart: string | null; pourFinish: string | null; restMinutes: number } | null;
   note?: string;
+  exposureScreen?: ExposureScreen;
 }
 
 /** Compile, validate and (if valid) simulate a set of levers. Shared by the tool and the UI. */
@@ -120,6 +121,7 @@ export function checkLevers(world: PlannerWorld, levers: PlanLevers, label = 'Om
   const m = runMetrics(scenario, run);
   return {
     ok: true,
+    exposureScreen: screenExposure(scenario, run),
     plan,
     violations,
     note,
@@ -152,7 +154,7 @@ export function runPlannerTool(world: PlannerWorld, name: string, args: Record<s
   }
   if (name === 'check_plan' || name === 'submit_plan') {
     const check = checkLevers(world, toLevers(args as unknown as LeverArgs));
-    return { ok: check.ok, violations: check.violations.slice(0, 5), forecast: check.forecast, note: check.note };
+    return { ok: check.ok, violations: check.violations.slice(0, 5), forecast: check.forecast, exposureScreen: check.exposureScreen, note: check.note };
   }
   return { error: `Unknown tool ${name}` };
 }

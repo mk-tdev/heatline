@@ -1,5 +1,7 @@
 # 02 · Heat-stress science and standards
 
+> Review update, 7 November 2026: the prototype uses explicitly labelled demonstration WBGT bands, not measured TWL. An independent NIOSH rolling-hour exposure screen now reports exceedances. See [current scientific basis](../Heatline/docs/scientific-basis.md) for formulas, primary sources, corrected evaluation and limitations. No prototype plan is certified safe or UAE-compliant.
+
 Researched 6 November 2026. This is the evidence base for Heatline's physiology and warning engine. It is **not** clinical guidance; values used in the build must cite the row they come from.
 
 ## The indices and what each is good for
@@ -24,7 +26,7 @@ Clothing adjustment factors are added to measured WBGT: work clothes / woven cov
 
 ### TWL zones — the UAE regulatory frame
 
-Primary source read: **Sharjah OSHJ-CoP-33 "Safety in Heat", Version 2 Rev 0, July 2024** (PDF saved in `evidence/`). Abu Dhabi's OSHAD CoP 11.0 (Safety in Heat, 2013) uses the same TWL approach per secondary sources; the OSHAD document itself was not retrieved.
+Primary source read: **Sharjah OSHJ-CoP-33 "Safety in Heat", Version 2 Rev 0, July 2024** (PDF saved in `evidence/`). The official [Abu Dhabi ADOSH-SF CoP 11.0 v4.0, July 2024](https://www.adphc.gov.ae/-/media/Project/ADPHC/ADPHC/PDF/OSHAD-SF/Codes-of-Practise/11---Safety-in-the-Heat-v31-English.pdf) was retrieved during the 7 November review; it explicitly requires environmental assessment using TWL and a site-specific heat-stress programme.
 
 TWL is "the maximum rate at which heat can be lost to the environment" in W/m², assuming hydrated, acclimatised, self-paced workers. Computed from dry bulb, wet bulb, globe temperature and wind.
 
