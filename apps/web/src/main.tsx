@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App, type Mode } from './App';
 import { Intro } from './components/Intro';
+import { LandingExplore } from './scene/LandingExplore';
 import { Evidence } from './components/Evidence';
 import './styles.css';
 import './experience.css';
@@ -22,10 +23,13 @@ function Root() {
   const [run, setRun] = useState<{ scenario: string; mode: Mode; key: number } | null>(null);
   const [desktopNotice, setDesktopNotice] = useState(false);
   const [evidence, setEvidence] = useState(false);
+  const [playground, setPlayground] = useState(false);
+  const needsDesktop = () => window.innerWidth < 1024 || /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   return (
     <>
       {run && <App key={run.key} scenarioId={run.scenario} startMode={run.mode} onBrief={() => setRun(null)} onEvidence={() => setEvidence(true)} />}
-      {!run && <Intro onStart={(scenario, mode) => { if (window.innerWidth < 1024 || /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) setDesktopNotice(true); else setRun({ scenario, mode, key: Date.now() }); }} onEvidence={() => setEvidence(true)} />}
+      {!run && <Intro onExploreFoot={() => { if (needsDesktop()) setDesktopNotice(true); else setPlayground(true); }} onStart={(scenario, mode) => { if (needsDesktop()) setDesktopNotice(true); else setRun({ scenario, mode, key: Date.now() }); }} onEvidence={() => setEvidence(true)} />}
+      {playground && <LandingExplore onClose={() => setPlayground(false)} />}
       {desktopNotice && <DesktopNotice onClose={() => setDesktopNotice(false)} />}
       {evidence && <Evidence onClose={() => setEvidence(false)} />}
     </>

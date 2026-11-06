@@ -73,7 +73,7 @@ Vercel hosts the web app and API functions. GitHub pushes to `main` deploy the p
 
 ### Explore on foot — just for fun
 
-Inside a scenario, click **Explore on foot**. Use **WASD** to walk, **Shift** to move faster, and drag to look; arrow keys also turn and walk. Approach the lift or crane base and press **E**, or use the on-screen shortcuts. Ride to level 12 and step onto the roof; in the crane, use **A/D** to rotate, **W/S** for the trolley, and **Q/E** for the hook. **Esc** returns to your shift.
+Click **Explore on foot** directly on the landing page to enter a standalone playground without starting a shift or calling an assistant. You can also open it inside a scenario. Use **WASD** to walk, **Shift** to move faster, and drag to look; arrow keys also turn and walk. Approach the lift or crane base and press **E**, or use the on-screen shortcuts. Ride to level 12 and step onto the roof; in the crane, use **A/D** to rotate, **W/S** for the trolley, and **Q/E** for the hook. **Esc** returns to your shift.
 
 This is a disposable copy of the visible site. Exploration has its own camera and machinery state, makes no assistant calls, and cannot modify workers, plans, outcomes or playback controls. The original simulation keeps its normal playback and decision pauses underneath.
 

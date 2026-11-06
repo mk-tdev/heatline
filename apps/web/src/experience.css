@@ -381,3 +381,9 @@
   .worksite-tour .tour-location { left: 8px; top: 78px; }
   .worksite-tour .tour-controls { bottom: 8px; max-width: calc(100% - 16px); padding: 9px 10px; max-height: 35vh; }
 }
+
+.hero-playground { display: flex; align-items: center; gap: 14px; margin-top: 14px; }
+.hero-playground > span { font-size: 11px; line-height: 1.6; color: #c6dedb; }
+.welcome .hero-playground button { flex-shrink: 0; padding: 11px 16px; min-height: 42px; background: #a9d9cd18; border-color: #a9d9cd88; color: #edf5ee; }
+.welcome .hero-playground button:hover:not(:disabled) { background: #a9d9cd; color: #153e50; }
+@media (max-width: 700px) { .hero-playground { flex-wrap: wrap; gap: 8px; } .hero-playground > span { font-size: 10px; } }

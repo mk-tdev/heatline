@@ -8,7 +8,7 @@ type Mode = 'walk' | 'lift' | 'crane';
 interface Tour { x: number; z: number; deck: boolean; yaw: number; pitch: number; mode: Mode; destination: number }
 
 /** A disposable visual sandbox. Only onClose crosses back into the application. */
-export function WorksiteExplore({ children, onClose }: { children: ReactNode; onClose: () => void }) {
+export function WorksiteExplore({ children, onClose, returnLabel = 'Back to shift' }: { children: ReactNode; onClose: () => void; returnLabel?: string }) {
   const machinery = useRef({ lift: .4, slew: 2.6, trolley: 30, cable: 24 });
   const tour = useRef<Tour>({ x: 49, z: 14, deck: false, yaw: .25, pitch: 0, mode: 'walk', destination: .4 });
   const keys = useRef(new Set<string>());
@@ -32,7 +32,7 @@ export function WorksiteExplore({ children, onClose }: { children: ReactNode; on
   };
   const close = () => { keys.current.clear(); onClose(); };
   useEffect(() => {
-    const app = document.querySelector<HTMLElement>('.app');
+    const app = document.getElementById('root');
     const oldInert = app?.inert;
     const previous = document.activeElement as HTMLElement | null;
     if (app) app.inert = true;
@@ -73,7 +73,7 @@ export function WorksiteExplore({ children, onClose }: { children: ReactNode; on
         <Walker tour={tour.current} machinery={machinery.current} keys={keys.current} onNear={setNear} onFloor={setFloor} onMoving={setLocked} />
       </Canvas>
     </PlaygroundContext.Provider>
-    <header className="tour-header"><div><span className="tour-dot"/><strong id="tour-title">Explore on foot</strong><p>Free exploration · separate from your shift</p></div><button ref={exit} onClick={close}>Back to shift <kbd>Esc</kbd></button></header>
+    <header className="tour-header"><div><span className="tour-dot"/><strong id="tour-title">Explore on foot</strong><p>Free exploration · separate from your shift</p></div><button ref={exit} onClick={close}>{returnLabel} <kbd>Esc</kbd></button></header>
     <span className="tour-crosshair" aria-hidden="true">+</span>
     <div className="tour-location" aria-live="polite">{mode === 'crane' ? 'Tower crane · operator view' : mode === 'lift' ? `Construction lift · ${floor}` : tour.current.deck ? 'Level 12 · rooftop walk' : 'Saadiyat Tower · ground walk'}</div>
     <section className="tour-controls">

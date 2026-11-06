@@ -12,7 +12,7 @@ const dateLabel = (iso: string) => new Date(`${iso}T12:00:00`).toLocaleDateStrin
 const MOODS = ['afternoon', 'morning', 'humid', 'storm'];
 const ICONS = ['☀', '◷', '◌', '≋'];
 
-export function Intro({ onStart, onEvidence }: { onStart: (scenario: string, mode: Mode) => void; onEvidence: () => void }) {
+export function Intro({ onStart, onEvidence, onExploreFoot }: { onExploreFoot: () => void; onStart: (scenario: string, mode: Mode) => void; onEvidence: () => void }) {
   const [ai, setAi] = useState(false);
   const [motion, setMotion] = useState(() => !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   useEffect(() => void health().then((h) => setAi(h.ai)), []);
@@ -35,6 +35,7 @@ export function Intro({ onStart, onEvidence }: { onStart: (scenario: string, mod
           <h1>The heat doesn’t<br />stop at three.</h1>
           <p className="hero-description">The midday break is over. The people building tomorrow still need protecting. Step onto their site—and see what one better decision can change.</p>
           <div className="hero-actions"><button className="hero-start" onClick={() => onStart('afternoon-pour', 'story')}><span className="play-glyph" aria-hidden="true">▶</span> Step into the site</button><button className="hero-secondary" onClick={choose}>Explore the scenarios <span aria-hidden="true">↓</span></button></div>
+          <div className="hero-playground"><button className="hero-secondary" onClick={onExploreFoot}>Explore on foot</button><span>Walk, ride the lift, operate the crane.<br />Just for fun. No simulation started.</span></div>
           <p className="hero-footnote">A playable 3D experience. Historical weather. Human decisions.</p>
         </div>
         <HeroShift />
