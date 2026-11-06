@@ -45,6 +45,13 @@ Decision recorded: the zone thresholds are a WBGT proxy for TWL (configurable, d
 - Fixes found in the browser: tents restricted to tentable zones (Omar had put one on the scaffold; new `tent-placement` rule); drei `<Html>` labels replaced by projected DOM labels (they were disappearing and logging errors); stale guardian text dimmed.
 - Tests: **53**.
 
+## Story mode and realism (6 Nov, after team feedback)
+
+- Entry screen with scenario brief, real conditions, role and six characters.
+- Nine story beats with camera fly-tos and worker selection; ending with decide-again, compare and explore.
+- Scene rebuilt as a Saadiyat district (two towers under construction, finished block, villas, site facilities, roads, sea) and articulated, UAE-authentic workers.
+- Browser-verified both branches: plan approved (0 red flags, pour 15:30–16:15) and original schedule (Suresh red flag 16:43 with live Malayalam emergency message). No console errors.
+
 ## Next
 
 1. Agent evals (30 planner runs, 60 guardian messages) recorded under `docs/eval/`.

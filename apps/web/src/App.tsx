@@ -3,13 +3,18 @@ import { crewSummaries, guardianContext, redFlagDisclosures, type GuardianMessag
 import { dubaiFlag } from '@heatline/climate';
 import { formatClock } from '@heatline/contracts';
 import { Site } from './scene/Site';
+import type { CameraView } from './scene/CameraRig';
 import { CrewCards, DecisionCard, NoorBrief, RedFlags, SiteLog, type DecisionState } from './components/Console';
 import { Phone } from './components/Phone';
 import { Compare } from './components/Compare';
+import { Intro } from './components/Intro';
+import { StoryCard } from './components/StoryCard';
+import { BEATS, type Beat } from './story';
 import { DECISION_AT, FEATURED, askGuardian, askPlanner, askSafety, health, loadWorld, runBranch, type AgentSource, type Branch, type Health } from './model';
 
 const SPEEDS = [1, 2, 4, 8]; // simulated minutes per real second
 const DEFAULT_ASK = 'The concrete truck is booked for 15:30. Can we still pour today without putting anyone at risk?';
+type Mode = 'intro' | 'story' | 'explore';
 
 export function App() {
   const world = useMemo(() => loadWorld(), []);
@@ -19,21 +24,48 @@ export function App() {
   const [active, setActive] = useState<Branch['id']>('original');
   const branch = active === 'plan' && planBranch ? planBranch : original;
 
+  const [mode, setMode] = useState<Mode>('intro');
   const [minute, setMinute] = useState(scenario.start);
-  const [playing, setPlaying] = useState(true);
+  const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(2);
   const [decided, setDecided] = useState(false);
   const [showDecision, setShowDecision] = useState(false);
   const [showCompare, setShowCompare] = useState(false);
   const [selected, setSelected] = useState<string>('anwar');
-  const [viewKey, setViewKey] = useState(0);
+  const [view, setView] = useState<CameraView>('establishing');
+  const [viewRevision, setViewRevision] = useState(0);
+  const [beat, setBeat] = useState<Beat | null>(null);
+  const seen = useRef(new Set<string>());
   const [ai, setAi] = useState<Health>({ ai: false, model: null });
   const [decision, setDecision] = useState<DecisionState>({ ask: DEFAULT_ASK, events: [], running: false });
 
   useEffect(() => void health().then(setAi), []);
 
+  const goTo = useCallback((v: CameraView) => {
+    setView(v);
+    setViewRevision((r) => r + 1);
+  }, []);
+
+  // ---- Story beats -----------------------------------------------------------------------------
+  const ctx = useMemo(() => ({ branch: active, run: branch.run }), [active, branch.run]);
+  const beatTimes = useMemo(() => BEATS.map((b) => ({ beat: b, at: b.at(ctx) })).filter((x): x is { beat: Beat; at: number } => x.at !== null), [ctx]);
+
+  const showBeat = useCallback(
+    (b: Beat) => {
+      seen.current.add(b.id);
+      setBeat(b);
+      setPlaying(false);
+      goTo(b.view);
+      if (b.select) setSelected(b.select);
+      if (b.decision) setShowDecision(true);
+    },
+    [goTo],
+  );
+
   // ---- Playback ------------------------------------------------------------------------------
   const clock = useRef({ last: 0, carry: 0 });
+  const minuteRef = useRef(minute);
+  minuteRef.current = minute;
   useEffect(() => {
     if (!playing) return;
     let raf = 0;
@@ -45,33 +77,29 @@ export function App() {
       if (clock.current.carry >= 1) {
         const advance = Math.floor(clock.current.carry);
         clock.current.carry -= advance;
-        setMinute((m) => {
-          let next = Math.min(scenario.end - 1, m + advance);
-          if (!decided && m < DECISION_AT && next >= DECISION_AT) {
-            next = DECISION_AT;
+        const m = minuteRef.current;
+        let next = Math.min(scenario.end - 1, m + advance);
+        // Story beats (story mode) or just the decision (explore mode) stop the clock on time.
+        const due = beatTimes.find(({ beat: b, at }) => at > m && at <= next && !seen.current.has(b.id) && (mode === 'story' || (b.decision && !decided)));
+        if (due) {
+          setMinute(due.at);
+          if (mode === 'story') showBeat(due.beat);
+          else {
+            seen.current.add(due.beat.id);
             setPlaying(false);
             setShowDecision(true);
+            goTo('deck');
           }
-          if (next >= scenario.end - 1) setPlaying(false);
-          return next;
-        });
+          return;
+        }
+        if (next >= scenario.end - 1) setPlaying(false);
+        setMinute(next);
       }
       raf = requestAnimationFrame(step);
     };
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
-  }, [playing, speed, decided, scenario.end]);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.code === 'Space' && !(e.target instanceof HTMLTextAreaElement)) {
-        e.preventDefault();
-        if (!showDecision) setPlaying((p) => !p);
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [showDecision]);
+  }, [playing, speed, decided, scenario.end, beatTimes, mode, showBeat, goTo]);
 
   const record = branch.run.minutes[Math.min(branch.run.minutes.length - 1, minute - scenario.start)]!;
   const crews = useMemo(() => crewSummaries(scenario, record), [scenario, record]);
@@ -83,6 +111,7 @@ export function App() {
   const [briefLoading, setBriefLoading] = useState(false);
   const lastBrief = useRef(-1);
   useEffect(() => {
+    if (mode === 'intro') return;
     const slot = minute === DECISION_AT ? DECISION_AT : Math.floor((minute - scenario.start) / 20) * 20 + scenario.start;
     const key = slot * 10 + (active === 'plan' ? 1 : 0);
     if (key === lastBrief.current || briefLoading) return;
@@ -93,31 +122,36 @@ export function App() {
       .then((b) => setBrief({ ...b, clock: at }))
       .catch(() => {})
       .finally(() => setBriefLoading(false));
-  }, [minute, crews, active, scenario.start, briefLoading]);
+  }, [minute, crews, active, scenario.start, briefLoading, mode]);
 
   // ---- Guardian: the selected worker's phone, refreshed when their level or action changes ---
-  const ctx = useMemo(() => guardianContext(scenario, record, selected), [scenario, record, selected]);
+  const gctx = useMemo(() => guardianContext(scenario, record, selected), [scenario, record, selected]);
   const [messages, setMessages] = useState<Record<string, GuardianMessage & AgentSource>>({});
   const [guardianLoading, setGuardianLoading] = useState(false);
-  const guardianKey = `${active}:${selected}:${ctx.level}:${ctx.action}`;
+  const guardianKey = `${active}:${selected}:${gctx.level}:${gctx.action}`;
   const pending = useRef(new Set<string>());
   useEffect(() => {
-    if (messages[guardianKey] || pending.current.has(guardianKey)) return;
+    if (mode === 'intro' || messages[guardianKey] || pending.current.has(guardianKey)) return;
     pending.current.add(guardianKey);
     setGuardianLoading(true);
-    askGuardian(ctx)
+    askGuardian(gctx)
       .then((m) => setMessages((all) => ({ ...all, [guardianKey]: m })))
       .catch(() => {})
       .finally(() => {
         pending.current.delete(guardianKey);
         setGuardianLoading(pending.current.size > 0);
       });
-  }, [guardianKey, ctx, messages]);
+  }, [guardianKey, gctx, messages, mode]);
   const lastMessage = useRef<(GuardianMessage & AgentSource) | null>(null);
   if (messages[guardianKey]) lastMessage.current = messages[guardianKey]!;
   const shownMessage = messages[guardianKey] ?? (lastMessage.current && guardianKey.startsWith(`${active}:${selected}:`) ? lastMessage.current : null);
 
-  // ---- Decision ------------------------------------------------------------------------------
+  // ---- Decision and story control ------------------------------------------------------------
+  const resume = useCallback(() => {
+    setBeat(null);
+    setPlaying(true);
+  }, []);
+
   const ask = useCallback(() => {
     setDecision((d) => ({ ...d, events: [], running: true, error: undefined }));
     askPlanner({ date: scenario.date, effectiveAt: DECISION_AT, unavailable: [], ask: decision.ask }, (e) => setDecision((d) => ({ ...d, events: [...d.events, e] })))
@@ -133,44 +167,98 @@ export function App() {
     setActive('plan');
     setDecided(true);
     setShowDecision(false);
-    setPlaying(true);
-  }, [decision.events, world]);
+    resume();
+  }, [decision.events, world, resume]);
 
   const keep = useCallback(() => {
     setActive('original');
     setDecided(true);
     setShowDecision(false);
-    setPlaying(true);
-  }, []);
+    resume();
+  }, [resume]);
+
+  const continueStory = useCallback(() => {
+    if (beat?.id === 'start') goTo('overview');
+    resume();
+  }, [beat, goTo, resume]);
+
+  /** Back to the 15:10 decision with everything after it unseen. */
+  const decideAgain = () => {
+    for (const b of BEATS) if (b.id !== 'start' && b.id !== 'anwar') seen.current.delete(b.id);
+    setShowCompare(false);
+    setDecided(false);
+    setActive('original');
+    setMinute(DECISION_AT);
+    setDecision({ ask: DEFAULT_ASK, events: [], running: false });
+    const d = BEATS.find((b) => b.decision)!;
+    if (mode === 'story') showBeat(d);
+    else {
+      setBeat(null);
+      setPlaying(false);
+      setShowDecision(true);
+      goTo('deck');
+    }
+  };
 
   const watch = (id: Branch['id']) => {
     setActive(id);
+    setDecided(true);
+    setShowDecision(false);
     setMinute(DECISION_AT);
     setShowCompare(false);
+    setBeat(null);
+    for (const b of BEATS) if (!['start', 'anwar', 'decision'].includes(b.id)) seen.current.delete(b.id);
     setPlaying(true);
   };
 
-  const restart = () => {
+  const begin = (m: Mode) => {
+    setMode(m);
+    seen.current.clear();
     setMinute(scenario.start);
-    setActive('original');
     setDecided(false);
+    setActive('original');
     setShowDecision(false);
+    if (m === 'story') showBeat(BEATS[0]!);
+    else {
+      setBeat(null);
+      goTo('overview');
+      setPlaying(true);
+    }
+  };
+
+  const explore = () => {
+    setMode('explore');
+    setBeat(null);
     setPlaying(true);
   };
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.code !== 'Space' || e.target instanceof HTMLTextAreaElement || mode === 'intro') return;
+      e.preventDefault();
+      if (beat && !beat.decision && !beat.ending) continueStory();
+      else if (!showDecision && !beat) setPlaying((p) => !p);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [beat, mode, showDecision, continueStory]);
 
   // ---- Derived scene state -------------------------------------------------------------------
   const started = branch.run.pourStartedAt;
   const finished = branch.run.pourFinishedAt;
   const pourProgress = started === null || minute < started ? 0 : finished !== null && minute >= finished ? 1 : Math.min(0.97, (minute - started) / (finished ? finished - started : scenario.pour.durationMin * 1.5));
-  const truckOnSite = minute >= scenario.pour.truckArrives && (finished === null || minute < finished + 8);
+  const pourActive = started !== null && minute >= started && (finished === null || minute < finished);
+  const truckOnSite = minute >= scenario.pour.truckArrives - 2 && (finished === null || minute < finished + 8);
+  const dust = scenario.weatherModifiers.some((m) => minute >= m.from && minute < m.to);
   const env = record.env;
   const flag = dubaiFlag(env.heatIndex);
   const markers = original.run.events.filter((e) => ['truck-arrived', 'battery-died', 'network-down', 'weather-modifier'].includes(e.kind));
   const redMarkers = branch.run.events.filter((e) => e.kind === 'red-flag');
   const featured = FEATURED.map((id) => scenario.workers.find((w) => w.id === id)!);
+  const startEnv = original.run.minutes[0]!.env;
 
   return (
-    <div className="app">
+    <div className={`app mode-${mode}`}>
       <header className="topbar">
         <div className="brand">
           <span className="logo">⌁</span> Heatline <small>Saadiyat Tower · Level 12 pour</small>
@@ -186,14 +274,16 @@ export function App() {
           </b>
         </div>
         <div className="stat">
-          <span>Feels like (heat index)</span>
+          <span>Feels like</span>
           <b>
             {env.heatIndex.toFixed(0)}°C <span className={`flag flag-${flag}`}>{flag}</span>
           </b>
         </div>
         <div className="stat">
-          <span>Midday break</span>
-          <b>ended 15:00</b>
+          <span>Air · humidity</span>
+          <b>
+            {env.airC.toFixed(1)}°C · {env.rhPct.toFixed(0)}%{dust ? ' · dust' : ''}
+          </b>
         </div>
         <div className="stat">
           <span>Site network</span>
@@ -202,18 +292,43 @@ export function App() {
         <div className={`ai ${ai.ai ? 'on' : ''}`}>{ai.ai ? `AI: ${ai.model}` : 'AI off · rules only'}</div>
         <div className="top-actions">
           <button onClick={() => setShowCompare(true)} disabled={!planBranch}>
-            Rewind & compare
+            Compare
           </button>
-          <button onClick={restart}>Restart</button>
+          <button
+            onClick={() => {
+              setPlaying(false);
+              setMode('intro');
+            }}
+          >
+            Brief
+          </button>
         </div>
       </header>
 
       <main className="stage">
-        <Site scenario={scenario} record={record} plan={activePlan} pourProgress={pourProgress} truckOnSite={truckOnSite} selectedWorker={selected} redFlagWorkers={flags.map((f) => f.worker)} viewKey={viewKey} />
+        <Site
+          scenario={scenario}
+          record={record}
+          plan={activePlan}
+          pourProgress={pourProgress}
+          pourActive={pourActive}
+          truckOnSite={truckOnSite}
+          dust={dust}
+          selectedWorker={selected}
+          redFlagWorkers={flags.map((f) => f.worker)}
+          view={view}
+          viewRevision={viewRevision}
+          showLabels={mode !== 'intro'}
+        />
         <div className="branch-tag">{branch.label}</div>
-        <button className="view-reset" onClick={() => setViewKey((k) => k + 1)}>
-          Reset view
-        </button>
+        <div className="views">
+          {(['overview', 'deck', 'yard', 'facade', 'welfare', 'gate'] as CameraView[]).map((v) => (
+            <button key={v} className={v === view ? 'active' : ''} onClick={() => goTo(v)}>
+              {v === 'welfare' ? 'rest area' : v}
+            </button>
+          ))}
+        </div>
+        {beat && mode === 'story' && <StoryCard beat={beat} ctx={ctx} metrics={branch.metrics} onContinue={continueStory} onDecideAgain={decideAgain} onCompare={() => setShowCompare(true)} onExplore={explore} canCompare={!!planBranch} />}
       </main>
 
       <aside className="console">
@@ -224,10 +339,10 @@ export function App() {
         <SiteLog events={branch.run.events} minute={minute} />
       </aside>
 
-      <Phone workers={featured} selected={selected} onSelect={setSelected} ctx={ctx} message={shownMessage} loading={guardianLoading} stale={!messages[guardianKey]} />
+      <Phone workers={featured} selected={selected} onSelect={setSelected} ctx={gctx} message={shownMessage} loading={guardianLoading} stale={!messages[guardianKey]} />
 
       <footer className="timeline">
-        <button className="play" onClick={() => !showDecision && setPlaying((p) => !p)} disabled={showDecision}>
+        <button className="play" onClick={() => !showDecision && !beat && setPlaying((p) => !p)} disabled={showDecision || !!beat}>
           {playing ? '❚❚' : '▶'}
         </button>
         <div className="speeds">
@@ -243,10 +358,10 @@ export function App() {
             min={scenario.start}
             max={scenario.end - 1}
             value={minute}
+            disabled={mode === 'story' && !!beat}
             onChange={(e) => {
               const m = Number(e.target.value);
-              if (!decided && m > DECISION_AT) return setMinute(DECISION_AT);
-              setMinute(m);
+              setMinute(!decided && m > DECISION_AT ? DECISION_AT : m);
             }}
           />
           <div className="marks">
@@ -261,9 +376,10 @@ export function App() {
             ))}
           </div>
         </div>
-        <small className="disclaimer">Simulation with a teaching physiology model and real ERA5 weather. Not clinical advice.</small>
+        <small className="disclaimer">Teaching physiology model, real ERA5 weather, published UAE rules. Not clinical advice.</small>
       </footer>
 
+      {mode === 'intro' && <Intro env={startEnv} ai={ai.ai} onStory={() => begin('story')} onExplore={() => begin('explore')} />}
       {showCompare && planBranch && <Compare a={original} b={planBranch} onClose={() => setShowCompare(false)} onWatch={watch} />}
     </div>
   );

@@ -11,7 +11,8 @@ Deadlines: registration closes **10 Nov**; prototype due **20 Nov** per Hack2ski
 | 6 Nov | M0 spikes | **Done** | Liljegren port matches ECMWF thermofeel on 744 hours; live `gpt-6-luna` structured output (4.8 s, Bengali) and strict tool call (2.8 s) |
 | 6 Nov | M1 engine | **Done** | Scenario, environment, physiology, rules, planner, three policies, golden comparison |
 | 6 Nov | M2 agents | **Mostly done** | Projections with leakage tests; guardian, Noor and Omar live on `gpt-6-luna` with rule fallbacks; NDJSON planner stream. Open: agent evals (section 9) |
-| 6 Nov | M3 experience | **First playable** | 3D twin with real sun and shadows, console, worker phone, 15:10 decision, rewind compare; runs locally with `npm run dev`. Open: voice, heat shimmer, polish, phone layout |
+| 6 Nov | M3 experience | **First playable** | 3D twin with real sun and shadows, console, worker phone, 15:10 decision, rewind compare; runs locally with `npm run dev` |
+| 6 Nov | M3b story and realism (team feedback: "only one building", characters not authentic, needs a story) | **Done** | Entry screen; nine story beats with camera moves; full Saadiyat district; articulated UAE-site workers; dust haze. Both branches verified end to end in the browser |
 | — | M4 rewind | **Partly done** | Branch from the 15:10 decision and side-by-side metrics. Open: any-decision rewind, split-screen replay, debrief agent |
 | — | M5 evidence, M6 field + forecast | Not started | |
 
@@ -253,6 +254,25 @@ Every number is about the **simulation**, and the report says so in its title. I
 - **Projection leakage:** 0 tolerated; enforced by tests, not evals.
 
 ## 10. User interface and visual direction
+
+**Story mode (implemented 6 Nov, `apps/web/src/story.ts`, `components/Intro.tsx`, `components/StoryCard.tsx`).** The app opens on an entry screen: the claim, the afternoon's real conditions at 15:00, why it matters (WBGT ≥ 31 °C every August day 12:00–18:00), the viewer's role, and six fictional characters with home towns and languages. "Begin the shift" plays the story; "Explore freely" plays without narration (it still pauses for the decision).
+
+| Beat | Time | Camera | What the viewer learns |
+| --- | --- | --- | --- |
+| Chapter 1 · The break is over | 15:00 | overview | Heat after the ban; guardians; crews not bodies |
+| Day two | 15:02 | tool store | Anwar stood down by the rules, privately |
+| Chapter 2 · The truck is coming | 15:10 | deck | The decision; Omar and the rules |
+| Concrete | truck event | gate | Branch-specific: rotation vs whole crew in sun |
+| Six percent | battery event | yard | Wearable dies; estimate continues |
+| No signal | network event | overview | Phones keep warning offline |
+| Chapter 3 · Suresh | red-flag event (original) or 16:43 (plan) | deck | Red flag and disclosure, or why it didn't happen |
+| Dust | weather event | overview | Twin recalculates |
+| Chapter 4 · End of shift | 18:00 | overview | Outcome numbers; decide again, compare, or explore |
+
+Beats that follow engine events (truck, battery, network, red flag, dust) take their time from the run, so they stay correct whatever plan is approved.
+
+**Scene (rebuilt 6 Nov, `apps/web/src/scene/`).** A fenced plot on Saadiyat Island with hoarding, gate and guard hut; Saadiyat Tower at Level 12 with core, columns, curtain wall on floors 1–4, blockwork, green netting, edge barriers, formwork props, rebar mat and fresh concrete; material hoist; hammerhead crane; concrete mixer and boom pump during the pour; rebar bundles and bending shed; shade shelter with benches, fans and water coolers; welfare cabins, tool store, first aid; site offices, toilets, generator, water tank, pickups; phase-2 tower at Level 6 with its own crane; a finished residential block, villas, palms, roads, beach, sea and distant silhouettes. Workers wear navy coveralls, lime hi-vis vests with reflective bands, yellow helmets with neck shades (the crew lead an orange vest, the foreman a white helmet and tablet, façade crew harnesses) and are articulated: they walk between places, work in task-specific poses, sit to rest and lie down when being cooled. Dust surges thicken and tint the haze.
+
 
 **Implemented (first playable, 6 Nov):** `apps/web` with the site twin (React Three Fiber, real sun direction and shadows, tower, scaffold, yard, tents, truck, concrete filling the deck during the pour), labels projected to the DOM, top bar, supervisor console (Noor's brief, crew cards with counts only, red-flag disclosure, decision card with Omar's streamed tool steps, site log), worker phone (featured-worker tabs, native script + English, readings with source, stale-message indicator), timeline with event markers and speeds, and the rewind comparison table. The engine runs in the browser; only model calls go to the server.
 

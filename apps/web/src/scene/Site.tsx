@@ -1,16 +1,18 @@
-// The 3D site. Engine coordinates are metres with x east and y north; three.js uses x east,
-// y up and z south, so an engine point (x, y) sits at (x, height, -y).
+// The 3D scene: the district, Saadiyat Tower, its people and the light of a real afternoon.
+// Engine coordinates are metres with x east and y north; see common.ts for the mapping.
 
 import { useEffect, useMemo, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import type { MinuteRecord, Plan, Scenario, Zone } from '@heatline/contracts';
 import { heatZone } from '@heatline/rules';
-import { Worker } from './Worker';
 import { LabelProjector, anchors } from './labels';
+import { World } from './World';
+import { SiteA } from './SiteA';
+import { Person, lookFor, poseFor } from './Person';
+import { CameraRig, type CameraView } from './CameraRig';
+import { toScene } from './common';
 
-const toScene = (x: number, y: number, h = 0) => new THREE.Vector3(x, h, -y);
 export const CREW_COLOURS: Record<string, string> = { A: '#4c9be8', B: '#f08a24', C: '#2fb39a' };
 const ZONE_CHIP: Record<string, string> = { unrestricted: '#3aa76d', low: '#b8c43a', medium: '#e8a33d', high: '#e5484d' };
 
@@ -18,24 +20,18 @@ export interface SiteProps {
   scenario: Scenario;
   record: MinuteRecord;
   plan: Plan | null;
-  pourProgress: number; // 0..1
+  pourProgress: number;
+  pourActive: boolean;
   truckOnSite: boolean;
+  dust: boolean;
   selectedWorker: string;
   redFlagWorkers: string[];
-  /** changing this puts the camera back to its home view */
-  viewKey: number;
+  view: CameraView;
+  viewRevision: number;
+  showLabels: boolean;
 }
 
-function CameraHome({ viewKey }: { viewKey: number }) {
-  const { camera } = useThree();
-  useEffect(() => {
-    camera.position.set(118, 62, 78);
-    camera.lookAt(46, 10, -8);
-  }, [viewKey, camera]);
-  return null;
-}
-
-const labelPoint = (zone: Zone) => (zone.id === 'facade' ? toScene(zone.at.x - 6, zone.at.y, 32) : toScene(zone.at.x, zone.at.y, zone.height + 6));
+const labelPoint = (zone: Zone) => (zone.id === 'facade' ? toScene(zone.at.x - 7, zone.at.y, 31) : zone.id === 'deck' ? toScene(zone.at.x, zone.at.y, zone.height + 9) : toScene(zone.at.x, zone.at.y, zone.height + 7));
 
 export function Site(props: SiteProps) {
   const labelled = useMemo(() => props.scenario.zones.filter((z) => z.kind === 'outdoor' || z.kind === 'elevated'), [props.scenario]);
@@ -45,13 +41,12 @@ export function Site(props: SiteProps) {
   }, [labelled]);
   return (
     <>
-      <Canvas shadows camera={{ position: [118, 62, 78], fov: 40, near: 1, far: 2000 }} gl={{ antialias: true }}>
+      <Canvas shadows camera={{ position: [260, 120, 260], fov: 38, near: 1, far: 4000 }} gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}>
         <SceneContents {...props} />
         <LabelProjector />
-        <OrbitControls key={props.viewKey} target={[46, 10, -8]} maxPolarAngle={Math.PI / 2.15} minDistance={40} maxDistance={330} enableDamping />
-        <CameraHome viewKey={props.viewKey} />
+        <CameraRig view={props.view} revision={props.viewRevision} />
       </Canvas>
-      <div className="labels">
+      <div className="labels" style={{ visibility: props.showLabels ? 'visible' : 'hidden' }}>
         {labelled.map((z) => {
           const c = props.record.zones.find((x) => x.zone === z.id)!;
           const hz = heatZone(c.wbgt);
@@ -60,7 +55,7 @@ export function Site(props: SiteProps) {
               <span className="zone-dot" style={{ background: ZONE_CHIP[hz] }} />
               <strong>{z.label}</strong>
               <span>
-                {c.wbgt.toFixed(1)}°C · {hz}
+                WBGT {c.wbgt.toFixed(1)}°C · {hz} risk
                 {c.shaded ? ' · shade' : ''}
               </span>
             </div>
@@ -78,64 +73,47 @@ export function Site(props: SiteProps) {
   );
 }
 
-function SceneContents({ scenario, record, plan, pourProgress, truckOnSite, selectedWorker, redFlagWorkers }: SiteProps) {
+function SceneContents({ scenario, record, plan, pourProgress, pourActive, truckOnSite, dust, selectedWorker, redFlagWorkers }: SiteProps) {
   const env = record.env;
   const sunDir = useMemo(() => {
     const az = (env.sunAzimuth * Math.PI) / 180;
-    const el = (Math.max(env.sunElevation, 2) * Math.PI) / 180;
+    const el = (Math.max(env.sunElevation, 3) * Math.PI) / 180;
     return new THREE.Vector3(Math.sin(az) * Math.cos(el), Math.sin(el), -Math.cos(az) * Math.cos(el));
   }, [env.sunAzimuth, env.sunElevation]);
-  const warmth = THREE.MathUtils.clamp(1 - env.sunElevation / 60, 0, 1); // later = warmer light
-  const sunColour = new THREE.Color().lerpColors(new THREE.Color('#fff4e0'), new THREE.Color('#ffb36b'), warmth);
-  const skyColour = new THREE.Color().lerpColors(new THREE.Color('#bcd6ea'), new THREE.Color('#f2c38f'), warmth * 0.8);
-  const zones = new Map(scenario.zones.map((z) => [z.id, z]));
-  const tentsUp = (plan?.tents ?? []).filter((t) => t.readyAt <= record.minute);
+  const warmth = THREE.MathUtils.clamp(1 - env.sunElevation / 55, 0, 1);
+  const sunColour = useMemo(() => new THREE.Color().lerpColors(new THREE.Color('#fff2dc'), new THREE.Color('#ffb066'), warmth), [warmth]);
+  const sky = useMemo(() => {
+    const base = new THREE.Color().lerpColors(new THREE.Color('#bdd5e6'), new THREE.Color('#f0c28e'), warmth * 0.75);
+    return dust ? base.lerp(new THREE.Color('#d6b98a'), 0.7) : base;
+  }, [warmth, dust]);
+  const zones = useMemo(() => new Map(scenario.zones.map((z) => [z.id, z])), [scenario]);
+
+  const spots = useMemo(() => layoutPeople(scenario, record, zones), [scenario, record, zones]);
 
   return (
     <>
-      <color attach="background" args={[skyColour.getStyle()]} />
-      <fog attach="fog" args={[skyColour.getStyle(), 260, 700]} />
-      <hemisphereLight args={['#fff1dc', '#b9935f', 0.55]} />
-      <SunLight direction={sunDir} colour={sunColour} />
-
-      {/* Ground: sand with a compacted site pad */}
-      <mesh rotation-x={-Math.PI / 2} position={[40, -0.05, 0]} receiveShadow>
-        <planeGeometry args={[900, 900]} />
-        <meshStandardMaterial color="#d8c39b" roughness={1} />
-      </mesh>
-      <mesh rotation-x={-Math.PI / 2} position={[48, 0.01, -5]} receiveShadow>
-        <planeGeometry args={[150, 100]} />
-        <meshStandardMaterial color="#c9b48b" roughness={1} />
-      </mesh>
-      <Sea />
-
-      <Tower scenario={scenario} pourProgress={pourProgress} />
-      <Scaffold />
-      <Crane />
-      <RebarYard at={zones.get('yard')!} />
-      <Container at={zones.get('cabin')!} colour="#eef0f2" label="AC" />
-      <Container at={zones.get('store')!} colour="#d5dde3" />
-      <Container at={zones.get('first-aid')!} colour="#f4f4f4" cross />
-      <Canopy at={zones.get('shelter')!.at} height={0} size={[14, 10]} colour="#e9e3d2" />
-      {tentsUp.map((t) => {
-        const z = zones.get(t.zone)!;
-        return <Canopy key={t.zone} at={z.at} height={z.kind === 'elevated' ? z.height : 0} size={[12, 9]} colour="#f7f2e3" />;
-      })}
-      {truckOnSite && <Truck />}
-
+      <color attach="background" args={[sky.getStyle()]} />
+      <DustFog colour={sky} dust={dust} />
+      <hemisphereLight args={['#fff1dc', '#b8925c', dust ? 0.75 : 0.55]} />
+      <SunLight direction={sunDir} colour={sunColour} intensity={dust ? 1.1 : 2.7} />
+      <World />
+      <SiteA scenario={scenario} minute={record.minute} plan={plan} pourProgress={pourProgress} pourActive={pourActive} truckOnSite={truckOnSite} />
       {scenario.workers.map((w, i) => {
         const t = record.truth.find((x) => x.worker === w.id)!;
-        const zone = zones.get(t.zone)!;
+        const role = w.id === 'ahmed' ? 'foreman' : w.id === 'suresh' ? 'lead' : 'worker';
+        const spot = spots.get(w.id)!;
         return (
-          <Worker
+          <Person
             key={w.id}
             id={w.id}
-            target={workerSpot(zone, i)}
-            crewColour={CREW_COLOURS[w.crew] ?? '#888'}
-            activity={t.activity}
+            target={spot.at}
+            facing={spot.facing}
+            look={lookFor(w.id, i, role, w.crew)}
+            pose={poseFor(t.activity, t.zone)}
             selected={w.id === selectedWorker}
             redFlag={redFlagWorkers.includes(w.id)}
-            label={w.featured ? w.name : undefined}
+            labelled={w.featured}
+            crewColour={CREW_COLOURS[w.crew] ?? '#888'}
           />
         );
       })}
@@ -143,17 +121,35 @@ function SceneContents({ scenario, record, plan, pourProgress, truckOnSite, sele
   );
 }
 
-function SunLight({ direction, colour }: { direction: THREE.Vector3; colour: THREE.Color }) {
+function DustFog({ colour, dust }: { colour: THREE.Color; dust: boolean }) {
+  const { scene } = useThree();
+  useEffect(() => {
+    if (!scene.fog) scene.fog = new THREE.Fog(colour, 420, 1700);
+  }, [scene, colour]);
+  useFrame((_, dt) => {
+    const fog = scene.fog as THREE.Fog | null;
+    if (!fog) return;
+    const near = dust ? 40 : 420;
+    const far = dust ? 320 : 1700;
+    fog.near += (near - fog.near) * Math.min(1, dt);
+    fog.far += (far - fog.far) * Math.min(1, dt);
+    fog.color.lerp(colour, Math.min(1, dt));
+  });
+  return null;
+}
+
+function SunLight({ direction, colour, intensity }: { direction: THREE.Vector3; colour: THREE.Color; intensity: number }) {
   const light = useRef<THREE.DirectionalLight>(null);
   const target = useMemo(() => {
     const o = new THREE.Object3D();
-    o.position.set(45, 0, -5);
+    o.position.set(45, 0, -15);
     return o;
   }, []);
   useFrame(() => {
     if (!light.current) return;
-    light.current.position.copy(target.position).addScaledVector(direction, 220);
+    light.current.position.copy(target.position).addScaledVector(direction, 300);
     light.current.target = target;
+    light.current.intensity += (intensity - light.current.intensity) * 0.05;
   });
   return (
     <>
@@ -161,208 +157,65 @@ function SunLight({ direction, colour }: { direction: THREE.Vector3; colour: THR
       <directionalLight
         ref={light}
         color={colour}
-        intensity={2.6}
+        intensity={intensity}
         castShadow
-        shadow-mapSize={[2048, 2048]}
-        shadow-camera-left={-120}
-        shadow-camera-right={120}
-        shadow-camera-top={120}
-        shadow-camera-bottom={-120}
+        shadow-mapSize={[4096, 4096]}
+        shadow-camera-left={-150}
+        shadow-camera-right={150}
+        shadow-camera-top={150}
+        shadow-camera-bottom={-150}
         shadow-camera-near={10}
-        shadow-camera-far={500}
-        shadow-bias={-0.0004}
+        shadow-camera-far={700}
+        shadow-bias={-0.0003}
+        shadow-normalBias={0.03}
       />
     </>
   );
 }
 
-/** Spread workers around their zone's anchor so they don't overlap. */
-function workerSpot(zone: Zone, index: number): THREE.Vector3 {
-  const ring = 2.2 + (index % 3) * 1.6;
-  const angle = index * 2.399; // golden angle
-  if (zone.id === 'facade') return toScene(zone.at.x - 1, zone.at.y + ((index % 6) - 2.5) * 3.5, 6 + (index % 4) * 7.5);
-  const base = toScene(zone.at.x + Math.cos(angle) * ring, zone.at.y + Math.sin(angle) * ring, zone.height + (zone.kind === 'elevated' ? 0.35 : 0));
-  return base;
-}
-
-function Tower({ scenario, pourProgress }: { scenario: Scenario; pourProgress: number }) {
+/** Where each person stands, sits or lies this minute, given their zone and what they are doing. */
+function layoutPeople(scenario: Scenario, record: MinuteRecord, zones: Map<string, Zone>) {
+  const out = new Map<string, { at: THREE.Vector3; facing: number }>();
+  const byZone = new Map<string, string[]>();
+  for (const t of record.truth) byZone.set(t.zone, [...(byZone.get(t.zone) ?? []), t.worker]);
   const t = scenario.tower;
-  const w = t.maxX - t.minX;
-  const d = t.maxY - t.minY;
-  const levels = Math.round(t.height / 3.5);
-  const centre = toScene((t.minX + t.maxX) / 2, (t.minY + t.maxY) / 2);
-  const columns = useMemo(() => {
-    const pts: [number, number][] = [];
-    for (let x = t.minX + 2; x <= t.maxX - 2; x += 9) for (let y = t.minY + 2; y <= t.maxY - 2; y += 9) pts.push([x, y]);
-    return pts;
-  }, [t]);
-  return (
-    <group>
-      {Array.from({ length: levels + 1 }, (_, i) => (
-        <mesh key={i} position={[centre.x, i * 3.5 + 0.2, centre.z]} castShadow receiveShadow>
-          <boxGeometry args={[w, 0.45, d]} />
-          <meshStandardMaterial color={i === levels ? '#b9b2a6' : '#cfc8bc'} roughness={0.9} />
-        </mesh>
-      ))}
-      {columns.map(([x, y]) => (
-        <mesh key={`${x}-${y}`} position={[x, t.height / 2, -y]} castShadow>
-          <boxGeometry args={[0.7, t.height, 0.7]} />
-          <meshStandardMaterial color="#bdb6aa" roughness={0.9} />
-        </mesh>
-      ))}
-      {/* Fresh concrete spreading across the deck as the pour progresses */}
-      {pourProgress > 0 && (
-        <mesh position={[t.minX + (w * pourProgress) / 2, t.height + 0.48, centre.z]} receiveShadow>
-          <boxGeometry args={[w * pourProgress, 0.12, d - 1]} />
-          <meshStandardMaterial color="#8d8a85" roughness={0.6} />
-        </mesh>
-      )}
-      {/* Rebar mat waiting for the pour */}
-      {pourProgress < 1 && (
-        <mesh position={[t.minX + w * pourProgress + (w * (1 - pourProgress)) / 2, t.height + 0.46, centre.z]}>
-          <boxGeometry args={[w * (1 - pourProgress), 0.06, d - 1]} />
-          <meshStandardMaterial color="#8a5a3a" roughness={0.8} />
-        </mesh>
-      )}
-    </group>
-  );
-}
-
-function Scaffold() {
-  const bars = useMemo(() => {
-    const out: { p: [number, number, number]; s: [number, number, number] }[] = [];
-    for (let y = 0; y <= 30; y += 3) out.push({ p: [-3.2, 15, -y], s: [0.15, 30, 0.15] });
-    for (let h = 0; h <= 30; h += 3.5) out.push({ p: [-3.2, h, -15], s: [0.15, 0.15, 30] });
-    for (let h = 0; h <= 30; h += 7) out.push({ p: [-2.2, h + 0.1, -15], s: [2, 0.12, 30] });
-    return out;
-  }, []);
-  return (
-    <group>
-      {bars.map((b, i) => (
-        <mesh key={i} position={b.p} castShadow>
-          <boxGeometry args={b.s} />
-          <meshStandardMaterial color={i % 2 ? '#9ea4a8' : '#c2862e'} metalness={0.3} roughness={0.6} />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
-function Crane() {
-  return (
-    <group position={[-22, 0, -48]}>
-      <mesh position={[0, 31, 0]} castShadow>
-        <boxGeometry args={[1.6, 62, 1.6]} />
-        <meshStandardMaterial color="#e3b23c" />
-      </mesh>
-      <mesh position={[22, 62, 0]} castShadow>
-        <boxGeometry args={[58, 1.2, 1.2]} />
-        <meshStandardMaterial color="#e3b23c" />
-      </mesh>
-      <mesh position={[-9, 60.5, 0]} castShadow>
-        <boxGeometry args={[4, 3, 2.5]} />
-        <meshStandardMaterial color="#7a7f86" />
-      </mesh>
-    </group>
-  );
-}
-
-function RebarYard({ at }: { at: Zone }) {
-  const bundles = useMemo(() => Array.from({ length: 6 }, (_, i) => toScene(at.at.x - 8 + (i % 3) * 8, at.at.y - 6 + Math.floor(i / 3) * 12, 0.4)), [at]);
-  return (
-    <group>
-      {bundles.map((p, i) => (
-        <mesh key={i} position={p} rotation-y={0.1 * i} castShadow>
-          <boxGeometry args={[6, 0.7, 1.4]} />
-          <meshStandardMaterial color="#7a4b31" roughness={0.7} metalness={0.4} />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
-function Container({ at, colour, label, cross }: { at: Zone; colour: string; label?: string; cross?: boolean }) {
-  const p = toScene(at.at.x, at.at.y, 1.3);
-  return (
-    <group position={p}>
-      <mesh castShadow receiveShadow>
-        <boxGeometry args={[12, 2.6, 4]} />
-        <meshStandardMaterial color={colour} roughness={0.6} />
-      </mesh>
-      {cross && (
-        <group position={[0, 0.2, 2.05]}>
-          <mesh>
-            <boxGeometry args={[1.8, 0.5, 0.05]} />
-            <meshStandardMaterial color="#d93a3a" />
-          </mesh>
-          <mesh>
-            <boxGeometry args={[0.5, 1.8, 0.05]} />
-            <meshStandardMaterial color="#d93a3a" />
-          </mesh>
-        </group>
-      )}
-      {label && (
-        <mesh position={[4.5, 1.6, 0]}>
-          <boxGeometry args={[1.5, 0.6, 1]} />
-          <meshStandardMaterial color="#9aa3aa" />
-        </mesh>
-      )}
-    </group>
-  );
-}
-
-function Canopy({ at, height, size, colour }: { at: { x: number; y: number }; height: number; size: [number, number]; colour: string }) {
-  const p = toScene(at.x, at.y, height);
-  const posts: [number, number][] = [
-    [-size[0] / 2, -size[1] / 2],
-    [size[0] / 2, -size[1] / 2],
-    [-size[0] / 2, size[1] / 2],
-    [size[0] / 2, size[1] / 2],
-  ];
-  return (
-    <group position={p}>
-      <mesh position={[0, 3.2, 0]} castShadow receiveShadow>
-        <boxGeometry args={[size[0], 0.12, size[1]]} />
-        <meshStandardMaterial color={colour} side={THREE.DoubleSide} />
-      </mesh>
-      {posts.map(([x, z], i) => (
-        <mesh key={i} position={[x, 1.6, z]} castShadow>
-          <cylinderGeometry args={[0.08, 0.08, 3.2]} />
-          <meshStandardMaterial color="#6b6b6b" />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
-function Truck() {
-  const drum = useRef<THREE.Mesh>(null);
-  useFrame((_, dt) => {
-    if (drum.current) drum.current.rotation.x += dt * 1.5;
-  });
-  return (
-    <group position={[48, 0, 8]} rotation-y={Math.PI / 2}>
-      <mesh position={[0, 1.6, 3.2]} castShadow>
-        <boxGeometry args={[2.5, 2.4, 2.4]} />
-        <meshStandardMaterial color="#e9eef2" />
-      </mesh>
-      <mesh position={[0, 0.7, 0]} castShadow>
-        <boxGeometry args={[2.5, 0.6, 8.5]} />
-        <meshStandardMaterial color="#444b52" />
-      </mesh>
-      <mesh ref={drum} position={[0, 2.4, -1]} rotation-z={Math.PI / 2} castShadow>
-        <cylinderGeometry args={[1.4, 1.1, 5.2, 16]} />
-        <meshStandardMaterial color="#d8822f" />
-      </mesh>
-    </group>
-  );
-}
-
-function Sea() {
-  return (
-    <mesh rotation-x={-Math.PI / 2} position={[40, -0.03, 330]}>
-      <planeGeometry args={[1200, 300]} />
-      <meshStandardMaterial color="#5fa3b6" roughness={0.3} metalness={0.1} />
-    </mesh>
-  );
+  for (const [zoneId, ids] of byZone) {
+    const zone = zones.get(zoneId)!;
+    ids.forEach((id, i) => {
+      let at: THREE.Vector3;
+      let facing = 0;
+      switch (zoneId) {
+        case 'deck': {
+          const cols = 5;
+          at = toScene(t.minX + 6 + (i % cols) * 7, t.minY + 6 + Math.floor(i / cols) * 6, t.height + 0.55);
+          facing = (i % 3) * 1.4;
+          break;
+        }
+        case 'facade': {
+          const boards = [7, 10.5, 14, 17.5];
+          at = toScene(-3.1, 4 + (i % 6) * 4.4, boards[i % boards.length]! + 0.1);
+          facing = Math.PI / 2;
+          break;
+        }
+        case 'yard': {
+          at = toScene(zone.at.x - 12 + (i % 5) * 6 + 1.2, zone.at.y - 9 + Math.floor(i / 5) * 18 + ((i % 2) - 0.5) * 2.4);
+          facing = i % 2 ? Math.PI / 2 : -Math.PI / 2;
+          break;
+        }
+        case 'shelter': {
+          const row = [-3, 0, 3][i % 3]!;
+          at = toScene(zone.at.x - 5 + Math.floor(i / 3) * 1.4, zone.at.y - row - 0.6);
+          facing = Math.PI;
+          break;
+        }
+        default: {
+          // Cabins and first aid: in front of the door (the figure stays visible).
+          at = toScene(zone.at.x - 4 + i * 1.3, zone.at.y - 3.2);
+          facing = Math.PI;
+        }
+      }
+      out.set(id, { at, facing });
+    });
+  }
+  return out;
 }
