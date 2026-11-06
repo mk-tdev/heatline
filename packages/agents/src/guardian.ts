@@ -35,7 +35,7 @@ Rules:
 export function guardianPrompt(ctx: GuardianContext): string {
   return [
     `Worker: ${ctx.name}, language: ${LANGUAGE_NAMES[ctx.language]}, ${ctx.acclimatised ? 'used to the heat' : `day ${ctx.daysOnSite} on site, not yet used to the heat`}.`,
-    `Time ${ctx.clock}. Place: ${ctx.placeLabel}, WBGT ${ctx.wbgt} °C.`,
+    `Time ${ctx.clock}. Place: ${ctx.placeLabel}, WBGT ${ctx.wbgt} °C.${ctx.ppe ? ` Wearing a ${ctx.ppe}, which traps heat (counts as +${ctx.clothingAdjustC} °C).` : ''}`,
     `Warning level: ${ctx.level}. Reasons: ${ctx.reasons.join(', ') || 'none'}. Action to give: ${ctx.action}.`,
     `Their own readings (${ctx.source === 'wearable' ? 'from their wearable' : 'estimated, no wearable'}): body temperature about ${ctx.estCoreC} °C${ctx.heartRate ? `, heart rate ${ctx.heartRate}` : ''}, water deficit about ${ctx.waterDeficitL} L, ${ctx.minutesWorkedWithoutRest} minutes worked without a rest.`,
   ].join('\n');

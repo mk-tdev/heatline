@@ -44,7 +44,7 @@ export interface Beat {
 
 const eventMinute = (run: RunResult, kind: string, worker?: string) => run.events.find((e) => e.kind === kind && (!worker || e.worker === worker))?.minute ?? null;
 
-export const BEATS: Beat[] = [
+const AFTERNOON_POUR: Beat[] = [
   {
     id: 'start',
     at: () => 900,
@@ -137,3 +137,173 @@ export const BEATS: Beat[] = [
         : 'The bus is waiting on the south road. One man is still in the first-aid room. Go back to 15:10 and see whether it had to happen.',
   },
 ];
+
+const ban = (c: BeatContext) => c.run.violations.some((v) => v.rule === 'midday-ban');
+
+const RACING_THE_BREAK: Beat[] = [
+  {
+    id: 'start',
+    at: () => 570,
+    chapter: 'Chapter 1',
+    title: '09:30 · A morning in coveralls',
+    view: 'facade',
+    select: 'bilal',
+    body: () =>
+      'Crew C is sealing the west façade in polyolefin coveralls. The suits keep the sealant off their skin and keep their body heat in: the rules add 1 °C to the heat they feel. The morning will climb from low to high risk before the midday break begins at 12:30.',
+  },
+  {
+    id: 'joel',
+    at: () => 572,
+    title: '09:32 · Back from leave',
+    view: 'store',
+    select: 'joel',
+    body: () =>
+      'Joel flew back from Pampanga yesterday after three weeks at home. More than 14 days away resets acclimatisation, so today he counts as new to the heat, capped at half a normal day’s exposure. His guardian has already moved him to indoor work in the tool store, in Tagalog.',
+  },
+  {
+    id: 'decision',
+    at: () => 680,
+    chapter: 'Chapter 2',
+    title: '11:20 · Concrete before the break',
+    view: 'deck',
+    decision: true,
+    body: () =>
+      'Concrete for the stair core arrives at 11:30 and needs 45 minutes. At 12:30 the midday break makes outdoor work in direct sun illegal, with a fine of AED 5,000 per worker. Can it be done in time, and safely? Ask Omar.',
+  },
+  {
+    id: 'truck',
+    at: (c) => eventMinute(c.run, 'truck-arrived'),
+    title: '11:30 · Concrete',
+    view: 'gate',
+    body: (c) =>
+      c.branch === 'plan'
+        ? `The pour crew has cooled off in the cabin and starts on time, rotating so nobody overstays the zone limit.${c.run.pourFinishedAt !== null ? ` The plan has it finished by ${clock(c.run.pourFinishedAt)}.` : ''}`
+        : 'The crew goes straight from heavy morning work onto the pour, with the usual break at ten to the hour.',
+  },
+  {
+    id: 'ban',
+    at: () => 750,
+    chapter: 'Chapter 3',
+    title: '12:30 · The midday break begins',
+    view: 'overview',
+    body: (c) =>
+      ban(c)
+        ? 'People are still working outdoors after 12:30. On a real site that is a fine of AED 5,000 per worker, and these are the hottest hours of the day. The rules engine has logged every breach.'
+        : `Every outdoor crew has stopped by 12:30.${c.run.pourFinishedAt !== null ? ` The stair core was poured by ${clock(c.run.pourFinishedAt)}.` : ''} The midday break is respected without anyone having to argue for it.`,
+  },
+  {
+    id: 'end',
+    at: () => 779,
+    chapter: 'Chapter 4',
+    title: '13:00 · Lunch in the cabin',
+    view: 'welfare',
+    ending: true,
+    body: () => 'The morning is over. Go back to 11:20 and see what the other choice would have meant for the crew and for the fine.',
+  },
+];
+
+const NO_POUR_DAY: Beat[] = [
+  {
+    id: 'start',
+    at: () => 900,
+    chapter: 'Chapter 1',
+    title: '15:00 · The heaviest afternoon',
+    view: 'overview',
+    body: () =>
+      'Friday 1 August 2025 was the most humid afternoon of the month near Saadiyat. The sea breeze brings water, not relief: every zone on site is in the high-risk band, even in shade. Watch the labels.',
+  },
+  {
+    id: 'decision',
+    at: () => 910,
+    chapter: 'Chapter 2',
+    title: '15:10 · The client wants the slab',
+    view: 'deck',
+    decision: true,
+    body: () => 'The truck is booked for 15:30 again and the client wants the slab finished today. Ask Omar whether a pour can start within the rules. Sometimes the right answer is no.',
+  },
+  {
+    id: 'truck',
+    at: () => 930,
+    title: '15:30 · The truck at the gate',
+    view: 'gate',
+    body: (c) =>
+      c.run.pourStartedAt === null
+        ? 'The truck goes back. A new pour cannot start in a high-risk zone, and no tent brings the deck below it today. The crews rotate on short work periods with long rests in the cabin; the slab moves to an early-morning slot.'
+        : 'The pour goes ahead in the high-risk zone with the whole crew in the sun.',
+  },
+  {
+    id: 'suresh-red',
+    at: (c) => (c.branch === 'original' ? eventMinute(c.run, 'red-flag', 'suresh') : null),
+    chapter: 'Chapter 3',
+    title: 'Suresh',
+    view: 'deck',
+    select: 'suresh',
+    body: () => 'Earlier than on a normal day, Suresh is confused and has to stop. It is a red flag; his name and place reach you, and first aid is on the way.',
+  },
+  {
+    id: 'end',
+    at: () => 1079,
+    chapter: 'Chapter 4',
+    title: '18:00 · No slab today',
+    view: 'overview',
+    ending: true,
+    body: (c) =>
+      c.run.pourStartedAt === null
+        ? 'No concrete was poured, and nobody was hurt. Go back to 15:10 and see what pouring anyway would have cost.'
+        : 'The slab is done. Go back to 15:10 and see the afternoon where it wasn’t.',
+  },
+];
+
+const EVERYTHING_FAILS: Beat[] = [
+  {
+    id: 'start',
+    at: () => 900,
+    chapter: 'Chapter 1',
+    title: '15:00 · A milder day, a fragile site',
+    view: 'overview',
+    body: () => 'Tuesday 26 August 2025 is milder, easing towards evening. But today the technology will fail, one piece at a time. Watch whether the warnings do.',
+  },
+  {
+    id: 'decision',
+    at: () => 910,
+    chapter: 'Chapter 2',
+    title: '15:10 · Plan for failure',
+    view: 'deck',
+    decision: true,
+    body: () => 'Three wearables are low on battery and IT warns that the network may drop. The concrete truck is still due at 15:30. Ask Omar how to run the afternoon safely.',
+  },
+  { id: 'battery-ravi', at: (c) => eventMinute(c.run, 'battery-died', 'ravi'), title: '15:40 · First battery', view: 'yard', select: 'ravi', body: () => 'Ravi’s wearable dies. His guardian switches to an estimate from the conditions and his work, and his screen says so.' },
+  { id: 'battery-suresh', at: (c) => eventMinute(c.run, 'battery-died', 'suresh'), title: '16:00 · Second battery', view: 'deck', select: 'suresh', body: () => 'Suresh’s goes too. Two of the three wearables are gone; both guardians keep warning from estimates.' },
+  {
+    id: 'network',
+    at: (c) => eventMinute(c.run, 'network-down'),
+    chapter: 'Chapter 3',
+    title: '16:05 · Thirty-five minutes without a network',
+    view: 'overview',
+    body: () => 'The site network goes down for 35 minutes. Every phone keeps the rules and the forecast on the device, so warnings continue. Only the AI wording waits until the network is back.',
+  },
+  { id: 'battery-bilal', at: (c) => eventMinute(c.run, 'battery-died', 'bilal'), title: '16:30 · Third battery', view: 'facade', select: 'bilal', body: () => 'Bilal’s wearable dies while the network is still down. Nobody on site has a working sensor now, and nobody is unprotected.' },
+  {
+    id: 'dust',
+    at: (c) => eventMinute(c.run, 'weather-modifier'),
+    title: '16:50 · Dust storm',
+    view: 'overview',
+    body: () => 'A dust storm halves the sunlight and adds humidity for almost an hour. The twin recomputes every zone; the rules use whatever they can still measure.',
+  },
+  {
+    id: 'end',
+    at: () => 1079,
+    chapter: 'Chapter 4',
+    title: '18:00 · Everything failed but the warnings',
+    view: 'overview',
+    ending: true,
+    body: () => 'Batteries, network and sunlight all failed this afternoon. Go back to 15:10 and compare the other choice.',
+  },
+];
+
+export const STORIES: Record<string, Beat[]> = {
+  'afternoon-pour': AFTERNOON_POUR,
+  'racing-the-break': RACING_THE_BREAK,
+  'no-pour-day': NO_POUR_DAY,
+  'everything-fails': EVERYTHING_FAILS,
+};

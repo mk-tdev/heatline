@@ -88,9 +88,11 @@ describe('planner levers and tools', () => {
     expect(plan.assignments.filter((a) => a.worker === 'bilal').every((a) => a.zone === 'store')).toBe(true);
   });
 
-  it('reports why an impossible pour time cannot be staffed', () => {
-    const result = runPlannerTool(world, 'check_plan', { tents: [], pourStart: '17:50', standDown: [] }) as { note?: string };
-    expect(result.note).toMatch(/cannot be staffed/);
+  it('refuses, rather than silently drops, a pour that cannot lawfully start', () => {
+    const result = runPlannerTool(world, 'check_plan', { tents: [], pourStart: '17:50', standDown: [] }) as { ok: boolean; note?: string; violations: { rule: string }[] };
+    expect(result.ok).toBe(false);
+    expect(result.violations.map((v) => v.rule)).toContain('pour-not-possible');
+    expect(result.note).toMatch(/not allowed/);
   });
 });
 

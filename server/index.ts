@@ -10,7 +10,7 @@ import { zodTextFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
 import template from '../data/scenario/saadiyat-tower.json' with { type: 'json' };
 import weather from '../data/weather/abu-dhabi-2025-08.json' with { type: 'json' };
-import { buildScenario, createEnvironment, runShift, type OpenMeteoHourly, type ScenarioTemplate } from '@heatline/sim';
+import { SCENARIOS, buildCatalogScenario, createEnvironment, runShift, type OpenMeteoHourly, type ScenarioTemplate } from '@heatline/sim';
 import {
   GUARDIAN_SYSTEM,
   GuardianMessage,
@@ -57,6 +57,8 @@ const GuardianInput = z.strictObject({
   minutesWorkedWithoutRest: z.number().int().min(0).max(600),
   placeLabel: z.string().max(60),
   wbgt: z.number().min(0).max(50),
+  ppe: z.string().max(60).nullable(),
+  clothingAdjustC: z.number().min(0).max(5),
 });
 const CrewInput = z.strictObject({
   crew: z.string().max(4),
@@ -78,7 +80,7 @@ const CrewInput = z.strictObject({
 });
 const SafetyInput = z.strictObject({ clock: z.string().regex(/^\d{2}:\d{2}$/), crews: z.array(CrewInput).max(10) });
 const PlannerInput = z.strictObject({
-  date: z.string().regex(/^2025-08-\d{2}$/),
+  scenario: z.enum(SCENARIOS.map((s) => s.id) as [string, ...string[]]),
   effectiveAt: z.number().int().min(0).max(1440),
   unavailable: z.array(z.string().max(20)).max(30),
   ask: z.string().max(300),
@@ -112,8 +114,8 @@ const withTimeout = <T>(ms: number, run: (signal: AbortSignal) => Promise<T>): P
   return run(controller.signal).finally(() => clearTimeout(timer));
 };
 
-function world(date: string, effectiveAt: number, unavailable: string[]): PlannerWorld {
-  const scenario = buildScenario(template as ScenarioTemplate, weather as OpenMeteoHourly, { date });
+function world(scenarioId: string, effectiveAt: number, unavailable: string[]): PlannerWorld {
+  const scenario = buildCatalogScenario(scenarioId, template as ScenarioTemplate, weather as OpenMeteoHourly);
   const environment = createEnvironment(scenario);
   const asPlayed = runShift(scenario, { policy: 'heatline', environment });
   const rec = asPlayed.minutes.find((m) => m.minute === effectiveAt - 1);
@@ -180,7 +182,7 @@ async function safety(clock: string, crews: CrewSummary[]) {
 async function planner(input: z.infer<typeof PlannerInput>, res: ServerResponse) {
   res.writeHead(200, { 'content-type': 'application/x-ndjson; charset=utf-8', 'cache-control': 'no-store' });
   const write = (event: unknown) => res.write(`${JSON.stringify(event)}\n`);
-  const w = world(input.date, input.effectiveAt, input.unavailable);
+  const w = world(input.scenario, input.effectiveAt, input.unavailable);
   const deadline = Date.now() + 75_000;
   const finishWithRules = (reason: string) => {
     const check = checkLevers(w, {}, 'Rules-based protective plan');

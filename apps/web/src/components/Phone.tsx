@@ -84,6 +84,11 @@ export function Phone({
             <b>{ctx.minutesWorkedWithoutRest} min</b>
           </div>
         </div>
+        {ctx.ppe && (
+          <div className="ppe">
+            Wearing: {ctx.ppe} · counts as +{ctx.clothingAdjustC}°C of heat
+          </div>
+        )}
         <small className="muted">
           {ctx.source === 'wearable' ? 'Readings from their wearable' : 'No wearable signal: estimated from conditions and work'} · {ctx.placeLabel}, {ctx.wbgt.toFixed(1)}°C
           <br />

@@ -1,5 +1,5 @@
 // Supervisor console: crew-level information only (the privacy boundary), Noor's brief, the
-// 15:10 decision with Omar's streamed reasoning, and the site log.
+// decision with Omar's streamed reasoning, and the site log.
 
 import type { CrewSummary, RedFlagDisclosure, SafetyBrief } from '@heatline/agents';
 import type { SimEvent } from '@heatline/contracts';
@@ -99,7 +99,9 @@ export function DecisionCard({
   onApprove,
   onKeep,
   setAsk,
+  clock,
 }: {
+  clock: string;
   state: DecisionState;
   onAsk: () => void;
   onApprove: () => void;
@@ -114,8 +116,8 @@ export function DecisionCard({
       <header>
         <span className="avatar omar">O</span>
         <div>
-          <strong>15:10 · Decision</strong>
-          <small>The concrete truck is due at 15:30. Omar plans; the rules decide what is allowed; you approve.</small>
+          <strong>{clock} · Decision</strong>
+          <small>Omar plans; the rules decide what is allowed; you approve.</small>
         </div>
       </header>
       <div className="ask">
@@ -149,7 +151,7 @@ export function DecisionCard({
           </ul>
           {final.check.forecast && (
             <div className="forecast">
-              <span>Forecast to 18:00</span>
+              <span>Forecast to the end of the shift</span>
               <b>{final.check.forecast.minutesPsi7}</b> high-strain worker-min · <b>{final.check.forecast.redFlags}</b> red flags · pour {final.check.forecast.pourStart ?? '—'}–{final.check.forecast.pourFinish ?? '—'}
             </div>
           )}

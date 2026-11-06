@@ -110,7 +110,10 @@ export function checkLevers(world: PlannerWorld, levers: PlanLevers, label = 'Om
   const violations = [...grouped].map(([rule, g]) => ({ rule, ...g }));
   let note: string | undefined;
   if (levers.pourStart !== null && levers.pourStart !== undefined && plan.pourStart === null) {
-    note = `A pour at ${formatClock(levers.pourStart)} cannot be staffed within the rules (zone too hot for the crew available, or after the truck window).`;
+    // Never silently drop a requested pour: refuse, and make "no pour" an explicit choice.
+    note = `A pour starting at ${formatClock(levers.pourStart)} is not allowed: the deck is in the high-risk zone, the crew cannot staff it within the work/rest limits, it would run into the midday break, or it is outside the truck window. Choose another time or no pour (null).`;
+    violations.push({ rule: 'pour-not-possible', count: 1, example: note });
+    return { ok: false, plan, violations, forecast: null, note };
   }
   if (!result.ok) return { ok: false, plan, violations, forecast: null, note };
   const run = runShift(scenario, { policy: 'heatline', environment, decisions: [{ at: effectiveAt, plan }] });

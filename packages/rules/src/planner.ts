@@ -8,7 +8,7 @@
 // earliest minute the deck crew can staff it continuously within the rules.
 
 import type { Activity, Assignment, Minute, Plan, Scenario, ShadeTent, WorkerProfile } from '@heatline/contracts';
-import { ZONE_RULES, exposureCapMin, heatZone, isAcclimatised, twlWorkClass } from './tables';
+import { ZONE_RULES, exposureCapMin, heatZone, isAcclimatised, middayBanApplies, twlWorkClass } from './tables';
 
 /**
  * High-level choices a person or a model can make; the planner turns them into a
@@ -41,6 +41,8 @@ const REST_ZONE = 'cabin';
 const OVERFLOW_REST_ZONE = 'shelter';
 const LIGHT_DUTY_ZONE = 'store';
 const REST_WATER_LPH = 0.3;
+const PRE_POUR_REST_MIN = 15;
+const POUR_CONTINGENCY_MIN = 15;
 
 export function protectivePlan(input: PlannerInput): Plan {
   const { scenario, effectiveAt } = input;
@@ -60,6 +62,7 @@ export function protectivePlan(input: PlannerInput): Plan {
 
   const end = scenario.end;
   const assignments: Assignment[] = [];
+  const isOutdoor = (zone: string) => ['outdoor', 'elevated'].includes(scenario.zones.find((z) => z.id === zone)?.kind ?? '');
   const cabinLoad = new Map<Minute, number>();
   const restZoneFor = (from: Minute, to: Minute): string => {
     const cap = scenario.zones.find((z) => z.id === REST_ZONE)?.capacity ?? Infinity;
@@ -67,26 +70,35 @@ export function protectivePlan(input: PlannerInput): Plan {
     for (let m = from; m < to; m++) cabinLoad.set(m, (cabinLoad.get(m) ?? 0) + 1);
     return REST_ZONE;
   };
-  const allowedWork = (zone: string, activity: Activity, from: Minute, to: Minute): number => {
+  const allowedWork = (zone: string, activity: Activity, from: Minute, to: Minute, clothing = 0): number => {
     const cls = twlWorkClass(activity);
     if (!cls) return 60;
     let min = 60;
+    const outdoor = isOutdoor(zone);
     for (let m = from; m < to; m++) {
-      const rule = ZONE_RULES[heatZone(input.zoneWbgt(zone, m, shade))];
+      if (outdoor && middayBanApplies(scenario.date, m)) return 0;
+      const rule = ZONE_RULES[heatZone(input.zoneWbgt(zone, m, shade) + clothing)];
       min = Math.min(min, rule.essentialOnly ? 0 : rule.workPerHour[cls]);
     }
     return min;
   };
-  const waterFor = (zone: string, from: Minute, to: Minute): number => {
+  const waterFor = (zone: string, from: Minute, to: Minute, clothing = 0): number => {
     let litres = 0;
-    for (let m = from; m < to; m++) litres += ZONE_RULES[heatZone(input.zoneWbgt(zone, m, shade))].waterLph / 60;
+    for (let m = from; m < to; m++) litres += ZONE_RULES[heatZone(input.zoneWbgt(zone, m, shade) + clothing)].waterLph / 60;
     return litres;
   };
 
   const lightDuty: WorkerProfile[] = [];
   const pour = levers.pourStart === null ? null : planPour(input, shade, new Set([...unavailable, ...standDown]), levers.pourStart);
   const pourCrew = new Set(pour?.crew.map((w) => w.id) ?? []);
-  const pourEnd = pour ? pour.start + scenario.pour.durationMin : 0;
+  // The pour window carries a contingency: guardian rest calls can pause the pour, and work keeps
+  // going until the concrete is placed.
+  let pourEnd = pour ? Math.min(end, pour.start + scenario.pour.durationMin + POUR_CONTINGENCY_MIN) : 0;
+  // The contingency never runs into the midday break.
+  if (pour) for (let m = pour.start; m < pourEnd; m++) if (middayBanApplies(scenario.date, m)) {
+    pourEnd = m;
+    break;
+  }
 
   /**
    * Rotate a worker on their own task from `from` to `to`, in slots of an hour. The whole crew
@@ -96,9 +108,10 @@ export function protectivePlan(input: PlannerInput): Plan {
   const ownTask = (w: WorkerProfile, task: (typeof scenario.tasks)[number], from: Minute, to: Minute, restFirst = false) => {
     for (let slot = from; slot < to; slot += SLOT) {
       const slotEnd = Math.min(to, slot + SLOT);
-      const work = allowedWork(task.zone, task.activity, slot, slotEnd);
+      const clothing = w.clothingAdjustC ?? 0;
+      const work = allowedWork(task.zone, task.activity, slot, slotEnd, clothing);
       const offset = restFirst && slot === from ? Math.max(0, slotEnd - slot - work) : 0;
-      rotate(assignments, w, slot, slotEnd, work, offset, task.zone, task.activity, undefined, waterFor(task.zone, slot, slotEnd), restZoneFor);
+      rotate(assignments, w, slot, slotEnd, work, offset, task.zone, task.activity, undefined, waterFor(task.zone, slot, slotEnd, clothing), restZoneFor);
     }
   };
 
@@ -116,7 +129,10 @@ export function protectivePlan(input: PlannerInput): Plan {
         ownTask(w, task, effectiveAt, end);
         continue;
       }
-      if (pour.start > effectiveAt) ownTask(w, task, effectiveAt, pour.start);
+      // Come to the pour cool: rest in the cabin just before it starts.
+      const restFrom = Math.max(effectiveAt, pour.start - PRE_POUR_REST_MIN);
+      if (restFrom > effectiveAt) ownTask(w, task, effectiveAt, restFrom);
+      if (pour.start > restFrom) assignments.push({ worker: w.id, from: restFrom, to: pour.start, zone: restZoneFor(restFrom, pour.start), activity: 'rest', drinkL: 0.3, reason: 'cool down before the pour' });
       rotate(assignments, w, pour.start, pourEnd, pour.workPerHour, pour.offsets.get(w.id)!, scenario.pour.zone, 'heavy', 'pour', waterFor(scenario.pour.zone, pour.start, pourEnd), restZoneFor);
       if (pourEnd < end) ownTask(w, task, pourEnd, end, true);
     }
@@ -164,16 +180,23 @@ function enforceLimits(input: PlannerInput, blocks: Assignment[], shade: Pick<Pl
     timeline.set(b.worker, row);
   }
   const heat = (slot: MinuteSlot) => slot.activity !== 'rest' && kind.get(slot.zone) !== 'cabin';
+  const clothingOf = new Map(scenario.workers.map((w) => [w.id, w.clothingAdjustC ?? 0]));
+  const wbgtFor = (worker: string, zone: string, minute: Minute) => input.zoneWbgt(zone, minute, shade) + (kind.get(zone) === 'cabin' ? 0 : (clothingOf.get(worker) ?? 0));
   const toRest = (slot: MinuteSlot): MinuteSlot => ({ zone: OVERFLOW_REST_ZONE, activity: 'rest', reason: 'limit enforced', drink: slot.drink });
 
   for (let pass = 0; pass < 6; pass++) {
     let changed = false;
-    for (const row of timeline.values()) {
+    for (const [worker, row] of timeline) {
       for (let i = 0; i < row.length; i++) {
         const slot = row[i]!;
         if (!heat(slot)) continue;
+        if (kind.get(slot.zone) !== 'cabin' && middayBanApplies(scenario.date, effectiveAt + i)) {
+          row[i] = toRest(slot);
+          changed = true;
+          continue;
+        }
         const cls = twlWorkClass(slot.activity)!;
-        const limit = ZONE_RULES[heatZone(input.zoneWbgt(slot.zone, effectiveAt + i, shade))].workPerHour[cls];
+        const limit = ZONE_RULES[heatZone(wbgtFor(worker, slot.zone, effectiveAt + i))].workPerHour[cls];
         const from = Math.max(0, i - 59);
         let worked = 0;
         for (let j = from; j <= i; j++) if (row[j]!.activity !== 'rest') worked++;
@@ -204,9 +227,9 @@ function enforceLimits(input: PlannerInput, blocks: Assignment[], shade: Pick<Pl
 
   // Water: the zone's hourly requirement, drunk across every minute of work (bottles on
   // site), plus a cup an hour while resting.
-  for (const row of timeline.values()) {
+  for (const [worker, row] of timeline) {
     row.forEach((slot, i) => {
-      slot.drink = slot.activity !== 'rest' ? ZONE_RULES[heatZone(input.zoneWbgt(slot.zone, effectiveAt + i, shade))].waterLph / 60 : REST_WATER_LPH / 60;
+      slot.drink = slot.activity !== 'rest' ? ZONE_RULES[heatZone(wbgtFor(worker, slot.zone, effectiveAt + i))].waterLph / 60 : REST_WATER_LPH / 60;
     });
   }
 
@@ -237,6 +260,10 @@ function planPour(input: PlannerInput, shade: Pick<Plan, 'tents'>, unavailable: 
   const earliest = fixedStart ?? Math.max(pour.truckArrives, input.effectiveAt);
   const latest = fixedStart ?? scenario.end - pour.durationMin;
   for (let start = earliest; start <= latest && start + pour.durationMin <= scenario.end; start += 5) {
+    if (ZONE_RULES[heatZone(input.zoneWbgt(pour.zone, start, shade))].essentialOnly) continue; // no new pour in a high-risk zone
+    let overlapsBan = false;
+    for (let m = start; m < start + pour.durationMin; m++) if (middayBanApplies(scenario.date, m)) overlapsBan = true;
+    if (overlapsBan) continue; // a pour must be finished before the midday break
     let work = 60;
     for (let m = start; m < start + pour.durationMin; m++) {
       work = Math.min(work, ZONE_RULES[heatZone(input.zoneWbgt(pour.zone, m, shade))].workPerHour.heavy);
@@ -244,7 +271,8 @@ function planPour(input: PlannerInput, shade: Pick<Plan, 'tents'>, unavailable: 
     if (work <= 0) continue;
     const groups = Math.ceil(60 / work);
     if (candidates.length < groups * pour.minCrew) continue;
-    const crew = candidates.slice(0, groups * pour.minCrew);
+    // One spare per rotation group when people are available, so a rest call doesn't stop the pour.
+    const crew = candidates.slice(0, Math.min(candidates.length, groups * (pour.minCrew + 1)));
     // Never strand one worker on a crew task (no lone work): bring them onto the pour too.
     for (const other of new Set(candidates.map((w) => w.crew))) {
       const left = candidates.filter((w) => w.crew === other && !crew.includes(w));

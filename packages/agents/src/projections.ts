@@ -104,6 +104,9 @@ export interface GuardianContext {
   minutesWorkedWithoutRest: number;
   placeLabel: string;
   wbgt: number;
+  /** protective clothing being worn and its WBGT adjustment, if any */
+  ppe: string | null;
+  clothingAdjustC: number;
 }
 
 export function guardianContext(scenario: Scenario, rec: MinuteRecord, workerId: string): GuardianContext {
@@ -129,6 +132,8 @@ export function guardianContext(scenario: Scenario, rec: MinuteRecord, workerId:
     minutesWorkedWithoutRest: o.continuousWorkMin,
     placeLabel: place.label,
     wbgt: round1(rec.zones.find((z) => z.zone === o.zone)!.wbgt),
+    ppe: profile.ppe ?? null,
+    clothingAdjustC: profile.clothingAdjustC ?? 0,
   };
 }
 

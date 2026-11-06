@@ -14,9 +14,46 @@ Deadlines: registration closes **10 Nov**; prototype due **20 Nov** per Hack2ski
 | 6 Nov | M3 experience | **First playable** | 3D twin with real sun and shadows, console, worker phone, 15:10 decision, rewind compare; runs locally with `npm run dev` |
 | 6 Nov | M3b story and realism (team feedback: "only one building", characters not authentic, needs a story) | **Done** | Entry screen; nine story beats with camera moves; full Saadiyat district; articulated UAE-site workers; dust haze. Both branches verified end to end in the browser |
 | — | M4 rewind | **Partly done** | Branch from the 15:10 decision and side-by-side metrics. Open: any-decision rewind, split-screen replay, debrief agent |
-| — | M5 evidence, M6 field + forecast | Not started | |
+| 7 Nov | M3c scenarios + coverage (team feedback: compact panels, more scenarios to meet the brief) | **Done** | Four scenarios, compact panels, PPE, strict midday ban, August back-test and evidence view; 72 tests |
+| 7 Nov | M5 evidence | **Done** | `npm run backtest` → `data/backtest/august-2025.json`; evidence report in the app |
+| — | M6 field + forecast | Partly (field failures scenario done) | Open: forecast mode for any coordinates, deployment |
 
 **Run it locally:** put `OPENAI_API_KEY` (and optionally `OPENAI_MODEL`) in `.env`, then `npm install` and `npm run dev`. Open http://127.0.0.1:5183. The API server runs on port 8787; without a key, everything runs in rules-only mode.
+
+## Coverage of the challenge's desired outcomes
+
+| Desired outcome (Climate-Resilient Worker Health) | Where Heatline shows it | Evidence |
+| --- | --- | --- |
+| Dynamic heat-risk assessment | Every scenario: Liljegren WBGT per zone and minute from real weather, shade, tents, clothing, workload, acclimatisation, hydration, optional wearables | `tests/climate.test.ts`, `tests/physiology.test.ts`; *The day nobody should pour* |
+| Clear, graded, multilingual warnings | Guardian on each worker's phone in 7 languages; four levels; one concrete action each | Live `gpt-6-luna` + rule fallbacks; `tests/projections.test.ts` |
+| Worker-first governance | Projections: crews only for the supervisor, name only on a red flag; no disciplinary data path | Leakage tests over every minute of both branches |
+| Field-ready operation | *When everything fails*: three wearables die, 35-minute network outage, dust storm; warnings continue on estimates | `tests/scenarios.test.ts` |
+| Supervisor decision support | A decision in every scenario; Omar's tools run the real engine; rules refuse unlawful plans | Pour timing, tents, stand-downs, midday break (*Racing the midday break*) |
+| Safety and productivity measures | August evidence report: lead time, false alarms, red flags, escalation, compliance, rest time, pours completed | 93 shifts × 4 policies |
+
+## Scenarios (implemented 7 Nov, `packages/sim/src/catalog.ts`, stories in `apps/web/src/story.ts`)
+
+| Scenario | Real day and shift | What it tests | Rules planner outcome (vs no intervention) |
+| --- | --- | --- | --- |
+| The afternoon pour | Tue 19 Aug 2025, 15:00–18:00 | Rotation, tents, red-flag escalation | 0 red flags (2), 17 high-strain worker-min (2,196), pour 15:30–16:15 |
+| Racing the midday break | Tue 12 Aug 2025, 09:30–13:00 | Midday ban, coveralls (+1 °C), re-acclimatisation after 3 weeks' leave | 0 red flags (2), pour done by 12:20, 0 breaches of the 12:30 ban |
+| The day nobody should pour | Fri 1 Aug 2025, 15:00–18:00 | Saying no: no lawful pour start exists | No pour, 0 high-strain minutes; no intervention gives 8 red flags |
+| When everything fails | Tue 26 Aug 2025, 15:00–18:00 | Battery, network and dust failures | 0 red flags (2); warnings continue on estimates during the outage |
+
+Rules added for coverage: **pour-start-high** (a new pour cannot start in a high-risk zone; a started pour may continue), **strict midday break** (no outdoor work 12:30–15:00, tents do not exempt; only recorded technical exemptions), **pour-not-possible** (the planner tool refuses rather than silently drops a requested pour), **clothing adjustment** per worker (ACGIH), pour crews with one spare per rotation group, 15 minutes cool-down before and a 15-minute contingency after.
+
+## August 2025 back-test (implemented 7 Nov, `packages/sim/src/backtest.ts`)
+
+31 days × 3 windows (07:00–10:00, 10:00–12:30, 15:00–18:00) × 4 policies, scripted failures removed. Runs in under 2 seconds.
+
+| Policy (93 shifts) | High-strain worker-min | Severe-strain worker-min | Red flags | Median min to cooling | Violation episodes | Rest worker-min | Pours done |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| No intervention | 177,118 | 31,503 | 197 | 6 | 6,863 | 56,189 | 93 |
+| Site-wide flags | 118,357 | 10,625 | 52 | 6 | 5,201 | 96,575 | 93 |
+| Heatline warnings only | 20,462 | 5,100 | 65 | 1 | 4,150 | 111,902 | 93 |
+| Heatline + protective plan | 12,712 | 0 | 0 | — | 11 | 149,860 | 85 |
+
+Warning performance (from no-intervention runs, judged against true strain the warning system cannot see): 86% of high-strain episodes warned in advance (3,815 of 4,449), median lead time 36 minutes (10th percentile 2 minutes), 10% false alarms (361 of 3,580 amber onsets). Honest findings: warnings alone still allow red flags when people push through; an enforced plan removes them; safety costs rest time and 8 pours with no lawful start.
 
 ## 1. Planning assumptions and decisions
 

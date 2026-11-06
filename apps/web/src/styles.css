@@ -888,3 +888,378 @@ button.big {
   padding: 12px 22px;
   border-radius: 12px;
 }
+
+/* ---- Compact layout (team feedback 7 Nov: side panels too tight) -------------------------- */
+.app {
+  grid-template-columns: 300px 1fr 268px;
+  grid-template-rows: 48px 1fr 60px;
+  font-size: 12px;
+}
+.topbar {
+  gap: 16px;
+  padding: 0 12px;
+}
+.brand {
+  font-size: 15px;
+  min-width: 0;
+  white-space: nowrap;
+}
+.brand small {
+  font-size: 11px;
+}
+.clock b {
+  font-size: 19px;
+}
+.clock small,
+.stat span {
+  font-size: 10px;
+}
+.stat b {
+  font-size: 12px;
+}
+.ai {
+  font-size: 11px;
+  padding: 3px 8px;
+}
+.top-actions button {
+  font-size: 12px;
+  padding: 4px 9px;
+}
+.console {
+  padding: 8px;
+  gap: 7px;
+}
+.card {
+  padding: 8px 10px;
+  border-radius: 10px;
+}
+.card header {
+  gap: 8px;
+  margin-bottom: 5px;
+}
+.card header strong {
+  font-size: 12px;
+}
+.card small,
+small {
+  font-size: 10.5px;
+}
+.avatar {
+  width: 22px;
+  height: 22px;
+  font-size: 11px;
+}
+.requests {
+  font-size: 11.5px;
+  gap: 4px;
+}
+.requests li {
+  padding: 4px 6px;
+  gap: 6px;
+}
+.card p {
+  font-size: 11.5px;
+  margin: 4px 0 0;
+}
+.crews {
+  gap: 6px;
+}
+.crew {
+  padding: 7px 9px;
+  border-radius: 10px;
+}
+.crew-head {
+  margin-bottom: 5px;
+  gap: 7px;
+}
+.crew-head strong {
+  font-size: 11.5px;
+}
+.crew-badge {
+  width: 20px;
+  height: 20px;
+  font-size: 11px;
+}
+.levelbar {
+  height: 12px;
+  font-size: 9px;
+}
+.crew-foot {
+  font-size: 10px;
+  margin-top: 4px;
+}
+.chip {
+  font-size: 9px;
+}
+.ask textarea {
+  font-size: 11.5px;
+}
+.ask button {
+  font-size: 11.5px;
+  padding: 4px 8px;
+}
+.steps {
+  font-size: 11px;
+  margin-top: 6px;
+}
+.plan {
+  font-size: 11.5px;
+  padding: 8px;
+}
+.forecast {
+  font-size: 11px;
+}
+.buttons button {
+  font-size: 11.5px;
+  padding: 5px 10px;
+}
+.log ul {
+  font-size: 11px;
+}
+.redflag {
+  font-size: 11.5px;
+}
+.phone-wrap {
+  padding: 8px;
+}
+.tabs {
+  gap: 4px;
+  margin-bottom: 7px;
+}
+.tabs button {
+  font-size: 11px;
+  padding: 3px 7px;
+}
+.phone {
+  border-radius: 18px;
+  padding: 11px 10px;
+  gap: 7px;
+}
+.phone-banner {
+  font-size: 10px;
+  padding-bottom: 5px;
+}
+.phone-head strong {
+  font-size: 15px;
+}
+.level {
+  font-size: 10px;
+  padding: 2px 7px;
+}
+.action {
+  font-size: 12px;
+  padding: 4px 8px;
+}
+.guardian {
+  font-size: 15px;
+  min-height: 40px;
+  line-height: 1.4;
+}
+.english {
+  font-size: 11px;
+}
+.readings {
+  gap: 4px;
+}
+.readings div {
+  padding: 4px 6px;
+  border-radius: 8px;
+}
+.readings span {
+  font-size: 10px;
+}
+.readings b {
+  font-size: 14px;
+}
+.phone small {
+  font-size: 10px;
+}
+.timeline {
+  gap: 10px;
+  padding: 0 12px;
+}
+.play {
+  width: 34px;
+  height: 34px;
+  font-size: 12px;
+}
+.speeds button {
+  font-size: 11px;
+  padding: 3px 6px;
+}
+.ticks {
+  font-size: 10px;
+}
+.disclaimer {
+  font-size: 10px;
+  max-width: 200px;
+}
+.zone-label {
+  font-size: 11px;
+  padding: 3px 7px;
+}
+.worker-label {
+  font-size: 10px;
+}
+.views button {
+  font-size: 11px;
+  padding: 3px 7px;
+}
+.branch-tag {
+  font-size: 12px;
+  padding: 3px 11px;
+}
+.story-card {
+  padding: 14px 16px;
+}
+.story-card h3 {
+  font-size: 18px;
+}
+.story-card p {
+  font-size: 13.5px;
+}
+
+/* Scenario cards on the entry screen */
+.scenarios {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 26px;
+}
+.scenario-card {
+  background: rgba(40, 33, 27, 0.9);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+.scenario-card:hover {
+  border-color: rgba(232, 163, 61, 0.55);
+}
+.scenario-meta {
+  font-size: 11px;
+  color: var(--muted);
+}
+.scenario-card h3 {
+  margin: 4px 0 4px;
+  font-size: 18px;
+}
+.scenario-card p {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.covers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.covers span {
+  font-size: 10.5px;
+  padding: 2px 7px;
+  border-radius: 9px;
+  background: rgba(232, 163, 61, 0.14);
+  color: #f2c27b;
+}
+.intro-card button {
+  font-size: 12px;
+}
+
+/* Evidence report */
+.evidence-overlay {
+  z-index: 80;
+  overflow-y: auto;
+  align-items: start;
+  padding: 32px 0;
+}
+.evidence {
+  width: min(1080px, 94vw);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px 20px;
+}
+.evidence header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+.evidence header strong {
+  font-size: 17px;
+}
+.ev-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.ev-kpis div {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+.ev-kpis b {
+  font-size: 24px;
+  display: block;
+}
+.ev-kpis span {
+  font-size: 11.5px;
+  color: var(--ink-2);
+}
+.evidence table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.evidence th,
+.evidence td {
+  text-align: left;
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--line);
+  font-variant-numeric: tabular-nums;
+  vertical-align: top;
+}
+.evidence th {
+  color: var(--ink-2);
+  font-weight: 600;
+  font-size: 11px;
+}
+.evidence td small {
+  color: var(--muted);
+}
+.evidence td {
+  position: relative;
+}
+.ev-bar {
+  display: block;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(232, 163, 61, 0.55);
+  margin-bottom: 3px;
+}
+.evidence td.win {
+  color: #9be3bd;
+  font-weight: 700;
+}
+.evidence h4 {
+  margin: 16px 0 6px;
+  font-size: 13px;
+}
+.compact-table td,
+.compact-table th {
+  padding: 5px 8px;
+}
+.ev-notes p {
+  font-size: 12px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+
+.ppe {
+  font-size: 10.5px;
+  background: rgba(232, 163, 61, 0.14);
+  color: #f2c27b;
+  border-radius: 8px;
+  padding: 4px 7px;
+}

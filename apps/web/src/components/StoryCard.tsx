@@ -4,7 +4,8 @@ import type { RunMetrics } from '@heatline/sim';
 import { formatClock } from '@heatline/contracts';
 import type { Beat, BeatContext } from '../story';
 
-export function StoryCard({ beat, ctx, metrics, onContinue, onDecideAgain, onCompare, onExplore, canCompare }: { beat: Beat; ctx: BeatContext; metrics: RunMetrics; onContinue: () => void; onDecideAgain: () => void; onCompare: () => void; onExplore: () => void; canCompare: boolean }) {
+export function StoryCard({ beat, ctx, metrics, onContinue, onDecideAgain, onCompare, onExplore, canCompare, decisionAt }: { beat: Beat; ctx: BeatContext; metrics: RunMetrics; onContinue: () => void; onDecideAgain: () => void; onCompare: () => void; onExplore: () => void; canCompare: boolean; decisionAt: number }) {
+  const at = formatClock(decisionAt);
   return (
     <div className={`story-card${beat.decision ? ' decision-beat' : ''}`}>
       {beat.chapter && <div className="chapter">{beat.chapter}</div>}
@@ -25,8 +26,8 @@ export function StoryCard({ beat, ctx, metrics, onContinue, onDecideAgain, onCom
             <span>pour finished</span>
           </div>
           <div>
-            <b>{ctx.run.violations.filter((v) => v.minute >= 910).length}</b>
-            <span>rule breaches after 15:10</span>
+            <b>{ctx.run.violations.filter((v) => v.minute >= decisionAt).length}</b>
+            <span>rule breaches after {at}</span>
           </div>
         </div>
       )}
@@ -36,10 +37,10 @@ export function StoryCard({ beat, ctx, metrics, onContinue, onDecideAgain, onCom
         ) : beat.ending ? (
           <>
             <button className="primary" onClick={onDecideAgain}>
-              Go back to 15:10 and decide again
+              Go back to {at} and decide again
             </button>
-            <button onClick={onCompare} disabled={!canCompare} title={canCompare ? '' : 'Approve a plan at 15:10 to have a second afternoon to compare'}>
-              Compare both afternoons
+            <button onClick={onCompare} disabled={!canCompare} title={canCompare ? '' : `Approve a plan at ${at} to have a second shift to compare`}>
+              Compare both choices
             </button>
             <button onClick={onExplore}>Explore freely</button>
           </>

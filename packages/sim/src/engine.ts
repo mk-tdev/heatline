@@ -157,7 +157,8 @@ export function runShift(scenario: Scenario, options: RunOptions): RunResult {
       const { w, s, zone, activity } = p;
       const zoneKind = scenario.zones.find((z) => z.id === zone)!.kind;
       const condition = conditionOf.get(zone)!;
-      const wbgt = condition.wbgt;
+      // Protective clothing raises the effective WBGT outside air-conditioned rooms.
+      const wbgt = condition.wbgt + (zoneKind === 'cabin' ? 0 : (w.clothingAdjustC ?? 0));
       const shaded = zoneKind !== 'cabin' && condition.shaded;
       const inputs = { activity, wbgt, inCabin: zoneKind === 'cabin', inShade: shaded, acclimatisationDay: w.acclimatisationDay };
 
@@ -365,7 +366,8 @@ function recordViolations(w: WorkerProfile, s: WorkerState, zone: string, activi
     if (!rule.unacclimatisedAllowed && !isAcclimatised(w.acclimatisationDay)) now.add('unacclimatised-in-zone');
     if (rule.workPerHour[cls] < 60 && s.continuousWork > rule.workPerHour[cls] + 5) now.add('work-rest');
     if (rule.essentialOnly && !(zone === scenario.pour.zone && plan.pourStart !== null)) now.add('essential-only');
-    if (middayBanApplies(scenario.date, minute) && !plan.tents.some((t) => t.zone === zone && t.readyAt <= minute)) now.add('midday-ban');
+    // The midday break bans outdoor work, shaded or not; only recorded technical exemptions are allowed.
+    if (middayBanApplies(scenario.date, minute) && !(plan.exemptions ?? []).some((e) => e.worker === w.id)) now.add('midday-ban');
   }
   if (!isAcclimatised(w.acclimatisationDay) && s.exposure > exposureCapMin(w.acclimatisationDay, w.experienced) && zoneKind !== 'cabin') now.add('acclimatisation-cap');
   for (const r of now) {

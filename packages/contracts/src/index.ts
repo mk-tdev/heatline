@@ -59,6 +59,13 @@ export interface WorkerProfile {
   batteryDiesAt?: Minute;
   /** behaviour: skips rest breaks that are not enforced */
   skipsBreaks?: boolean;
+  /**
+   * Clothing adjustment added to WBGT outside air-conditioned rooms [°C], e.g. +1 for
+   * polyolefin coveralls, +3 for double-layer woven garments (ACGIH; research/02).
+   */
+  clothingAdjustC?: number;
+  /** what the worker is wearing, for display (e.g. "polyolefin coverall") */
+  ppe?: string;
 }
 
 export interface CrewTask {
@@ -105,6 +112,8 @@ export interface Scenario {
   /** concrete pour: crew, zone, earliest start, duration, minimum crew on deck */
   pour: { crew: string; zone: string; truckArrives: Minute; durationMin: number; minCrew: number };
   networkOutage?: { from: Minute; to: Minute };
+  /** the supervisor's decision point in the story, and the question put to the planner */
+  decision?: { at: Minute; question: string };
   weatherModifiers: WeatherModifier[];
   weather: WeatherHour[];
 }

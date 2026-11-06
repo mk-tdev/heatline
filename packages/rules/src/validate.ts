@@ -113,15 +113,15 @@ function checkWorkerMinute(
 ) {
   const { scenario, plan } = input;
   const zone = scenario.zones.find((z) => z.id === a.zone)!;
-  const wbgt = input.zoneWbgt(a.zone, minute, plan);
+  const zone0 = input.scenario.zones.find((z) => z.id === a.zone)!;
+  const wbgt = input.zoneWbgt(a.zone, minute, plan) + (zone0.kind === 'cabin' ? 0 : (w.clothingAdjustC ?? 0));
   const rule = ZONE_RULES[heatZone(wbgt)];
   const workClass = twlWorkClass(a.activity)!;
   const clock = formatClock(minute);
 
   const outdoor = zone.kind === 'outdoor' || zone.kind === 'elevated';
-  const tentShade = plan.tents.some((t) => t.zone === a.zone && t.readyAt <= minute);
-  if (outdoor && !tentShade && middayBanApplies(scenario.date, minute) && !exempt) {
-    add({ rule: 'midday-ban', minute, worker: w.id, detail: `${w.name} in direct sun at ${clock} during the midday break` });
+  if (outdoor && middayBanApplies(scenario.date, minute) && !exempt) {
+    add({ rule: 'midday-ban', minute, worker: w.id, detail: `${w.name} working outdoors at ${clock} during the midday break` });
   }
   if (!rule.unacclimatisedAllowed && !isAcclimatised(w.acclimatisationDay)) {
     add({ rule: 'unacclimatised-in-zone', minute, worker: w.id, detail: `${w.name} (day ${w.acclimatisationDay}) assigned to ${heatZone(wbgt)}-risk work in ${a.zone} at ${clock}` });
@@ -152,7 +152,8 @@ function checkWater(input: ValidationInput, byWorker: Map<string, Assignment[]>,
         const a = blocks.find((b) => b.from <= m && m < b.to);
         if (!a || a.activity === 'rest') continue;
         workMin++;
-        required += ZONE_RULES[heatZone(input.zoneWbgt(a.zone, m, plan))].waterLph / 60;
+        const cabin = scenario.zones.find((z) => z.id === a.zone)?.kind === 'cabin';
+        required += ZONE_RULES[heatZone(input.zoneWbgt(a.zone, m, plan) + (cabin ? 0 : (w.clothingAdjustC ?? 0)))].waterLph / 60;
       }
       if (workMin === 0) continue;
       const planned = blocks
@@ -171,6 +172,11 @@ function checkPour(input: ValidationInput, blockAt: (w: string, m: Minute) => As
   if (plan.pourStart === null) return;
   if (plan.pourStart < pour.truckArrives) {
     add({ rule: 'pour-before-truck', minute: plan.pourStart, detail: `Pour cannot start before the truck at ${formatClock(pour.truckArrives)}` });
+  }
+  // Starting a pour is ordinary work: not allowed in a high-risk zone. Once started, a pour may
+  // continue if conditions worsen, because stopping halfway leaves a cold joint.
+  if (ZONE_RULES[heatZone(input.zoneWbgt(pour.zone, plan.pourStart, plan))].essentialOnly) {
+    add({ rule: 'pour-start-high', minute: plan.pourStart, crew: pour.crew, detail: `The deck is in the high-risk zone at ${formatClock(plan.pourStart)}; a new pour cannot start there` });
   }
   if (plan.pourStart + pour.durationMin > (input.horizonEnd ?? scenario.end)) {
     add({ rule: 'pour-after-shift', minute: plan.pourStart, detail: 'Pour would not finish before the shift ends' });

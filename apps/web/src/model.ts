@@ -4,10 +4,9 @@
 import template from '../../../data/scenario/saadiyat-tower.json';
 import weather from '../../../data/weather/abu-dhabi-2025-08.json';
 import type { Decision, Minute, Plan, RunResult, Scenario } from '@heatline/contracts';
-import { buildScenario, createEnvironment, runMetrics, runShift, type OpenMeteoHourly, type RunMetrics, type ScenarioTemplate, type SiteEnvironment } from '@heatline/sim';
+import { buildCatalogScenario, createEnvironment, runMetrics, runShift, type OpenMeteoHourly, type RunMetrics, type ScenarioTemplate, type SiteEnvironment } from '@heatline/sim';
 import type { CrewSummary, GuardianContext, GuardianMessage, PlanCheck, SafetyBrief } from '@heatline/agents';
 
-export const DECISION_AT: Minute = 15 * 60 + 10;
 export const FEATURED = ['anwar', 'suresh', 'ravi', 'ahmed', 'bilal', 'joel'] as const;
 
 export interface World {
@@ -15,8 +14,8 @@ export interface World {
   environment: SiteEnvironment;
 }
 
-export function loadWorld(date?: string): World {
-  const scenario = buildScenario(template as ScenarioTemplate, weather as OpenMeteoHourly, { date });
+export function loadWorld(scenarioId: string): World {
+  const scenario = buildCatalogScenario(scenarioId, template as ScenarioTemplate, weather as OpenMeteoHourly);
   return { scenario, environment: createEnvironment(scenario) };
 }
 
@@ -68,7 +67,7 @@ export type PlannerEvent =
   | { type: 'tool'; name: string; args: Record<string, unknown>; result: unknown }
   | { type: 'final'; source: 'model' | 'rules'; model?: string; reason?: string; levers: Record<string, unknown>; rationale: string; check: PlanCheck };
 
-export async function askPlanner(body: { date: string; effectiveAt: Minute; unavailable: string[]; ask: string }, onEvent: (e: PlannerEvent) => void): Promise<void> {
+export async function askPlanner(body: { scenario: string; effectiveAt: Minute; unavailable: string[]; ask: string }, onEvent: (e: PlannerEvent) => void): Promise<void> {
   const r = await fetch('/api/planner', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
   if (!r.ok || !r.body) throw new Error(`planner ${r.status}`);
   const reader = r.body.getReader();

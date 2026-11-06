@@ -15,9 +15,9 @@ exports[`golden comparison: 19 Aug 2025, decision at 15:10 > matches the frozen 
     "violationEpisodes": 80,
   },
   "changed": {
-    "minutesPsi7": 69,
+    "minutesPsi7": 17,
     "minutesPsi9": 0,
-    "peakCoreC": 38.51,
+    "peakCoreC": 38.39,
     "pour": [
       "15:30",
       "16:15",

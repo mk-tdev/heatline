@@ -52,6 +52,15 @@ Decision recorded: the zone thresholds are a WBGT proxy for TWL (configurable, d
 - Scene rebuilt as a Saadiyat district (two towers under construction, finished block, villas, site facilities, roads, sea) and articulated, UAE-authentic workers.
 - Browser-verified both branches: plan approved (0 red flags, pour 15:30–16:15) and original schedule (Suresh red flag 16:43 with live Malayalam emergency message). No console errors.
 
+## Scenarios, coverage and compact UI (7 Nov, team feedback)
+
+- Four scenarios on real days, each with its own decision and story; scenario picker on the entry screen.
+- Protective clothing per worker; strict midday break; no new pour in a high-risk zone; planner refuses impossible pour requests; spares, cool-down and contingency for pour crews.
+- August back-test and in-app evidence report (lead time 36 min median, 86% detected, 10% false alarms; red flags 197 → 0 with an approved plan).
+- Compact side panels (300 px / 268 px, smaller type) to give the 3D view more room.
+- Live checks: Omar refused to pour on 1 Aug and planned the 11:30 stair-core pour to finish before 12:30 on 12 Aug. All four stories verified in the browser with no console errors.
+- Tests: **72**.
+
 ## Next
 
 1. Agent evals (30 planner runs, 60 guardian messages) recorded under `docs/eval/`.
