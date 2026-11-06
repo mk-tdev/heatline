@@ -14,8 +14,8 @@ Updated 6 November 2026 (GST).
 | Liljegren WBGT TypeScript port | **Done** | Matches ECMWF thermofeel on all 744 August 2025 hours: worst error 0.0000 °C at 4 dp (`tests/climate.test.ts`) |
 | Solar position (NOAA) | Done | Reproduces the golden cos(zenith) to 1e-6; azimuth sanity tests |
 | Heat index + Dubai flag bands | Done | NWS regression check; band boundaries |
-| Claude call with strict tool + structured output, latency at `low`/`medium` | **Blocked: needs `ANTHROPIC_API_KEY`** | — |
-| Azure Speech voices for ar-AE, hi-IN, ur-PK, bn-IN/BD, ml-IN, en | **Blocked: needs an Azure Speech key and region** | — |
+| OpenAI structured output + strict tool loop, latency at `low`/`medium` | **Waiting for `OPENAI_API_KEY`** | — |
+| `gpt-4o-mini-tts` samples in EN, AR, HI, UR, BN, ML | **Waiting for `OPENAI_API_KEY`** | Bengali and Malayalam are not in OpenAI's listed speech languages |
 | 3D asset licences | Candidates listed | `docs/assets-and-licenses.md` |
 
 ## M1 engine (done 6 Nov, ahead of the 7–8 Nov gate)
@@ -38,4 +38,4 @@ Decision recorded: the zone thresholds are a WBGT proxy for TWL (configurable, d
 
 ## Next (M2, 7–9 Nov)
 
-Role projections with leakage tests; guardian, site-safety and planner agents with fallbacks; NDJSON server. Model calls need `ANTHROPIC_API_KEY`.
+Role projections with leakage tests; guardian, site-safety and planner agents with fallbacks; NDJSON server. Provider: **OpenAI only** (decided 6 Nov): `gpt-6.1-sol` planner/debrief, `gpt-6-luna` guardian/safety, `gpt-4o-mini-tts`, `gpt-transcribe`. Model calls need `OPENAI_API_KEY`.

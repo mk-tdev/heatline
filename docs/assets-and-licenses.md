@@ -23,5 +23,6 @@ Every third-party asset, dataset and library used in the build is listed here wi
 
 | Service | Use | Notes |
 | --- | --- | --- |
-| Anthropic Claude (`claude-opus-5-5`) | Guardian, site safety, planner and debrief agents | Server-side key; optionally via Microsoft Foundry |
-| Azure AI Speech | Neural text-to-speech for EN, AR, HI, UR, BN, ML; English speech-to-text | Verify voices per locale in the M0 spike |
+| OpenAI `gpt-6.1-sol`, `gpt-6-luna` (Responses API) | Planner and debrief; guardian and site safety | Server-side `OPENAI_API_KEY` |
+| OpenAI `gpt-4o-mini-tts` | Spoken warnings | Deprecated, shuts down 6 Jan 2027; Bengali/Malayalam not in the listed languages |
+| OpenAI `gpt-transcribe` | Supervisor voice orders | — |

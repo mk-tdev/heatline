@@ -12,9 +12,9 @@ Deadlines: registration closes **10 Nov**; prototype due **20 Nov** per Hack2ski
 | Language | TypeScript throughout, Node ≥ 22 | Same stack as CrisisCraft; shared code between engine, server and tests |
 | Frontend | React 19 + Vite + Three.js via React Three Fiber | Proven in CrisisCraft and Brew & Reason |
 | Engine | Pure TypeScript package, deterministic, seeded, no wall-clock, no I/O | Replay, back-testing and tests depend on it |
-| Model | **Claude Opus 5.5** (`claude-opus-5-5`) through the Anthropic TypeScript SDK; Microsoft Foundry deployment as an option (Microsoft is an event co-creator) | Structured outputs and strict tool use; server-side refusal fallback (`fallbacks: "default"`) |
-| Effort | Guardian `low`, safety officer `low`, planner `medium`, debrief `medium` | Latency for warnings; reasoning for plans |
-| Voice | Azure AI Speech neural text-to-speech for EN, AR, HI, UR, BN, ML; speech-to-text for supervisor orders (EN) | Broad South Asian language coverage; **verify locales and voices in M0** |
+| Provider | **OpenAI for everything** (team decision, 6 Nov), official `openai` Node SDK, Responses API | One key and one SDK for agents, speech and transcription |
+| Models | Planner and debrief: `gpt-6.1-sol` (reasoning `medium`). Guardian and site safety: `gpt-6-luna` (reasoning `low`). Overridable by env (`HEATLINE_MODEL_PLANNER`, `HEATLINE_MODEL_FAST`) | Sol balances intelligence and cost; Luna is the cheapest and fastest for short, frequent messages. IDs from developers.openai.com/api/docs/models, read 6 Nov 2026 |
+| Voice | Text to speech: `gpt-4o-mini-tts` on `/v1/audio/speech` (voice `marin`/`cedar`, `instructions` for a calm tone). Supervisor orders: `gpt-transcribe` | `gpt-4o-mini-tts` shuts down 6 Jan 2027 (after the event); successor is Realtime-only. OpenAI lists Hindi, Urdu, Arabic and Tagalog for speech; **Bengali and Malayalam are not listed** — test in M0 |
 | Weather | Open-Meteo historical (scenario, back-test) and forecast (forecast mode); no key | Already downloaded and analysed in `research/data/` |
 | WBGT | TypeScript port of Liljegren (2008), validated against ECMWF thermofeel outputs on all 744 August hours (tolerance 0.15 °C) | Physically based; the simple approximation was shown to mislead ([research 03](../../research/03-abu-dhabi-heat-data.md)) |
 | TWL | Shown only from a supplied measurement or a tested implementation of Brake & Bates; otherwise display WBGT and say so | Never present an approximation as a compliance value |
@@ -55,7 +55,7 @@ data/               Scenario JSON, weather JSON (copied from research/data), rul
 | `climate` | Turn weather + sun + geometry into per-zone WBGT, heat index, shade | Fetch from the network (the server does) |
 | `sim` | Advance state per tick; apply approved plans; produce events | Call models, read the clock, render |
 | `rules` | Decide warning levels, validate plans, detect red flags, enforce governance | Defer a safety decision to a model |
-| `agents` | Build each role's permitted context, call Claude, validate outputs | See state outside its projection; mutate state |
+| `agents` | Build each role's permitted context, call OpenAI models, validate outputs | See state outside its projection; mutate state |
 | `server` | Own sessions, serialise commands, stream agent turns, hold credentials | Accept client-authored state |
 | `web` | Render, collect commands, show provenance ("what they saw") | Invent outcomes; treat animation as state |
 
@@ -169,19 +169,18 @@ Rule tables live in `data/rules/*.json`, each row with a `source` field pointing
 
 | Agent | Sees | Can do | Model |
 | --- | --- | --- | --- |
-| **Guardian** (one per featured worker) | Own signals and history, own location's conditions, own schedule, own rule state, the worker's language | Phrase the current rule-based warning; answer the worker's questions; run symptom check-ins | Claude, effort `low`, ≤ 2 sentences, strict JSON |
-| **Noor · site safety** | Crew aggregates only (counts per warning level, zone conditions, water stock, schedule compliance) | Raise crew-level requests to the supervisor | Claude, effort `low` |
-| **Omar · planner** | Noor's requests, task list, roster with *capability tags only* (acclimatised yes/no, current crew), forecast, zone map | Tools: `get_forecast`, `list_tasks`, `check_plan` (dry run), `submit_plan` | Claude, effort `medium`, tool loop (≤ 6 steps) |
-| **Debrief** | Event log and metrics of one or two runs | Write the after-action review; every claim cites event IDs; numbers are inserted from metrics, not generated | Claude, effort `medium` |
+| **Guardian** (one per featured worker) | Own signals and history, own location's conditions, own schedule, own rule state, the worker's language | Phrase the current rule-based warning; answer the worker's questions; run symptom check-ins | `gpt-6-luna`, effort `low`, ≤ 2 sentences, structured output |
+| **Noor · site safety** | Crew aggregates only (counts per warning level, zone conditions, water stock, schedule compliance) | Raise crew-level requests to the supervisor | `gpt-6-luna`, effort `low` |
+| **Omar · planner** | Noor's requests, task list, roster with *capability tags only* (acclimatised yes/no, current crew), forecast, zone map | Tools: `get_forecast`, `list_tasks`, `check_plan` (dry run), `submit_plan` | `gpt-6.1-sol`, effort `medium`, strict tool loop (≤ 6 steps) |
+| **Debrief** | Event log and metrics of one or two runs | Write the after-action review; every claim cites event IDs; numbers are inserted from metrics, not generated | `gpt-6.1-sol`, effort `medium` |
 
 Projection tests: for every role, a property test generates random states and asserts the serialised context contains no field outside the role's allowlist (e.g., no `hr`, `tc`, `symptoms` in Noor's or Omar's context).
 
-### Model use details (from the Claude API reference used for this plan)
+### Model use details (OpenAI Responses API, docs read 6 Nov 2026)
 
-- `client.messages.create` / `client.beta.messages.create` with `output_config: { effort, format: { type: "json_schema", schema } }` for single-shot roles.
-- Planner: tools with `strict: true`, `tool_choice: auto` (forced tool choice is not supported on Opus 5.5), and a prompt instruction to finish with `submit_plan`.
-- `betas: ["server-side-fallback-2026-07-01"]`, `fallbacks: "default"`; check `stop_reason` (`refusal`, `max_tokens`) before using output.
-- No `temperature`/`top_p` (rejected); thinking cannot be disabled on Opus 5.5, so latency is controlled with `effort`.
+- Single-shot roles (guardian, site safety, debrief): `openai.responses.parse({ model, reasoning: { effort }, input, text: { format: zodTextFormat(schema, name) } })`, then `response.output_parsed`; reject and fall back if parsing fails or output is incomplete.
+- Planner: `openai.responses.create` with function tools defined `strict: true` (`additionalProperties: false`, every property in `required`, optional fields as `["type", "null"]`), loop on `function_call` items, append `function_call_output` items, ≤ 6 steps, and require a final `submit_plan` call. Tool calling for Sol requires the Responses API.
+- No `temperature`/`top_p` when reasoning effort is not `none`.
 - Budgets: guardian ≤ 6 s, planner ≤ 40 s total workflow, debrief ≤ 30 s; streamed to the UI as NDJSON with visible tool steps, as in CrisisCraft.
 - Every model output passes the same guardrail class as ReRoute's coach: length, language script, no medical claims, numbers must match engine values.
 
@@ -192,8 +191,8 @@ Each role has a deterministic fallback: template warnings in all languages (pre-
 ## 8. Voice and languages
 
 - Written warnings: EN, AR, HI, UR, BN, ML. Templates are translated once and frozen; model-phrased warnings are checked by script detection and a back-translation eval (section 9).
-- Spoken: Azure AI Speech neural voices; target ≥ 4 languages live (EN, AR, HI, BN), all six if voices verify in M0. Cache audio by text hash.
-- Supervisor voice orders: speech-to-text (EN), transcript editable before sending.
+- Spoken: OpenAI `gpt-4o-mini-tts`; target EN, AR, HI, UR live (listed languages). Bengali and Malayalam are not in OpenAI's speech language list: test them in M0; if quality is poor, show the written warning and play a short pre-recorded tone plus the worker's name. Cache audio by text hash.
+- Supervisor voice orders: `gpt-transcribe` (EN), transcript editable before sending.
 - Native-speaker review of the template set before the demo is recorded (ask contacts; record who reviewed).
 
 ## 9. Replay, back-testing and evaluation
@@ -224,7 +223,7 @@ Every number is about the **simulation**, and the report says so in its title. I
 ### Agent evaluation (recorded, like CrisisCraft's 30 runs)
 
 - **Planner, 30 runs** over 3 scenario states: share of first proposals that pass validation; share passing after one revision; share protecting the unacclimatised worker; median latency.
-- **Guardian, 60 messages** (6 languages × 10 situations): correct script, length, no forbidden content, numbers match engine, back-translation preserves the action (judged by a second Claude call with a rubric, then spot-checked by a person).
+- **Guardian, 60 messages** (6 languages × 10 situations): correct script, length, no forbidden content, numbers match engine, back-translation preserves the action (judged by a second model call with a rubric, then spot-checked by a person).
 - **Projection leakage:** 0 tolerated; enforced by tests, not evals.
 
 ## 10. User interface and visual direction
@@ -255,7 +254,7 @@ heatline/
 
 | Date (GST) | Milestone | Gate |
 | --- | --- | --- |
-| **Fri 6 Nov** | M0 spikes: repo scaffold; Liljegren TS port + golden file from thermofeel; Claude call with strict tools; Azure Speech voices for 6 locales; 3D asset licences | Golden WBGT within 0.15 °C on 744 hours; 4+ languages have voices |
+| **Fri 6 Nov** | M0 spikes: repo scaffold; Liljegren TS port + golden file from thermofeel; OpenAI strict tool loop and structured output; `gpt-4o-mini-tts` samples in 6 languages; 3D asset licences | Golden WBGT within 0.15 °C on 744 hours (done); 4+ languages have acceptable voices |
 | Sat 7 – Sun 8 | M1 engine: climate, sim, rules, scenario, calibration tests; headless shift runs in < 2 s | Golden default run and comparison fixture pass |
 | **Mon 9** | M2 agents: projections + leakage tests, guardian, Noor, Omar tool loop, fallbacks, NDJSON server | **Confirm challenge switch (registration closes 10 Nov)** |
 | Tue 10 – Wed 11 | M3 experience: 3D site with sun/shadow, console, worker phone, voice | Full shift playable in the browser |
@@ -282,7 +281,8 @@ heatline/
 | Challenge switch refused | Reframe the same build for *Workforce Health Early Warning* (multi-signal site warning, back-testing, small-cell suppression); the engine and evidence carry over |
 | Physiology model criticised | Present it as a teaching model with calibration targets and citations; never claim clinical accuracy; show sensitivity in the back-test |
 | TWL computation not ready | WBGT-based schedule, labelled; TWL only from imported measurements |
-| Voices missing for a language | Written warning + English audio; list the gap |
+| Voices missing or poor for a language (Bengali, Malayalam not listed by OpenAI) | Written warning in the worker's language + audio cue; list the gap honestly |
+| `gpt-4o-mini-tts` shutdown on 6 Jan 2027 | Fine for the event; production migration to the Realtime API successor noted |
 | 3D scope slips | Cut order: dust visual → second tent → façade detail → keep a 2D top-down twin (still shadow-accurate) |
 | Model latency | Effort `low` for guardians; prefetch the next warning text when a level change is imminent; rules-only fallback |
 | Back-test runtime | Rules-only policy, no model calls; parallel workers; cache weather per day |
@@ -315,7 +315,7 @@ Cut order overall (last cut first): forecast mode → Tagalog/Malayalam audio �
 
 1. Scaffold the monorepo (contracts, climate, sim, rules, agents, eval, web, server) with Vitest and strict TypeScript.
 2. Port Liljegren WBGT to `packages/climate`; generate `data/weather/wbgt-golden.json` with thermofeel from `research/data`; write the golden test.
-3. Spike: one Claude call with a strict tool and structured output from the server; record latency at `low` and `medium` effort.
-4. Spike: Azure Speech voices for ar-AE, hi-IN, ur-PK, bn-IN/BD, ml-IN, en; save one sample per language.
+3. Spike: one `gpt-6-luna` structured-output call and one `gpt-6.1-sol` strict tool loop from the server; record latency at `low` and `medium` effort.
+4. Spike: `gpt-4o-mini-tts` samples in EN, AR, HI, UR, BN, ML; listen to Bengali and Malayalam before committing to them.
 5. Pick 3D construction assets with clear licences (CC0 preferred) and record them in `docs/assets-and-licenses.md`.
 6. Email Hack2skill support to confirm the challenge switch and the deadline.
