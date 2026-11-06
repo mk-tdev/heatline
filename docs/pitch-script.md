@@ -2,7 +2,13 @@
 
 About 75 seconds, excluding the live demo. Rehearse aloud and leave space for the opening and closing lines.
 
-## Script
+## Opening cue — before the 25-second first-person demo
+
+“Before we talk about heat, step onto the site with me.”
+
+Open **Explore on foot** from the landing page, take the lift, then return home. Close this opening with: **“That was the playground. Now let’s make a decision that matters.”**
+
+## Script — after returning from first person
 
 It’s three in the afternoon. The midday break is over—but the heat isn’t.
 
@@ -24,9 +30,9 @@ Heatline. Different stories. The same right to go home well.
 
 ## Delivery
 
-Use slides **1–4**, switch to the live demo at **slide 5**, then return to **6, 8 and 9** for evidence, the partnership ask and the closing. Keep slide 7 and the sources appendix for questions. Deliver the script’s final three paragraphs after the demo.
+Show **slide 1**, deliver the opening cue and run the **25-second standalone first-person segment**. Return to **slides 2–4** for the human story and AI roles; slide 3 also serves as the exploration visual backup. At **slide 5**, run the **two-minute AI and heat-safety demo**. Return to **6, 8 and 9** for evidence, the partnership ask and the closing. Keep slide 7, crane operation and the sources appendix for questions. Deliver the script’s final three paragraphs after the AI demo. Allow roughly four minutes overall, including transitions.
 
-- [Two-minute demo flow and backup plan](demo-flow.md)
+- [First-person opening, AI demo flow and backup plan](demo-flow.md)
 - [Google Slides with speaker notes](https://docs.google.com/presentation/d/1U0cnRU4kcdr1z3TvDzAg8BzZWnwEI871LIf-HcL61D0/edit)
 - [Live demo](https://heatline-plum.vercel.app)
 - [Scientific basis and limitations](scientific-basis.md)

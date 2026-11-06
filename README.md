@@ -80,7 +80,7 @@ This is a disposable copy of the visible site. Exploration has its own camera an
 ## 🎤 Present Heatline
 
 - **[Short pitch script](docs/pitch-script.md)** — about 75 seconds, with slide cues and the closing ask.
-- **[Two-minute demo flow](docs/demo-flow.md)** — exact controls, presenter lines, rehearsal setup and a backup plan.
+- **[Judges’ demo flow](docs/demo-flow.md)** — a 25-second first-person opening, then two minutes of AI and heat-safety decisions, with presenter lines and a backup plan.
 - **[Google Slides](https://docs.google.com/presentation/d/1U0cnRU4kcdr1z3TvDzAg8BzZWnwEI871LIf-HcL61D0/edit)** — visual pitch, live AI screenshot and speaker notes. Deck access may require permission from its owner.
 
 ## 🚀 Run it locally
