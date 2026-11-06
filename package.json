@@ -19,11 +19,13 @@
     "test:watch": "vitest",
     "check": "npm run typecheck && npm run test",
     "golden:wbgt": "python3 -I scripts/wbgt-golden.py",
-    "build": "npm run build --workspace @heatline/web",
-    "backtest": "node --import tsx scripts/backtest.ts"
+    "build": "npm run build:api && npm run build --workspace @heatline/web",
+    "backtest": "node --import tsx scripts/backtest.ts",
+    "build:api": "node scripts/build-api.mjs"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
+    "esbuild": "^0.28.2",
     "tsx": "^4.23.15",
     "typescript": "^5.9.0",
     "vitest": "^3.2.0"
