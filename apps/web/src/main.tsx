@@ -4,6 +4,7 @@ import { App, type Mode } from './App';
 import { Intro } from './components/Intro';
 import { Evidence } from './components/Evidence';
 import './styles.css';
+import './experience.css';
 
 function Root() {
   const [run, setRun] = useState<{ scenario: string; mode: Mode; key: number } | null>(null);

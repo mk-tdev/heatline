@@ -26,3 +26,7 @@ Every third-party asset, dataset and library used in the build is listed here wi
 | OpenAI `gpt-6.1-sol`, `gpt-6-luna` (Responses API) | Planner and debrief; guardian and site safety | Server-side `OPENAI_API_KEY` |
 | OpenAI `gpt-4o-mini-tts` | Spoken warnings | Deprecated, shuts down 6 Jan 2027; Bengali/Malayalam not in the listed languages |
 | OpenAI `gpt-transcribe` | Supervisor voice orders | — |
+
+## Generated landing-page images (7 November 2026)
+
+Two fictional illustrations were created with the built-in image generation tool: `apps/web/public/images/saadiyat-hero.jpg` and `apps/web/public/images/worker-break.jpg`. Neither is a photograph documenting a real site, person or pilot. Generation prompts and usage are recorded in [generated-imagery.md](generated-imagery.md). Both are labelled AI-generated in the product.
