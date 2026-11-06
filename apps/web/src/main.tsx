@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App, type Mode } from './App';
 import { Intro } from './components/Intro';
@@ -6,13 +6,27 @@ import { Evidence } from './components/Evidence';
 import './styles.css';
 import './experience.css';
 
+function DesktopNotice({ onClose }: { onClose: () => void }) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => { dialog.current?.showModal(); }, []);
+  return <dialog ref={dialog} className="desktop-dialog" onCancel={onClose} onClose={onClose} aria-labelledby="desktop-title">
+    <img src="/favicon.svg" width="56" height="56" alt="" />
+    <p className="section-kicker">A little more room to explore</p>
+    <h2 id="desktop-title">Meet us on desktop.</h2>
+    <p>The interactive 3D site is supported on desktop and laptop with a window at least 1024 pixels wide. Open this page there to step into a shift.</p>
+    <p>You can still discover the scenarios, meet the crew and read the evidence on your phone.</p>
+    <button autoFocus onClick={onClose}>Keep exploring</button>
+  </dialog>;
+}
 function Root() {
   const [run, setRun] = useState<{ scenario: string; mode: Mode; key: number } | null>(null);
+  const [desktopNotice, setDesktopNotice] = useState(false);
   const [evidence, setEvidence] = useState(false);
   return (
     <>
       {run && <App key={run.key} scenarioId={run.scenario} startMode={run.mode} onBrief={() => setRun(null)} onEvidence={() => setEvidence(true)} />}
-      {!run && <Intro onStart={(scenario, mode) => setRun({ scenario, mode, key: Date.now() })} onEvidence={() => setEvidence(true)} />}
+      {!run && <Intro onStart={(scenario, mode) => { if (window.innerWidth < 1024 || /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) setDesktopNotice(true); else setRun({ scenario, mode, key: Date.now() }); }} onEvidence={() => setEvidence(true)} />}
+      {desktopNotice && <DesktopNotice onClose={() => setDesktopNotice(false)} />}
       {evidence && <Evidence onClose={() => setEvidence(false)} />}
     </>
   );

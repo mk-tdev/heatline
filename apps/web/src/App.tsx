@@ -1,3 +1,4 @@
+import { BrandMark } from './components/BrandMark';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { dialogueFor } from './dialogue';
 import { fallbackGuardianMessage, crewSummaries, guardianContext, redFlagDisclosures, type GuardianMessage, type SafetyBrief } from '@heatline/agents';
@@ -271,7 +272,7 @@ export function App({ scenarioId, startMode, onBrief, onEvidence }: { scenarioId
     <div className={`app mode-${mode}`}>
       <header className="topbar">
         <div className="brand">
-          <span className="logo">⌁</span> Heatline <small>{scenario.title}</small>
+          <BrandMark /> Heatline <small>{scenario.title}</small>
         </div>
         <div className="clock">
           <b>{formatClock(minute)}</b>
@@ -346,7 +347,7 @@ export function App({ scenarioId, startMode, onBrief, onEvidence }: { scenarioId
         />
         <div className="branch-tag">{branch.label}</div>
         <div className="views">
-          {(['overview', 'deck', 'yard', 'facade', 'welfare', 'gate'] as CameraView[]).map((v) => (
+          {(['overview', 'deck', 'yard', 'facade', 'equipment', 'welfare', 'gate'] as CameraView[]).map((v) => (
             <button key={v} className={v === view ? 'active' : ''} onClick={() => goTo(v)}>
               {v === 'welfare' ? 'rest area' : v}
             </button>

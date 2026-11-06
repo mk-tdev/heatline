@@ -2,8 +2,9 @@
 // second tower going up, a finished residential block across the road, villas, palms, the sea
 // and distant cultural-district silhouettes. Static scenery only; nothing here is simulated.
 
-import { useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useMemo } from 'react';
+import { Crane } from './Machinery';
+export { Crane } from './Machinery';
 import * as THREE from 'three';
 import { PALETTE, rand, toScene } from './common';
 
@@ -394,79 +395,6 @@ function Vehicles() {
           <boxGeometry args={[11, 0.35, 0.02]} />
           <meshStandardMaterial color="#e3a72f" />
         </mesh>
-      </group>
-    </group>
-  );
-}
-
-/** Hammerhead tower crane: lattice mast, jib, counter-jib, cab and hook. */
-export function Crane({ at, height, jib, turn = 0 }: { at: THREE.Vector3; height: number; jib: number; turn?: number }) {
-  const mast = useMemo(() => Array.from({ length: Math.floor(height / 3) }, (_, i) => i), [height]);
-  const yellow = PALETTE.steelYellow;
-  const slew = useRef<THREE.Group>(null);
-  const hook = useRef<THREE.Group>(null);
-  const seed = useMemo(() => at.x * 0.13, [at]);
-  // A slow lift cycle: the jib slews back and forth while the load rises and falls on the hook.
-  useFrame(({ clock }) => {
-    const t = clock.elapsedTime * 0.06 + seed;
-    if (slew.current) slew.current.rotation.y = turn + Math.sin(t) * 0.9;
-    if (hook.current) hook.current.position.y = -height * 0.55 + (Math.sin(t * 2.3) + 1) * height * 0.22;
-  });
-  return (
-    <group position={at}>
-      <mesh position={[0, 0.6, 0]} castShadow receiveShadow>
-        <boxGeometry args={[6, 1.2, 6]} />
-        <meshStandardMaterial color="#9c968c" />
-      </mesh>
-      {[-0.9, 0.9].flatMap((x) =>
-        [-0.9, 0.9].map((z) => (
-          <mesh key={`${x}${z}`} position={[x, height / 2, z]} castShadow>
-            <boxGeometry args={[0.18, height, 0.18]} />
-            <meshStandardMaterial color={yellow} />
-          </mesh>
-        )),
-      )}
-      {mast.map((i) => (
-        <mesh key={i} position={[0, i * 3 + 1.5, 0.9]} rotation-z={i % 2 ? 0.95 : -0.95}>
-          <boxGeometry args={[0.08, 2.3, 0.08]} />
-          <meshStandardMaterial color={yellow} />
-        </mesh>
-      ))}
-      <group ref={slew} position={[0, height, 0]} rotation-y={turn}>
-        <mesh position={[0, 1.2, 0]} castShadow>
-          <boxGeometry args={[2.4, 2.4, 2.4]} />
-          <meshStandardMaterial color="#e9e4d6" />
-        </mesh>
-        <mesh position={[jib / 2, 2.6, 0]} castShadow>
-          <boxGeometry args={[jib, 1.2, 1.2]} />
-          <meshStandardMaterial color={yellow} wireframe={false} />
-        </mesh>
-        <mesh position={[-jib * 0.18, 2.6, 0]} castShadow>
-          <boxGeometry args={[jib * 0.32, 1, 1.4]} />
-          <meshStandardMaterial color={yellow} />
-        </mesh>
-        <mesh position={[-jib * 0.3, 1.9, 0]} castShadow>
-          <boxGeometry args={[3, 2, 2.6]} />
-          <meshStandardMaterial color="#8f949a" />
-        </mesh>
-        <mesh position={[0, 6.5, 0]} castShadow>
-          <boxGeometry args={[0.5, 8, 0.5]} />
-          <meshStandardMaterial color={yellow} />
-        </mesh>
-        <group ref={hook} position={[jib * 0.62, -height * 0.4, 0]}>
-          <mesh position={[0, height * 0.2, 0]}>
-            <boxGeometry args={[0.04, height * 0.4, 0.04]} />
-            <meshStandardMaterial color="#333" />
-          </mesh>
-          <mesh castShadow>
-            <boxGeometry args={[0.8, 0.8, 0.8]} />
-            <meshStandardMaterial color="#e5484d" />
-          </mesh>
-          <mesh position={[0, -1.2, 0]} castShadow>
-            <boxGeometry args={[1, 0.5, 6]} />
-            <meshStandardMaterial color="#7a4a30" metalness={0.4} />
-          </mesh>
-        </group>
       </group>
     </group>
   );

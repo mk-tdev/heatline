@@ -1,4 +1,5 @@
 // A cinematic invitation into the fictional site. Generated imagery is illustrative.
+import { BrandMark } from './BrandMark';
 import { useEffect, useMemo, useState } from 'react';
 import { SCENARIOS } from '@heatline/sim';
 import { formatClock } from '@heatline/contracts';
@@ -27,7 +28,7 @@ export function Intro({ onStart, onEvidence }: { onStart: (scenario: string, mod
         <div className="hero-shade" />
         <div className="sun-wash" aria-hidden="true" />
         <nav className="welcome-nav" aria-label="Main navigation">
-          <a className="welcome-brand" href="#"><span aria-hidden="true">⌁</span> Heatline</a>
+          <a className="welcome-brand" href="#"><BrandMark /> Heatline</a>
           <div className="welcome-nav-links"><button onClick={choose}>The experiences</button><button onClick={onEvidence}>The evidence</button></div>
           <span className="challenge-pill">Future Health Challenge</span>
         </nav>
@@ -36,6 +37,7 @@ export function Intro({ onStart, onEvidence }: { onStart: (scenario: string, mod
           <h1>The heat doesn’t<br />stop at three.</h1>
           <p className="hero-description">The midday break is over. The people building tomorrow still need protecting. Step onto their site—and see what one better decision can change.</p>
           <div className="hero-actions"><button className="hero-start" onClick={() => onStart('afternoon-pour', 'story')}><span className="play-glyph" aria-hidden="true">▶</span> Step into the site</button><button className="hero-secondary" onClick={choose}>Explore the scenarios <span aria-hidden="true">↓</span></button></div>
+          <p className="mobile-notice">Best explored on a bigger screen. The 3D simulator supports desktop and laptop only; you can explore the stories and evidence here.</p>
           <p className="hero-footnote">A playable 3D experience. Historical weather. Human decisions.</p>
         </div>
         <div className="site-beacon beacon-deck" aria-hidden="true"><span /><div>Level 12 deck<small>Shade changes the plan</small></div></div>
@@ -68,7 +70,7 @@ export function Intro({ onStart, onEvidence }: { onStart: (scenario: string, mod
         </section>
 
         <section className="evidence-invitation"><div><span className="evidence-orbit" aria-hidden="true">◎</span><p>Curiosity, backed by transparency.</p><h2>Look beyond the good ending.</h2><p>Explore a month of simulated shifts, missed warnings, exposure screening and the assumptions that change the result.</p></div><button onClick={onEvidence}>Open the evidence <span aria-hidden="true">↗</span></button></section>
-        <footer className="welcome-footer"><span className="welcome-brand"><span aria-hidden="true">⌁</span> Heatline</span><p>Historical weather drives synthetic workers and a teaching model. Illustrations are AI-generated. Demonstration policies are not clinical predictions or UAE compliance certification.</p><span className="connection-status"><i />{ai ? 'Assistants connected' : 'Local guidance ready'}</span></footer>
+        <footer className="welcome-footer"><span className="welcome-brand"><BrandMark /> Heatline</span><p>Historical weather drives synthetic workers and a teaching model. Illustrations are AI-generated. Demonstration policies are not clinical predictions or UAE compliance certification.</p><span className="connection-status"><i />{ai ? 'Assistants connected' : 'Local guidance ready'}</span></footer>
       </main>
     </div>
   );

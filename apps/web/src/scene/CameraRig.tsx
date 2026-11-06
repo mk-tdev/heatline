@@ -8,9 +8,10 @@ import * as THREE from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { toScene } from './common';
 
-export type CameraView = 'overview' | 'establishing' | 'deck' | 'yard' | 'facade' | 'welfare' | 'store' | 'gate' | 'first-aid';
+export type CameraView = 'equipment' | 'overview' | 'establishing' | 'deck' | 'yard' | 'facade' | 'welfare' | 'store' | 'gate' | 'first-aid';
 
 const VIEWS: Record<CameraView, { target: THREE.Vector3; from: THREE.Vector3; distance: number }> = {
+  equipment: { target: toScene(44, 20, 31), from: new THREE.Vector3(.95, .25, .55), distance: 145 },
   establishing: { target: toScene(30, 20, 10), from: new THREE.Vector3(0.62, 0.32, 0.72), distance: 260 },
   overview: { target: toScene(42, 10, 8), from: new THREE.Vector3(0.6, 0.45, 0.66), distance: 165 },
   deck: { target: toScene(22, 14, 41), from: new THREE.Vector3(0.62, 0.55, 0.56), distance: 62 },

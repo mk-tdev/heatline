@@ -7,7 +7,7 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { Plan, Scenario, Zone } from '@heatline/contracts';
 import { PALETTE, rand, toScene } from './common';
-import { Crane } from './World';
+import { Crane, Hoist } from './Machinery';
 
 const STOREY = 3.5;
 
@@ -202,24 +202,6 @@ function Scaffold() {
 }
 
 /** Rack-and-pinion material hoist on the east face, the cage riding up and down. */
-function Hoist() {
-  const cage = useRef<THREE.Mesh>(null);
-  useFrame(({ clock }) => {
-    if (cage.current) cage.current.position.y = 3 + ((Math.sin(clock.elapsedTime * 0.25) + 1) / 2) * 36;
-  });
-  return (
-    <group position={toScene(42, 9)}>
-      <mesh position={[0, 22, 0]} castShadow>
-        <boxGeometry args={[0.8, 44, 0.8]} />
-        <meshStandardMaterial color="#d2d6d9" metalness={0.4} />
-      </mesh>
-      <mesh ref={cage} position={[1.3, 10, 0]} castShadow>
-        <boxGeometry args={[1.8, 2.4, 2.6]} />
-        <meshStandardMaterial color="#e5b23a" />
-      </mesh>
-    </group>
-  );
-}
 
 function RebarYard({ yard }: { yard: Zone }) {
   const bundles = useMemo(() => Array.from({ length: 10 }, (_, i) => ({ p: toScene(yard.at.x - 12 + (i % 5) * 6, yard.at.y - 9 + Math.floor(i / 5) * 18, 0.35), turn: (rand(i) - 0.5) * 0.15 })), [yard]);
