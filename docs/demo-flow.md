@@ -31,7 +31,7 @@ Return to slides **2–3** for the worker introduction and rooftop visual. Use s
 
 ## Anwar’s phone — 35 seconds
 
-Before presenting, open the [supervisor dashboard](https://heatline-plum.vercel.app/worker/supervisor.html) on the laptop and choose **Start a fresh demo shift**. Verify Crew B shows zero. Use **Copy worker link** and open that exact link on the phone while connected. Wait for **Ready for offline use**. Keep the laptop connected.
+Before presenting, open the [supervisor dashboard](https://heatline-plum.vercel.app/worker/supervisor.html) on the laptop and choose **Start a fresh demo shift**. Verify Crew B shows zero. Ask a judge to scan the QR code on the laptop with their phone camera and open the worker page while connected. If scanning is unavailable, use **Copy worker link**. Starting a fresh shift generates a new code. Wait for **Ready for offline use**. Keep the laptop connected.
 
 1. Disconnect the phone from Wi-Fi and cellular data. Reload the worker page. Point out the offline indicator.
 2. Tap **Decline sharing**. “Anwar can decline the wearable and still receive this warning.” Show the Bengali instruction to rest in shade and drink water. This replays a stored yellow warning from the morning shift at 09:40.
