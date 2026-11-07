@@ -12,3 +12,6 @@ dist/
 # Third-party documents: kept locally, not redistributed
 research/evidence/
 research/challenges/
+
+# Private team notes (not part of the submission)
+team-notes/
