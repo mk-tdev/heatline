@@ -8,3 +8,7 @@ dist/
 
 .vercel/
 .vercel
+
+# Third-party documents: kept locally, not redistributed
+research/evidence/
+research/challenges/

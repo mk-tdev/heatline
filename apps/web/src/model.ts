@@ -50,7 +50,8 @@ export async function health(): Promise<Health> {
   }
 }
 
-export type AgentSource = { source: 'model' | 'rules'; model?: string; ms?: number };
+/** voice: the server's signature that lets this exact message be read aloud. */
+export type AgentSource = { source: 'model' | 'rules'; model?: string; ms?: number; voice?: string };
 
 export async function askGuardian(ctx: GuardianContext, offline = false): Promise<GuardianMessage & AgentSource> {
   if (offline || ctx.action === 'emergency') return { ...fallbackGuardianMessage(ctx), source: 'rules' };
@@ -77,7 +78,10 @@ export type PlannerEvent =
 
 export async function askPlanner(body: { scenario: string; effectiveAt: Minute; unavailable: string[]; ask: string }, onEvent: (e: PlannerEvent) => void): Promise<void> {
   const r = await fetch('/api/planner', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
-  if (!r.ok || !r.body) throw new Error(`planner ${r.status}`);
+  if (!r.ok || !r.body) {
+    const detail = await r.json().catch(() => null) as { error?: string } | null;
+    throw new Error(detail?.error ?? `planner ${r.status}`);
+  }
   const reader = r.body.getReader();
   const decoder = new TextDecoder();
   let buffer = '';

@@ -57,4 +57,4 @@ These rules also map to the separate *Workforce Early Warning* brief's requireme
 
 ## Sources
 
-Listed inline. Primary documents downloaded to `evidence/`: Sharjah OSHJ-CoP-33 v2 (2024); Dubai Municipality guideline v2.0 (2019).
+Listed inline. Primary documents read (not redistributed here; available from the publishers): Sharjah OSHJ-CoP-33 v2 (2024); Dubai Municipality guideline v2.0 (2019).

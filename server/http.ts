@@ -7,6 +7,7 @@
 import { type IncomingMessage, type ServerResponse } from 'node:http';
 import OpenAI from 'openai';
 import { recordShade, shadeCount } from './shade';
+import { allow, signSpeech, verifySpeech, visitor } from './guard';
 import { zodTextFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
 import template from '../data/scenario/saadiyat-tower.json' with { type: 'json' };
@@ -252,7 +253,7 @@ async function planner(input: z.infer<typeof PlannerInput>, res: ServerResponse)
 
 // ---- Voice: read the guardian's message aloud (for workers who can't read the screen) ----------
 
-const SpeakInput = z.strictObject({ text: z.string().min(1).max(300), language: Language });
+const SpeakInput = z.strictObject({ text: z.string().min(1).max(300), language: Language, token: z.string().max(100) });
 const speechCache = new Map<string, Buffer>();
 
 async function speak(text: string, language: z.infer<typeof Language>): Promise<Buffer> {
@@ -291,17 +292,23 @@ export async function handler(req: IncomingMessage, res: ServerResponse) {
     if (req.method === 'POST' && url.pathname === '/api/guardian') {
       const parsed = GuardianInput.safeParse(await readJson(req));
       if (!parsed.success) return send(res, 400, { error: 'invalid guardian context' });
-      return send(res, 200, await guardian(parsed.data as GuardianContext));
+      const ctx = parsed.data as GuardianContext;
+      // Over the limit: still answer, with the pre-written message and no model call.
+      const out = allow('guardian', visitor(req)) ? await guardian(ctx) : { ...fallbackGuardianMessage(ctx), source: 'rules', ms: 0 };
+      return send(res, 200, { ...out, voice: openai ? signSpeech(ctx.language, out.message) : undefined });
     }
     if (req.method === 'POST' && url.pathname === '/api/safety') {
       const parsed = SafetyInput.safeParse(await readJson(req));
       if (!parsed.success) return send(res, 400, { error: 'invalid crew summaries' });
+      if (!allow('safety', visitor(req))) return send(res, 200, { ...fallbackSafetyBrief(parsed.data.crews as CrewSummary[]), source: 'rules', ms: 0 });
       return send(res, 200, await safety(parsed.data.clock, parsed.data.crews as CrewSummary[]));
     }
     if (req.method === 'POST' && url.pathname === '/api/speak') {
       if (!openai) return send(res, 503, { error: 'voice needs an OpenAI key' });
       const parsed = SpeakInput.safeParse(await readJson(req));
       if (!parsed.success) return send(res, 400, { error: 'invalid speech request' });
+      if (!verifySpeech(parsed.data.language, parsed.data.text, parsed.data.token)) return send(res, 403, { error: 'speech is only for guardian messages' });
+      if (!allow('speak', visitor(req))) return send(res, 429, { error: 'too many requests, try again in a minute' });
       const audio = await speak(parsed.data.text, parsed.data.language);
       res.writeHead(200, { 'content-type': 'audio/mpeg', 'cache-control': 'no-store', 'content-length': audio.length });
       return res.end(audio);
@@ -309,6 +316,7 @@ export async function handler(req: IncomingMessage, res: ServerResponse) {
     if (req.method === 'POST' && url.pathname === '/api/planner') {
       const parsed = PlannerInput.safeParse(await readJson(req));
       if (!parsed.success) return send(res, 400, { error: 'invalid planner request' });
+      if (!allow('planner', visitor(req))) return send(res, 429, { error: 'Omar has had a lot of requests from you. Try again in a few minutes.' });
       return planner(parsed.data, res);
     }
     send(res, 404, { error: 'not found' });

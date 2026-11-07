@@ -6,7 +6,7 @@ Researched 6 November 2026. Every claim is marked **Verified** (a source was rea
 
 1. **Challenge switch: done.** The team confirmed on 6 Nov 2026 that the entry is accepted under *Population Health → Climate-Resilient Worker Health* (previously *Wellbeing → Sustaining Healthy Behaviors*).
 2. **Treat 15 November as a possible deadline until confirmed.** One syndicated report says applications close 15 Nov; the Hack2skill page says prototypes are due 20 Nov. Plan the internal release for **15 Nov**.
-3. **Fix the challenge files in `research/challenges/`.** Two are mislabeled (see below).
+3. **Fix the team's local challenge files.** Two are mislabeled (see below). They are not stored in this public repository.
 
 ## The event
 
@@ -40,7 +40,7 @@ Verified list: [Hack2skill event page](https://hack2skill.com/event/futurehealth
 
 ## The challenge we are answering
 
-Source: the team's copy in [`challenges/[Population Health] Climate-Resilient Worker Health.txt`](challenges/%5BPopulation%20Health%5D%20Climate-Resilient%20Worker%20Health.txt) (copied from the Hack2skill dashboard; not visible on the public page).
+Source: the team's local copy of the challenge statement from the Hack2skill dashboard (not visible on the public page, and not redistributed here).
 
 **Question:** how might we protect workers exposed to extreme heat and other climate-related occupational risks through earlier warning, personalised prevention and safer operational decisions?
 

@@ -26,7 +26,7 @@ Clothing adjustment factors are added to measured WBGT: work clothes / woven cov
 
 ### TWL zones — the UAE regulatory frame
 
-Primary source read: **Sharjah OSHJ-CoP-33 "Safety in Heat", Version 2 Rev 0, July 2024** (PDF saved in `evidence/`). The official [Abu Dhabi ADOSH-SF CoP 11.0 v4.0, July 2024](https://www.adphc.gov.ae/-/media/Project/ADPHC/ADPHC/PDF/OSHAD-SF/Codes-of-Practise/11---Safety-in-the-Heat-v31-English.pdf) was retrieved during the 7 November review; it explicitly requires environmental assessment using TWL and a site-specific heat-stress programme.
+Primary source read: **Sharjah OSHJ-CoP-33 "Safety in Heat", Version 2 Rev 0, July 2024** (read in full; available from Sharjah OSHJ). The official [Abu Dhabi ADOSH-SF CoP 11.0 v4.0, July 2024](https://www.adphc.gov.ae/-/media/Project/ADPHC/ADPHC/PDF/OSHAD-SF/Codes-of-Practise/11---Safety-in-the-Heat-v31-English.pdf) was retrieved during the 7 November review; it explicitly requires environmental assessment using TWL and a site-specific heat-stress programme.
 
 TWL is "the maximum rate at which heat can be lost to the environment" in W/m², assuming hydrated, acclimatised, self-paced workers. Computed from dry bulb, wet bulb, globe temperature and wind.
 
@@ -99,4 +99,4 @@ Design rule: **"stopped sweating" is not a reliable sign** (older guidance said 
 
 ## Sources
 
-Listed inline. Downloaded primary documents (in `evidence/`): Sharjah OSHJ-CoP-33 v2 (2024) PDF and text; Dubai Municipality guideline v2.0 (2019) PDF and text.
+Listed inline. Primary documents read: Sharjah OSHJ-CoP-33 v2 (2024); Dubai Municipality guideline v2.0 (2019). They are not redistributed in this repository.

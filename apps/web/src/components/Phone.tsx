@@ -75,7 +75,7 @@ export function Phone({
           {message ? message.message : <span className="muted">…</span>}
           {loading && <span className="spinner" />}
         </div>
-        {message && !stale && !offline && <Listen text={message.message} language={ctx.language} />}
+        {message?.voice && !stale && !offline && <Listen text={message.message} language={ctx.language} token={message.voice} />}
         {message && <div className={`english${stale ? ' stale' : ''}`}>{stale ? 'Updating… ' : ''}{message.english}</div>}
         <div className="readings">
           <div>
@@ -112,7 +112,7 @@ export function Phone({
 }
 
 /** Reads the guardian's message aloud in the worker's language (OpenAI text-to-speech via the server). */
-function Listen({ text, language }: { text: string; language: string }) {
+function Listen({ text, language, token }: { text: string; language: string; token: string }) {
   const [state, setState] = useState<'idle' | 'loading' | 'playing' | 'off'>('idle');
   const audio = useRef<HTMLAudioElement | null>(null);
   useEffect(
@@ -130,7 +130,7 @@ function Listen({ text, language }: { text: string; language: string }) {
     }
     setState('loading');
     try {
-      const res = await fetch('/api/speak', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text, language }) });
+      const res = await fetch('/api/speak', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text, language, token }) });
       if (!res.ok) return setState(res.status === 503 ? 'off' : 'idle');
       const url = URL.createObjectURL(await res.blob());
       audio.current?.pause();
