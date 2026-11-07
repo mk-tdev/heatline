@@ -63,6 +63,8 @@ A short path through the demo:
 
 </details>
 
+On a phone, open [Anwar’s worker demo](https://heatline-plum.vercel.app/worker/index.html) and wait for **Ready for offline use**. Disconnect and reload, decline wearable sharing, read the Bengali warning, and confirm arrival in shade. The supervisor preview shows Crew B’s confirmation count on the same device. **Reset this demo** clears the saved step.
+
 ## 🌍 Live demo
 
 **[Open Heatline](https://heatline-plum.vercel.app)** on desktop to enter the simulator.
@@ -80,7 +82,7 @@ This is a disposable copy of the visible site. Exploration has its own camera an
 ## 🎤 Present Heatline
 
 - **[Short pitch script](docs/pitch-script.md)** — about 75 seconds, with slide cues and the closing ask.
-- **[Judges’ demo flow](docs/demo-flow.md)** — a 25-second first-person opening, then two minutes of AI and heat-safety decisions, with presenter lines and a backup plan.
+- **[Judges’ demo flow](docs/demo-flow.md)** — a 25-second first-person opening, a 35-second offline phone replay, then two minutes of AI and heat-safety decisions, with presenter lines and a backup plan.
 - **[Google Slides](https://docs.google.com/presentation/d/1U0cnRU4kcdr1z3TvDzAg8BzZWnwEI871LIf-HcL61D0/edit)** — visual pitch, live AI screenshot and speaker notes. Deck access may require permission from its owner.
 
 ## 🚀 Run it locally

@@ -43,7 +43,7 @@ Metric definitions:
 
 ## Field behaviour and governance
 
-The browser contains local warning templates and supplies them immediately while model text is pending. API errors/timeouts fall back locally. The simulated outage bypasses guardian and site-brief model calls and hides speech playback. This demonstrates continuity in an already-loaded app, not offline installation or real device integration. Planner and speech depend on connectivity.
+The browser contains local warning templates and supplies them immediately while model text is pending. API errors/timeouts fall back locally. The simulated outage bypasses guardian and site-brief model calls and hides speech playback. This demonstrates continuity in an already-loaded app, not offline installation or real device integration. Planner and speech depend on connectivity. The separate mobile worker replay can reload offline after its service worker caches the page. It reproduces Anwar’s environment-only 09:40 warning from Racing the midday break. A local receipt records a self-report and the supervisor preview displays the crew count on that device. There is no remote delivery in this flow.
 
 The side-by-side supervisor and worker screens are a synthetic demonstration of role projections. They are not production authentication, access control, consent management or on-device privacy enforcement. No real worker data should be loaded into this demo.
 

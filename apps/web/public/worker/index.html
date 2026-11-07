@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#123e3c">
+<title>Anwar’s worker demo · Heatline</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#e6eeea;color:#173837;font:1rem/1.55 system-ui,sans-serif}
+main{max-width:34rem;margin:clamp(0rem,5vw,3rem) auto;background:#fbfcf8;border:1px solid #b9cbc4}
+header,section,footer{padding:1.25rem clamp(1rem,5vw,2rem)}header{background:#123e3c;color:white;display:flex;align-items:center;justify-content:space-between;gap:1rem}header strong{font-size:1.25rem}header small{color:#cce8dc}
+h1{font-size:clamp(1.85rem,7vw,2.65rem);line-height:1.14;margin:.45rem 0 1rem;letter-spacing:-.035em}h1:focus{outline:none}
+p{margin:.65rem 0 1rem}.label{color:#45665f;font-weight:650;font-size:.83rem}button,a{font:inherit;font-weight:650}button{min-height:48px;width:100%;padding:.7rem .8rem;text-align:left;background:#134e46;color:white;border:1px solid #134e46;cursor:pointer;margin:.3rem 0}button.secondary{color:#14473f;background:transparent}button:focus-visible,a:focus-visible{outline:3px solid #cb680a;outline-offset:2px}
+aside{padding:1rem;border-left:4px solid #bb7913;background:#fff0c8}aside p{margin:.4rem 0}.bn{font-size:1.3rem}footer{border-top:1px solid #ccdad4;font-size:.85rem;color:#436058}footer p{margin:0 0 .6rem}a{color:inherit}output{font-weight:bold;font-size:2.4rem;display:block} [hidden]{display:none!important}
+</style>
+<main>
+<header><strong>Heatline</strong><small>Worker demo · <span id="connection"></span></small></header>
+<section id="choice">
+<div class="label">Anwar · Crew B · Day 2</div>
+<h1 tabindex="-1">Wearable sharing</h1>
+<p lang="bn">পরিধানযোগ্য যন্ত্রের তথ্য শেয়ার করা আপনার ইচ্ছা। তথ্য শেয়ার না করলেও তাপের সতর্কতা পাবেন।</p>
+<p>You can use warnings based on site conditions and your assigned work. This demo uses a stored training shift. Your choice stays on this device.</p>
+<button id="decline"><span lang="bn">শেয়ার করব না</span> · Decline sharing</button>
+</section>
+<section id="warning" hidden>
+<div class="label">Anwar · Level 12 deck · 09:40 replay</div>
+<h1 tabindex="-1">Heat warning</h1>
+<aside><strong lang="bn">হলুদ সতর্কতা</strong> · Yellow warning
+<p class="bn" lang="bn">আনোয়ার, এখনই ছায়ায় একটু বিশ্রাম নিন এবং পানি পান করুন।</p>
+<p>Anwar, take a short rest in the shade now and drink water.</p></aside>
+<p>Wearable sharing is off. The replay uses the deck’s estimated heat exposure and Anwar’s work history.</p>
+<button id="ack"><span lang="bn">আমি ছায়ায় পৌঁছেছি</span> · I reached shade</button>
+</section>
+<section id="receipt" hidden>
+<div class="label">Anwar · Worker confirmation</div>
+<h1 tabindex="-1" lang="bn">ছায়ায় পৌঁছেছি</h1>
+<p>You confirmed you reached shade. This is a self-report. Only this device holds the confirmation.</p>
+<button id="preview">See supervisor preview →</button>
+</section>
+<section id="crew" hidden>
+<div class="label">Local supervisor preview</div>
+<h1 tabindex="-1">Crew B</h1>
+<output id="count"></output> shade arrivals confirmed
+<p>This crew count is the full preview. Delivery to a supervisor’s device is outside this demo.</p>
+<button id="back" class="secondary">Return to worker receipt</button>
+</section>
+<footer><p id="ready" role="status">Preparing for offline use…</p><p id="storage" role="status"></p><button id="reset" class="secondary" hidden>Reset this demo</button><a href="/">Heatline home</a></footer>
+</main>
+<script type="module">
+const el = id => document.getElementById(id);
+const key = 'heatline.worker.replay.v1';
+const stages = ['choice','warning','receipt'];
+let stage = 'choice';
+try {
+  const saved = localStorage.getItem(key);
+  if (stages.includes(saved)) stage = saved;
+} catch { el('storage').textContent = 'Storage unavailable. Keep this tab open.'; }
+function show(view, focus = true) {
+  if (view === 'crew') el('count').value = stage === 'receipt' ? '1' : '0';
+  for (const id of [...stages,'crew']) el(id).hidden = id !== view;
+  el('reset').hidden = view === 'choice';
+  if (focus) el(view).querySelector('h1').focus();
+}
+function save(next) {
+  stage = next;
+  try {
+    if (next === 'choice') localStorage.removeItem(key);
+    else localStorage.setItem(key,next);
+  } catch { el('storage').textContent = 'Storage unavailable. This receipt lasts for this tab only.'; }
+  show(stage);
+}
+el('decline').onclick = () => save('warning');
+el('ack').onclick = () => save('receipt');
+el('preview').onclick = () => show('crew');
+el('back').onclick = () => show('receipt');
+el('reset').onclick = () => save('choice');
+function connection() { el('connection').textContent = navigator.onLine ? 'Online' : 'Offline'; }
+window.addEventListener('online',connection);
+window.addEventListener('offline',connection);
+connection();
+show(stage,false);
+try {
+  await navigator.serviceWorker.register('/worker/sw.js', {scope:'/worker/'});
+  await navigator.serviceWorker.ready;
+  el('ready').textContent = 'Ready for offline use. You can disconnect and reopen this page.';
+} catch { el('ready').textContent = 'Offline reload unavailable. Keep this tab open to use the replay.'; }
+</script>
+</html>

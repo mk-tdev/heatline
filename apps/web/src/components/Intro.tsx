@@ -36,6 +36,7 @@ export function Intro({ onStart, onEvidence, onExploreFoot }: { onExploreFoot: (
           <p className="hero-description">The midday break is over. The people building tomorrow still need protecting. Step onto their site—and see what one better decision can change.</p>
           <div className="hero-actions"><button className="hero-start" onClick={() => onStart('afternoon-pour', 'story')}><span className="play-glyph" aria-hidden="true">▶</span> Step into the site</button><button className="hero-secondary" onClick={choose}>Explore the scenarios <span aria-hidden="true">↓</span></button></div>
           <div className="hero-playground"><button className="hero-secondary" onClick={onExploreFoot}>Explore on foot</button><span>Walk, ride the lift, operate the crane.<br />Just for fun. No simulation started.</span></div>
+          <div className="hero-playground"><a className="hero-secondary" href="/worker/index.html">Open Anwar’s worker demo →</a><span>Try the offline warning on your phone.</span></div>
           <p className="hero-footnote">A playable 3D experience. Historical weather. Human decisions.</p>
         </div>
         <HeroShift />

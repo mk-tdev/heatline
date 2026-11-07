@@ -1,6 +1,6 @@
 # Heatline — judges’ demo: first-person opening, then AI
 
-A **25-second first-person opening**, followed by **two minutes of AI and heat-safety decisions**. Total live-demo time: about 2 minutes 25 seconds.
+A **25-second first-person opening**, a **35-second offline phone replay**, then **two minutes of AI and heat-safety decisions**. Total live-demo time: about three minutes.
 
 Start with the site at human height. Then hear Anwar, watch Omar test a plan, and compare the shift.
 
@@ -27,7 +27,16 @@ Show the cover slide, say **“Before we talk about heat, step onto the site wit
 
 Use the lift shortcut rather than spending the opening walking to it. Do not add a crane ride to the timed opening. If the lift takes longer on the presentation machine, exit at 25 seconds and continue; a rooftop arrival is not required to make the transition.
 
-Return briefly to slides **2–4** to introduce the workers and AI roles. Slide 3 is the first-person visual backup. At slide **5**, switch back to the browser for the main demo.
+Return to slides **2–3** for the worker introduction and rooftop visual. Use slide **4** for the phone replay.
+
+## Anwar’s phone — 35 seconds
+
+Before presenting, open [the worker demo](https://heatline-plum.vercel.app/worker/index.html) online on a phone, reset any previous run and wait for **Ready for offline use**. Keep the presentation laptop connected.
+
+1. Disconnect the phone from Wi-Fi and cellular data. Reload the worker page. Point out the offline indicator.
+2. Tap **Decline sharing**. “Anwar can decline the wearable and still receive this warning.” Show the Bengali instruction to rest in shade and drink water. This replays a stored yellow warning from the morning shift at 09:40.
+3. Tap **I reached shade → See supervisor preview**. “Crew B shows one self-reported arrival. The confirmation stays on this phone.” This is a local preview of the crew count.
+4. At slide **5**, move to the connected laptop. “That was Anwar’s morning. Now the supervisor has an afternoon pour to plan.” Reconnect the phone when convenient.
 
 ## AI and heat-safety sequence — two minutes
 
@@ -58,7 +67,7 @@ From the landing page, use **Explore on foot → Crane base → Enter crane cab*
 - If the model is unavailable, label rules-based output as fallback. Do not present it as live AI.
 - If no valid plan returns, show the refusal honestly and use the disclosed prepared result to explain comparison.
 - If speech fails, read the English translation and continue. Do not spend the pitch debugging audio.
-- Avoid deliberately disconnecting the network during the main pitch. Reserve failure scenarios for questions.
+- If the phone was not prepared online, show slide 4 and describe the replay. Keep the laptop connected for the AI segment.
 
 ## Evidence boundaries
 

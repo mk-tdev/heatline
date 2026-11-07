@@ -14,7 +14,7 @@ It’s three in the afternoon. The midday break is over—but the heat isn’t.
 
 A concrete truck is coming. The deck is exposed. And Anwar is only on his second day.
 
-Heatline turns that moment into a decision you can explore.
+On his phone, Anwar can decline wearable sharing. A stored Bengali warning still works offline. He confirms he reached shade, and the local supervisor preview shows one crew confirmation.
 
 Inside this live 3D construction site, historical weather drives twenty synthetic workers. Guardian explains each worker’s guidance in their language—and speaks it aloud. Noor shows supervisors what their crews need. Omar checks conditions, tests plans, and shows his work.
 
@@ -30,7 +30,7 @@ Heatline. Different stories. The same right to go home well.
 
 ## Delivery
 
-Show **slide 1**, deliver the opening cue and run the **25-second standalone first-person segment**. Return to **slides 2–4** for the human story and AI roles; slide 3 also serves as the exploration visual backup. At **slide 5**, run the **two-minute AI and heat-safety demo**. Return to **6, 8 and 9** for evidence, the partnership ask and the closing. Keep slide 7, crane operation and the sources appendix for questions. Deliver the script’s final three paragraphs after the AI demo. Allow roughly four minutes overall, including transitions.
+Show **slide 1**, deliver the opening cue and run the **25-second standalone first-person segment**. Return to **slides 2–3** for the human story. Use **slide 4** for the 35-second offline phone replay. At **slide 5**, run the **two-minute AI and heat-safety demo**. Return to **6, 8 and 9** for evidence, the partnership ask and the closing. Keep slide 7, crane operation and the sources appendix for questions. Deliver the script’s final three paragraphs after the AI demo. Allow roughly four and a half minutes overall, including transitions.
 
 - [First-person opening, AI demo flow and backup plan](demo-flow.md)
 - [Google Slides with speaker notes](https://docs.google.com/presentation/d/1U0cnRU4kcdr1z3TvDzAg8BzZWnwEI871LIf-HcL61D0/edit)

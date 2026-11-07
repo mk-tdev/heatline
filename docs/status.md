@@ -13,7 +13,7 @@ Updated 7 November 2026. The section below supersedes older milestone claims.
 ## Scientific credibility and daylight UI
 
 - Independent NIOSH rolling-hour REL/RAL exposure screening in plan review, replay and the evidence report; demonstration WBGT bands explicitly do not establish TWL equivalence or UAE compliance.
-- Corrected advance-warning accounting: 3,608 / 4,449 episodes (81%), 207 simultaneous, 634 missed. Median lead among detected episodes 37 minutes; false-alert fraction 361 / 3,580 (10%). Old 86% / 36-minute figures below are historical.
+- Corrected advance-warning accounting: 3,608 / 4,449 episodes (81.1%), 207 simultaneous, 634 missed. Median lead among detected episodes 37 minutes; false-alert fraction 361 / 3,580 (10%).
 - Five sensitivity variants recorded; combined adverse assumptions reduce advance detection to 2,439 / 4,219 (58%). These are stress tests, not confidence intervals.
 - Sensor-free body temperatures suppressed; hydration qualitative; emergency text fixed with no oral-fluid instruction. Browser-local messages survive failed model calls.
 - Daylight white/slate/blue panels, collapsible crew/activity sections, clearer private-worker preview, responsive stacked layout and keyboard focus styling. 3D scene retained.
@@ -76,7 +76,7 @@ Decision recorded: the zone thresholds are a WBGT proxy for TWL (configurable, d
 
 - Four scenarios on real days, each with its own decision and story; scenario picker on the entry screen.
 - Protective clothing per worker; strict midday break; no new pour in a high-risk zone; planner refuses impossible pour requests; spares, cool-down and contingency for pour crews.
-- August back-test and in-app evidence report (lead time 36 min median, 86% detected, 10% false alarms; red flags 197 → 0 with an approved plan).
+- August back-test and in-app evidence report (37-minute median lead among advance detections, 81.1% warned in advance, 10.1% false-alert fraction; red flags 197 → 0 with an approved plan).
 - Compact side panels (300 px / 268 px, smaller type) to give the 3D view more room.
 - Live checks: Omar refused to pour on 1 Aug and planned the 11:30 stair-core pour to finish before 12:30 on 12 Aug. All four stories verified in the browser with no console errors.
 - Tests: **72**.

@@ -1,6 +1,6 @@
 # Heatline implementation plan
 
-> Historical planning record. Current evidence, limitations and corrected metrics are in [scientific-basis.md](scientific-basis.md) and [status.md](status.md). Earlier “lawful”, TWL-proxy, 86% detection and safety claims below are superseded.
+> Historical planning record. Current evidence, limitations and corrected metrics are in [scientific-basis.md](scientific-basis.md) and [status.md](status.md). Earlier “lawful”, TWL-proxy, detection and safety claims below are superseded.
 
 Planning date: 6 November 2026 (Abu Dhabi time). Concept: [`research/06-heatline-concept.md`](../research/06-heatline-concept.md). Evidence: [`research/`](../research/README.md).
 
@@ -55,7 +55,7 @@ Rules added for coverage: **pour-start-high** (a new pour cannot start in a high
 | Heatline warnings only | 20,462 | 5,100 | 65 | 1 | 4,150 | 111,902 | 93 |
 | Heatline + protective plan | 12,712 | 0 | 0 | — | 11 | 149,860 | 85 |
 
-Warning performance (from no-intervention runs, judged against true strain the warning system cannot see): 86% of high-strain episodes warned in advance (3,815 of 4,449), median lead time 36 minutes (10th percentile 2 minutes), 10% false alarms (361 of 3,580 amber onsets). Honest findings: warnings alone still allow red flags when people push through; an enforced plan removes them; safety costs rest time and 8 pours with no lawful start.
+In the default simulation, warnings preceded 3,608 of 4,449 high-strain episodes (81.1%). The median lead among advance detections was 37 minutes. Another 207 warnings coincided with onset and 634 episodes were missed. The false-alert fraction was 361 of 3,580 assessable warning onsets (10.1%).
 
 ## 1. Planning assumptions and decisions
 
