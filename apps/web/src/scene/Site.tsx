@@ -13,6 +13,7 @@ import { SiteA } from './SiteA';
 import { Person, lookFor, poseFor } from './Person';
 import { CameraRig, type CameraView } from './CameraRig';
 import { toScene } from './common';
+import { CrewHoist, CrewLift } from './crewTransit';
 import { WorksiteExplore } from './WorksiteExplore';
 import type { Line } from '../dialogue';
 
@@ -96,6 +97,8 @@ export function Site(props: SiteProps) {
 }
 
 function SceneContents({ scenario, record, plan, pourProgress, pourActive, truckOnSite, truckLeaves, dust, selectedWorker, redFlagWorkers, sandbox = false }: SiteProps & { sandbox?: boolean }) {
+  const lift = useMemo(() => new CrewHoist(), []);
+  useFrame((_,dt) => { if(!sandbox) lift.tick(Math.min(dt,.1)); }, -2);
   const env = record.env;
   const sunDir = useMemo(() => {
     const az = (env.sunAzimuth * Math.PI) / 180;
@@ -115,7 +118,7 @@ function SceneContents({ scenario, record, plan, pourProgress, pourActive, truck
   const homeTime = record.minute >= scenario.end - 6;
 
   return (
-    <>
+    <CrewLift.Provider value={sandbox ? null : lift}>
       <color attach="background" args={[sky.getStyle()]} />
       <DustFog colour={sky} dust={dust} />
       <hemisphereLight args={['#fff1dc', '#b8925c', dust ? 0.75 : 0.55]} />
@@ -131,6 +134,7 @@ function SceneContents({ scenario, record, plan, pourProgress, pourActive, truck
         return (
           <Person
             key={w.id}
+            slot={i}
             anchor={!sandbox}
             id={w.id}
             target={spot.at}
@@ -144,7 +148,7 @@ function SceneContents({ scenario, record, plan, pourProgress, pourActive, truck
           />
         );
       })}
-    </>
+    </CrewLift.Provider>
   );
 }
 
@@ -203,7 +207,7 @@ function SunLight({ direction, colour, intensity }: { direction: THREE.Vector3; 
 /** Everyone starts the shift under the shade shelter (it is just after the midday break) and walks out. */
 function spawnFor(scenario: Scenario, index: number) {
   const shelter = scenario.zones.find((z) => z.id === 'shelter')!;
-  return toScene(shelter.at.x - 6 + (index % 7) * 2, shelter.at.y - 3 + Math.floor(index / 7) * 2.5);
+  return toScene(shelter.at.x - 6 + (index % 7) * 2, shelter.at.y - 6.5 - Math.floor(index / 7) * 1.1);
 }
 
 /** Where each person stands, sits or lies this minute, given their zone and what they are doing. */
@@ -220,7 +224,7 @@ function layoutPeople(scenario: Scenario, record: MinuteRecord, zones: Map<strin
       switch (zoneId) {
         case 'deck': {
           const cols = 5;
-          at = toScene(t.minX + 6 + (i % cols) * 7, t.minY + 6 + Math.floor(i / cols) * 6, t.height + 0.55);
+          at = toScene(t.minX + 6 + (i % cols) * 7, t.minY + 5 + Math.floor(i / cols) * 14, t.height + 0.55);
           facing = (i % 3) * 1.4;
           break;
         }
@@ -237,7 +241,7 @@ function layoutPeople(scenario: Scenario, record: MinuteRecord, zones: Map<strin
         }
         case 'shelter': {
           const row = [-3, 0, 3][i % 3]!;
-          at = toScene(zone.at.x - 5 + Math.floor(i / 3) * 1.4, zone.at.y - row - 0.6);
+          at = toScene(zone.at.x - 5 + Math.floor(i / 3) * 1.4, zone.at.y - row - 0.85);
           facing = Math.PI;
           break;
         }

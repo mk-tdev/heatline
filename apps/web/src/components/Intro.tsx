@@ -63,7 +63,7 @@ export function Intro({ onStart, onEvidence, onExploreFoot }: { onExploreFoot: (
         </section>
 
         <section className="people-story">
-          <div className="people-photo"><img src="/images/worker-break.jpg" alt="AI-generated illustration of three fictional construction workers sharing a relaxed break in the shade" loading="lazy" /><span>Fictional people. A very real reason to care.</span></div>
+          <div className="people-photo"><img src="/images/crew-comic.jpg" alt="Three comic panels show a construction worker under the sun, a worker checking his watch, and a crew lead directing the pour" loading="lazy" /></div>
           <div className="people-copy"><p className="section-kicker">Behind every warning, a person</p><h2>Different stories.<br />The same right <br />to go home well.</h2><p>Anwar is on his second day. Ravi’s sensor is running out of battery. Suresh wants to finish the pour. Heatline makes room for the person behind the task.</p><div className="language-ribbon"><span>বাংলা</span><span>हिन्दी</span><span>العربية</span><span>മലയാളം</span><span>اردو</span><span>Tagalog</span></div><details className="meet-crew"><summary>Meet the six featured workers <span>+</span></summary><div>{CHARACTERS.map((c) => <p key={c.id}><strong>{c.fullName}</strong><small>{c.role} · {c.language}</small>{c.line}</p>)}</div></details></div>
         </section>
 

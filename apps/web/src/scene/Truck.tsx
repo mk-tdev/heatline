@@ -21,18 +21,43 @@ function buildChassis() {
   for(const z of [2.86,-1.92,-3.26]) for(const side of [-1,1]) {
     const wheel=(radius:number,depth:number,x:number,c:string)=>part(
       new THREE.CylinderGeometry(radius,radius,depth,22).rotateZ(Math.PI/2),x,.56,z,c);
-    wheel(.56,.36,side*.99,'#222427'); wheel(.32,.05,side*1.18,'#727c80'); wheel(.14,.07,side*1.21,'#454d50');
+    wheel(.56,.38,side*.99,'#262829');
+    wheel(.355,.045,side*1.19,'#a4aaa7');
+    wheel(.29,.055,side*1.2,'#414749');
+    wheel(.20,.07,side*1.22,'#919692');
+    for (let lug = 0; lug < 8; lug++) {
+      const angle = lug * Math.PI / 4;
+      part(new THREE.CylinderGeometry(.028,.028,.04,6).rotateZ(Math.PI/2),
+        side*1.265,.56+.15*Math.sin(angle),z+.15*Math.cos(angle),'#c3c6be');
+    }
   }
-  box(0,1.94,2.91,2.4,1.62,2.1,'#e3e1d6');
-  box(0,2.24,3.975,2.12,.73,.04,'#344d59');
-  box(0,2.82,2.88,2.44,.15,2.15,'#f3efe1');
+  // Side profile of a cab-over cab, including the wheel opening and raked windscreen.
+  const outline = new THREE.Shape();
+  const profile = [[1.83,1.06],[2.16,1.06],[2.32,1.32],[3.37,1.32],
+    [3.59,1.05],[4.05,1.05],[4.05,2.02],[3.81,2.84],[1.87,2.84]];
+  profile.forEach(([z,y],i) => i ? outline.lineTo(-z!,y!) : outline.moveTo(-z!,y!));
+  outline.closePath();
+  const cab = new THREE.ExtrudeGeometry(outline,{depth:2.22,bevelEnabled:true,
+    bevelThickness:.065,bevelSize:.06,bevelSegments:3,steps:1}).rotateY(Math.PI/2);
+  part(cab,-1.11,0,0,'#e0ded2');
+  part(new THREE.BoxGeometry(2.13,.77,.05).rotateX(-.285),0,2.42,4.00,'#2b4653');
+  for (const x of [-.56,.54]) {
+    part(new THREE.BoxGeometry(.66,.025,.028).rotateZ(.08),x,2.14,4.12,'#181f22');
+  }
+  box(0,2.87,2.82,2.31,.09,1.97,'#f3efe1');
   box(0,1.21,4.01,2.44,.3,.24,'#62696a');
-  for(let i=0;i<4;i++) box(0,1.48+i*.085,3.977,1.25,.045,.06,'#333a3d');
+  for(let i=0;i<4;i++) box(0,1.48+i*.085,4.13,1.25,.045,.06,'#333a3d');
   for(const side of [-1,1]) {
-    box(side*1.21,2.24,2.95,.035,.69,1.4,'#405963');
+    box(side*1.185,2.42,2.88,.035,.68,1.55,'#344e58');
+    box(side*1.21,2.42,3.39,.026,.69,.044,'#232c30');
+    box(side*1.19,1.94,2.25,.05,.065,.22,'#434b4d');
+    box(side*1.24,1.02,2.05,.38,.10,.53,'#7b8382');
+    box(side*1.16,.81,2.05,.38,.10,.53,'#5a6569');
+    box(side*.91,1.0,.65,.55,.58,1.53,'#939893');
+    for (const z of [.18,1.12]) box(side*.92,1.0,z,.57,.60,.07,'#555e60');
     box(side*1.27,2.36,3.6,.23,.05,.05,'#41464a');
     box(side*1.41,2.36,3.6,.11,.29,.16,'#363d40');
-    box(side*.91,1.48,3.99,.42,.18,.09,'#fff2c9');
+    box(side*.91,1.52,4.16,.42,.19,.12,'#fff2c9');
     box(side*1.04,.93,1.69,.45,.16,.64,'#667075');
     box(side*.97,.91,-2.59,.48,.16,2.68,'#42494c');
     box(side*.96,.71,-4.17,.27,.13,.1,'#b94b38');
@@ -42,14 +67,37 @@ function buildChassis() {
 }
 
 function buildDrum() {
-  const profile=[[-2.65,.55],[-2.25,1.03],[-1.25,1.27],[.55,1.24],[1.7,.91],[2.65,.51]];
-  const geometry=new THREE.LatheGeometry(profile.map(([y,r])=>new THREE.Vector2(r!,y!)),48);
-  const colors=[];
-  for(let i=0;i<geometry.attributes.position!.count;i++) {
-    const uv=geometry.attributes.uv!;
-    const phase=(uv.getX(i)*2+uv.getY(i)*.65)%1;
-    const color=new THREE.Color(phase<.22?'#b66b38':'#ddd9c9');
-    colors.push(color.r,color.g,color.b);
+  // Turn the angular grid along the drum so the two painted spirals have crisp edges.
+  const profile = [[-2.66,.04],[-2.65,.43],[-2.40,.80],[-1.83,1.11],[-1.20,1.28],
+    [-.74,1.31],[.33,1.28],[.92,1.18],[1.55,.96],[2.33,.63],[2.63,.53],[2.67,.53]];
+  const rings = profile.map(([y,r]) => new THREE.Vector2(r!,y!));
+  const outline: THREE.Vector2[] = [rings[0]!];
+  for (let i = 1; i < rings.length; i++) {
+    const start = rings[i-1]!;
+    const end = rings[i]!;
+    const steps = Math.ceil(start.distanceTo(end) / .14);
+    for (let step = 1; step <= steps; step++) {
+      outline.push(start.clone().lerp(end, step / steps));
+    }
+  }
+  const geometry = new THREE.LatheGeometry(outline,64).toNonIndexed();
+  const positions = geometry.getAttribute('position');
+  const uv = geometry.getAttribute('uv');
+  const normals = geometry.getAttribute('normal');
+  const colors: number[] = [];
+  for (let face=0; face<positions.count; face+=3) {
+    const u = (uv.getX(face)+uv.getX(face+1)+uv.getX(face+2))/3;
+    const stripe = (u*2)%1;
+    const paint = new THREE.Color(stripe < .23 ? '#a9502b' : stripe < .28 ? '#563e34' : '#d9d6c5');
+    for (let i=face; i<face+3; i++) {
+      const y = positions.getY(i);
+      const angle = 2*Math.PI*uv.getX(i) + y*.74;
+      const radius = Math.hypot(positions.getX(i),positions.getZ(i));
+      positions.setXYZ(i,radius*Math.sin(angle),y,radius*Math.cos(angle));
+      const radial = Math.hypot(normals.getX(i),normals.getZ(i));
+      normals.setXYZ(i,radial*Math.sin(angle),normals.getY(i),radial*Math.cos(angle));
+      colors.push(paint.r,paint.g,paint.b);
+    }
   }
   geometry.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
   return geometry;
@@ -67,7 +115,16 @@ export function Truck({body = 'tanker'}:{body?:'mixer' | 'tanker' | 'pump'}) {
         <mesh ref={drum} geometry={geometry} castShadow><meshStandardMaterial vertexColors roughness={.76} side={THREE.DoubleSide}/></mesh>
       </group>
       <mesh position={[0,2.73,-3.83]} castShadow><cylinderGeometry args={[.66,.29,.72,10]}/><meshStandardMaterial color="#92938b"/></mesh>
-      <mesh position={[.12,1.92,-4.24]} rotation-x={-.35} castShadow><boxGeometry args={[.47,.17,1.4]}/><meshStandardMaterial color="#717b79"/></mesh>
+      <group position={[0,1.91,-4.04]} rotation={[-.31,.26,0]}>
+        <mesh rotation-x={Math.PI/2} castShadow>
+          <cylinderGeometry args={[.28,.23,1.82,16,1,true,-Math.PI/2,Math.PI]}/>
+          <meshStandardMaterial color="#798281" side={THREE.DoubleSide}/>
+        </mesh>
+      </group>
+      <group position={[.84,1.89,-3.7]} rotation-x={-.21}>
+        {[-.22,.22].map(x=><mesh key={x} position-x={x}><boxGeometry args={[.055,1.96,.06]}/><meshStandardMaterial color="#505c5d"/></mesh>)}
+        {[0,1,2,3,4,5].map(i=><mesh key={i} position-y={i*.31-.85}><boxGeometry args={[.45,.042,.085]}/><meshStandardMaterial color="#9a9f95"/></mesh>)}
+      </group>
     </> : body === 'pump' ? <group>
       <mesh position={[0,1.45,-.9]} castShadow><boxGeometry args={[2.4,.45,5.9]}/><meshStandardMaterial color="#c4c2b8"/></mesh>
       {[-2.7,1.2].map(z=><group key={z} position={[0,0,z]}>

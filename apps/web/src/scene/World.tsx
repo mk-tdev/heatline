@@ -72,7 +72,7 @@ function Hoarding() {
     const out: { p: THREE.Vector3; w: number; turn: number }[] = [];
     const { minX, maxX, minY, maxY } = SITE;
     for (let x = minX; x < maxX; x += 6) {
-      out.push({ p: toScene(x + 3, minY, h / 2), w: 6, turn: 0 });
+      if(x!==54) out.push({ p: toScene(x + 3, minY, h / 2), w: 6, turn: 0 });
       out.push({ p: toScene(x + 3, maxY, h / 2), w: 6, turn: 0 });
     }
     for (let y = minY; y < maxY; y += 6) {

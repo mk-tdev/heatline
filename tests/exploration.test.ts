@@ -13,8 +13,39 @@ describe('playground walking boundaries', () => {
     expect(walkPosition(7, -11, true, { x: 8, z: -11 })).toEqual({ x: 7, z: -11 });
   });
   it('does not mutate caller-owned positions and stays within the site', () => {
-    const previous = Object.freeze({ x: 49, z: 14 });
+    const previous = Object.freeze({ x: 109, z: 40 });
     expect(walkPosition(200, 200, false, previous)).toEqual({ x: 112, z: 42 });
-    expect(previous).toEqual({ x: 49, z: 14 });
+    expect(previous).toEqual({ x: 109, z: 40 });
   });
+});
+
+import { CrewHoist, CrewWalk } from '../apps/web/src/scene/crewTransit';
+import { clearPath, obstacles, route } from '../apps/web/src/scene/worksiteRoutes';
+import { Vector3 } from 'three';
+
+it('takes a detour around the benches and follows only clear segments', () => {
+  const start={x:70,z:20.5}, end={x:70,z:12.5};
+  const path=route(start,end,0);
+  expect(path.at(-1)).toEqual(end);
+  expect(clearPath(start,end,obstacles(0))).toBe(false);
+  path.forEach((point,i)=>expect(clearPath(path[i-1] ?? start,point,obstacles(0))).toBe(true));
+});
+
+it('boards, rides with the cage, and exits at the roof, scaffold and ground', () => {
+  const lift=new CrewHoist(), walk=new CrewWalk(0), p=new Vector3(64,0,20.5);
+  for (const target of [new Vector3(13,42.55,-5),new Vector3(-3.1,7.14,-17),new Vector3(70,0,14.85)]) {
+    let riding=false;
+    for(let i=0;i<3000 && p.distanceTo(target)>.02;i++) {
+      const y=lift.height;
+      lift.tick(.05);
+      walk.advance('worker',p,target,lift,.05);
+      if(lift.height!==y && lift.requests.get('worker')?.phase==='riding') {
+        riding=true;
+        expect(p.x).toBeCloseTo(43.7);
+        expect(p.y).toBeCloseTo(lift.height+.14);
+      }
+    }
+    expect(riding).toBe(true);
+    expect(p.distanceTo(target)).toBeLessThan(.02);
+  }
 });

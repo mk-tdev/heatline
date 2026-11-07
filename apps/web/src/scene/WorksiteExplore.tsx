@@ -2,14 +2,14 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { PlaygroundContext, clamp, walkPosition } from './explorationState';
+import { type PlaygroundMachinery, PlaygroundContext, clamp, walkPosition } from './explorationState';
 
 type Mode = 'walk' | 'lift' | 'crane';
 interface Tour { x: number; z: number; deck: boolean; yaw: number; pitch: number; mode: Mode; destination: number }
 
 /** A disposable visual sandbox. Only onClose crosses back into the application. */
 export function WorksiteExplore({ children, onClose, returnLabel = 'Back to shift' }: { children: ReactNode; onClose: () => void; returnLabel?: string }) {
-  const machinery = useRef({ lift: .4, slew: 2.6, trolley: 30, cable: 24 });
+  const machinery = useRef<PlaygroundMachinery>({ groundEquipment: [], lift: .4, slew: 2.6, trolley: 30, cable: 24 });
   const tour = useRef<Tour>({ x: 49, z: 14, deck: false, yaw: .25, pitch: 0, mode: 'walk', destination: .4 });
   const keys = useRef(new Set<string>());
   const [mode, setMode] = useState<Mode>('walk');
@@ -98,7 +98,7 @@ export function WorksiteExplore({ children, onClose, returnLabel = 'Back to shif
   </div>, document.body);
 }
 
-function Walker({ tour, machinery, keys, onNear, onFloor, onMoving }: { tour: Tour; machinery: { lift: number; slew: number; trolley: number; cable: number }; keys: Set<string>; onNear: (s: string) => void; onFloor: (s: string) => void; onMoving: (v: boolean) => void }) {
+function Walker({ tour, machinery, keys, onNear, onFloor, onMoving }: { tour: Tour; machinery: PlaygroundMachinery; keys: Set<string>; onNear: (s: string) => void; onFloor: (s: string) => void; onMoving: (v: boolean) => void }) {
   const { camera, gl } = useThree();
   const last = useRef('');
   useEffect(() => {
@@ -128,7 +128,7 @@ function Walker({ tour, machinery, keys, onNear, onFloor, onMoving }: { tour: To
       } else {
         const f = clamp(axis('KeyW','KeyS') + axis('ArrowUp','ArrowDown'), -1, 1), side = axis('KeyD','KeyA');
         const speed = (keys.has('ShiftLeft') || keys.has('ShiftRight') ? 12 : 5) * dt / Math.max(1, Math.hypot(f, side));
-        const next = walkPosition(tour.x + (-Math.sin(tour.yaw) * f + Math.cos(tour.yaw) * side) * speed, tour.z + (-Math.cos(tour.yaw) * f - Math.sin(tour.yaw) * side) * speed, tour.deck, tour);
+        const next = walkPosition(tour.x + (-Math.sin(tour.yaw) * f + Math.cos(tour.yaw) * side) * speed, tour.z + (-Math.cos(tour.yaw) * f - Math.sin(tour.yaw) * side) * speed, tour.deck, tour, machinery.groundEquipment);
         tour.x = next.x; tour.z = next.z;
         camera.position.set(tour.x, tour.deck ? 44.1 : 1.8, tour.z);
       }

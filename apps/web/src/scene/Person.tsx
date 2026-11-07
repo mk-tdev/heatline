@@ -3,10 +3,11 @@
 // rebar, pouring, fixing panels), sits to rest, lies down when being cooled.
 // Individual strain is never shown on the figure; only a disclosed red flag adds a beacon.
 
-import { useEffect, useMemo, useRef, type RefObject } from 'react';
+import { useContext, useEffect, useMemo, useRef, type RefObject } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { Activity } from '@heatline/contracts';
+import { CrewLift, CrewWalk } from './crewTransit';
 import { anchors } from './labels';
 
 export interface Look {
@@ -33,6 +34,7 @@ export function Person({
   id,
   target,
   spawn,
+  slot=0,
   look,
   pose,
   facing = 0,
@@ -46,6 +48,7 @@ export function Person({
   target: THREE.Vector3;
   /** where the figure first appears; it then walks to `target` */
   spawn?: THREE.Vector3;
+  slot?: number;
   look: Look;
   pose: Pose;
   facing?: number;
@@ -81,23 +84,27 @@ export function Person({
   }, [id, anchor]);
   const start = useMemo(() => (spawn ?? target).clone(), []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const lift=useContext(CrewLift);
+  const transit=useMemo(()=>new CrewWalk(start.y,slot),[start,slot]);
+  useEffect(()=>()=>lift?.release(id),[lift,id]);
   useFrame(({ clock }, dt) => {
     const g = root.current;
     if (!g) return;
     const t = clock.elapsedTime + seed;
-    // Walk toward the target. Long hops (up the hoist, between levels) are shortened.
-    const delta = new THREE.Vector3().subVectors(target, g.position);
-    const dist = delta.length();
-    let walking = false;
-    if (dist > 60) g.position.copy(target);
-    else if (dist > 0.25) {
-      walking = true;
-      const step = Math.min(dist, dt * (dist > 12 ? 9 : 3.2));
-      g.position.addScaledVector(delta.normalize(), step);
-      heading.current = Math.atan2(delta.x, delta.z);
-    } else {
-      heading.current += ((facing - heading.current + Math.PI * 3) % (Math.PI * 2) - Math.PI) * Math.min(1, dt * 2);
+    const beforeX=g.position.x, beforeZ=g.position.z;
+    let walking=false;
+    if(lift && anchor) walking=transit.advance(id,g.position,target,lift,Math.min(dt,.1));
+    else {
+      // Ambient pedestrians follow level pavement. Sandbox crew start at their station.
+      const dx=target.x-beforeX, dz=target.z-beforeZ, d=Math.hypot(dx,dz);
+      if(d>.02) {
+        const fraction=Math.min(1,Math.min(dt,.1)*3.2/d);
+        g.position.x+=dx*fraction; g.position.z+=dz*fraction; walking=true;
+      }
     }
+    if(walking) heading.current=Math.atan2(g.position.x-beforeX,g.position.z-beforeZ);
+    else heading.current += ((facing-heading.current+Math.PI*3)%(Math.PI*2)-Math.PI)*Math.min(1,dt*2);
+    const currentPose=lift && anchor && (lift.requests.has(id) || g.position.distanceTo(target)>.5) ? 'stand' : pose;
     g.rotation.y = heading.current;
 
     // Reset joints, then pose.
@@ -114,7 +121,7 @@ export function Person({
       set(armR, s * 0.5);
       set(torso, 0.06);
       hipY += Math.abs(Math.cos(t * 8)) * 0.04;
-    } else if (pose === 'work-heavy') {
+    } else if (currentPose === 'work-heavy') {
       // Bent over, tying rebar or working the concrete: rhythmic arms.
       const s = Math.sin(t * 5);
       set(legL, -0.35);
@@ -125,7 +132,7 @@ export function Person({
       set(armL, -1.1 + s * 0.35);
       set(armR, -1.1 - s * 0.35);
       hipY = 0.85;
-    } else if (pose === 'work-moderate') {
+    } else if (currentPose === 'work-moderate') {
       // Fixing panels: arms raised, small reaching movements.
       const s = Math.sin(t * 2.4);
       set(legL);
@@ -135,7 +142,7 @@ export function Person({
       set(torso, -0.05);
       set(armL, -2.4 + s * 0.2);
       set(armR, -2.1 - s * 0.25);
-    } else if (pose === 'work-light') {
+    } else if (currentPose === 'work-light') {
       const s = Math.sin(t * 1.6);
       set(legL);
       set(legR);
@@ -144,7 +151,7 @@ export function Person({
       set(torso, 0.25);
       set(armL, -0.9 + s * 0.15);
       set(armR, -0.8 - s * 0.15);
-    } else if (pose === 'stand') {
+    } else if (currentPose === 'stand') {
       // Standing and waiting, a slight shift of weight.
       const s = Math.sin(t * 0.7);
       set(legL, s * 0.04);
@@ -154,7 +161,7 @@ export function Person({
       set(torso, 0.02);
       set(armL, 0.05);
       set(armR, Math.sin(t * 0.3) > 0.8 ? -1.2 : 0.05);
-    } else if (pose === 'rest') {
+    } else if (currentPose === 'rest') {
       // Seated on a bench, a bottle of water now and then.
       set(legL, -1.45);
       set(legR, -1.45);

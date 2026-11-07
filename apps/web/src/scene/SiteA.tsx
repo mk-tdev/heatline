@@ -3,7 +3,10 @@ import { Truck } from './Truck';
 // netting, glazing on the lower floors, hoist, formwork on the deck and the pour; plus the
 // rebar shed, materials, welfare facilities and the concrete pump during the pour.
 
-import { useMemo, useRef } from 'react';
+import { CrewLift } from './crewTransit';
+import { PlaygroundContext } from './explorationState';
+import { rect } from './worksiteRoutes';
+import { useContext, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { Plan, Scenario, Zone } from '@heatline/contracts';
@@ -19,6 +22,7 @@ export function SiteA({ scenario, minute, plan, pourProgress, pourActive, truckO
     <group>
       <Tower scenario={scenario} pourProgress={pourProgress} />
       <Scaffold />
+      {[2,3,4,5].map(f=><mesh key={f} position={[-1.1,f*STOREY+.14,-10.05]}><boxGeometry args={[2.3,.15,1.4]}/><meshStandardMaterial color="#99876a"/></mesh>)}
       <Hoist />
       <Crane operable at={toScene(50, 34)} height={62} jib={58} turn={2.6} />
       <RebarYard yard={zones.get('yard')!} />
@@ -32,7 +36,7 @@ export function SiteA({ scenario, minute, plan, pourProgress, pourActive, truckO
         return <Tent key={t.zone} at={z} />;
       })}
       {truckOnSite && <PourSet active={pourActive} deckHeight={scenario.tower.height} />}
-      <Mixer minute={minute} arrives={scenario.pour.truckArrives} leaves={truckLeaves} />
+      <Mixer minute={minute} arrives={scenario.pour.truckArrives} leaves={truckLeaves} pump={truckOnSite} />
     </group>
   );
 }
@@ -77,10 +81,12 @@ function Tower({ scenario, pourProgress }: { scenario: Scenario; pourProgress: n
             <boxGeometry args={[w, STOREY - 0.5, 0.08]} />
             <meshStandardMaterial color={PALETTE.glass} roughness={0.12} metalness={0.5} />
           </mesh>
-          <mesh position={[t.maxX + 0.05, i * STOREY + 1.95, c.z]}>
-            <boxGeometry args={[0.08, STOREY - 0.5, d]} />
-            <meshStandardMaterial color={PALETTE.glass} roughness={0.12} metalness={0.5} />
-          </mesh>
+          {[[-30,-11.1],[-9.05,0]].map(([lo,hi])=>(
+            <mesh key={lo} position={[t.maxX+.05,i*STOREY+1.95,(lo!+hi!)/2]}>
+              <boxGeometry args={[.08,STOREY-.5,hi!-lo!]} />
+              <meshStandardMaterial color={PALETTE.glass} roughness={.12} metalness={.5}/>
+            </mesh>
+          ))}
         </group>
       ))}
       {/* Block walls going in on floors 4–7 */}
@@ -135,7 +141,7 @@ function EdgeBarrier({ w, d, y, centre }: { w: number; d: number; y: number; cen
     const m = Math.floor(d / 2.5);
     for (let i = 0; i < m; i++) {
       const z = centre.z - d / 2 + 1.25 + i * 2.5;
-      out.push({ p: [centre.x + w / 2, y, z], s: [0.08, 0.12, 2.4], c: i % 2 ? '#1b1b1b' : '#f2c21b' });
+      if (Math.abs(z+10.05)>1.8) out.push({ p: [centre.x + w / 2, y, z], s: [0.08, 0.12, 2.4], c: i % 2 ? '#1b1b1b' : '#f2c21b' });
       out.push({ p: [centre.x - w / 2, y, z], s: [0.08, 0.12, 2.4], c: i % 2 ? '#f2c21b' : '#1b1b1b' });
     }
     return out;
@@ -415,14 +421,19 @@ mixerRoad.add(new THREE.LineCurve3(toScene(120, -17), toScene(80, -14)));
 mixerRoad.add(new THREE.LineCurve3(toScene(80, -14), toScene(58, -14)));
 const DRIVE_MIN = 6;
 
-function Mixer({ minute, arrives, leaves }: { minute: number; arrives: number; leaves: number }) {
+function Mixer({ minute, arrives, leaves, pump }: { minute: number; arrives: number; leaves: number; pump:boolean }) {
   const truck = useRef<THREE.Group>(null);
+  const controlled=useContext(PlaygroundContext);
+  const crew=useContext(CrewLift);
+  const space=controlled ?? crew;
   const progress = useRef<number | null>(null);
   const visible = minute >= arrives - DRIVE_MIN && minute <= leaves + DRIVE_MIN;
   // Route progress: 0 → 1 driving in, 1 while parked, 1 → 0 driving out.
   const t = minute < arrives ? (minute - (arrives - DRIVE_MIN)) / DRIVE_MIN : minute <= leaves ? 1 : 1 - (minute - leaves) / DRIVE_MIN;
   useFrame((_, dt) => {
     const vehicle = truck.current;
+    if (space) space.groundEquipment.length=0;
+    if (space && pump) space.groundEquipment.push(rect(50,-2,5.4,9));
     if (!vehicle) { progress.current = null; return; }
     const previous = progress.current;
     const current = previous === null || Math.abs(previous - t) > .3
@@ -431,6 +442,10 @@ function Mixer({ minute, arrives, leaves }: { minute: number; arrives: number; l
     vehicle.position.copy(mixerRoad.getPoint(current));
     const direction = mixerRoad.getTangent(current);
     vehicle.rotation.y = Math.atan2(direction.x, direction.z) + (minute > leaves ? Math.PI : 0);
+    if(space) {
+      const x=Math.abs(direction.x), z=Math.abs(direction.z);
+      space.groundEquipment.push(rect(vehicle.position.x,vehicle.position.z,10*x+2.8*z,10*z+2.8*x));
+    }
   });
   if (!visible) return null;
   return (

@@ -1,3 +1,4 @@
+import { CrewLift } from './crewTransit';
 // Illustrative machinery; ambient motion does not model crane operations or worker transport.
 import { useContext, useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
@@ -100,22 +101,20 @@ export function Hoist() {
     const out:Member[]=[];
     for(const x of [.6,2.8]) for(const z of [-1.4,1.4]) out.push([[x,0,z],[x,2.6,z]]);
     for(const y of [.15,1.1,2.5]) {
-      out.push([[.6,y,-1.4],[2.8,y,-1.4]],[[.6,y,1.4],[2.8,y,1.4]],[[2.8,y,-1.4],[2.8,y,1.4]]);
+      out.push([[.6,y,-1.4],[2.8,y,-1.4]],[[.6,y,1.4],[2.8,y,1.4]]);
     }
-    for(let z=-1.2;z<=1.2;z+=.3) out.push([[2.8,.2,z],[2.8,2.5,z]]);
+
     for(let x=.8;x<2.8;x+=.3) for(const z of [-1.4,1.4]) out.push([[x,.2,z],[x,2.5,z]]);
     return out;
   },[]);
   const ties=useMemo<Member[]>(()=>Array.from({length:12},(_,i)=>[[-2,(i+1)*3.5,0],[0,(i+1)*3.5,0]] as Member),[]);
-  useFrame(({clock})=>{
-    // Four seconds at each landing; eight seconds of eased travel to the next stop.
-    const t=window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:clock.elapsedTime;
-    const stops=[0,3,6,9,12,9,6,3,0];
-    const leg=Math.floor(t/12)%8, phase=Math.max(0,(t%12-4)/8), ease=phase*phase*(3-2*phase);
-    if(cage.current) cage.current.position.y=playground?.lift ?? .4+(stops[leg]!+(stops[leg+1]!-stops[leg]!)*ease)*3.5;
+  const crewLift=useContext(CrewLift);
+  useFrame(()=>{
+    if(cage.current) cage.current.position.y=playground?.lift ?? crewLift?.height ?? .4;
   });
   return <group position={toScene(42,9)}>
     <Box at={[1,.15,0]} size={[5,.3,4.2]} color="#aaa99e"/>
+    {[2,3,4,5,12].map(f=><Box key={f} at={[-.7,f*3.5+.35,-1.05]} size={[3.1,.13,1.12]} color="#878b86"/>)}
     <Steel members={mast} width={.09} color="#b2bdbe"/><Steel members={ties} width={.16} color={DARK}/>
     <Box at={[.44,22,0]} size={[.12,44,.16]} color={DARK}/>
     <group ref={cage} position={[0,.4,0]}>
@@ -123,7 +122,7 @@ export function Hoist() {
       <Box at={[1.7,.06,0]} size={[2.35,.16,3]} color={DARK}/>
       <Box at={[1.7,2.65,0]} size={[2.5,.18,3.15]}/>
       <Box at={[.75,2.95,0]} size={[.7,.5,.9]} color={DARK}/>
-      <Box at={[2.85,.45,0]} size={[.1,.5,2.8]}/>
+
     </group>
     {[0,1,2].map(i=><Box key={i} at={[1.7,.45,i-1]} size={[2.5,.12,.12]} color={DARK}/>)}
   </group>;
