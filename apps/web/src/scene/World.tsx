@@ -3,6 +3,7 @@
 // and distant cultural-district silhouettes. Static scenery only; nothing here is simulated.
 
 import { useMemo } from 'react';
+import { District } from './District';
 import { Crane } from './Machinery';
 export { Crane } from './Machinery';
 import * as THREE from 'three';
@@ -14,7 +15,7 @@ export function World() {
   return (
     <group>
       <Ground />
-      <Roads />
+      <District />
       <Sea />
       <Hoarding />
       <SiteOffices />
@@ -32,7 +33,7 @@ function Ground() {
   return (
     <group>
       <mesh rotation-x={-Math.PI / 2} position={[40, -0.06, 0]} receiveShadow>
-        <planeGeometry args={[2400, 2400]} />
+        <planeGeometry args={[4400, 4400]} />
         <meshStandardMaterial color={PALETTE.sand} roughness={1} />
       </mesh>
       {/* Compacted site pad inside the hoarding */}
@@ -49,53 +50,15 @@ function Ground() {
   );
 }
 
-function Roads() {
-  const dashes = useMemo(() => Array.from({ length: 40 }, (_, i) => i), []);
-  return (
-    <group>
-      {/* East road (north–south) and south road (east–west) */}
-      <mesh rotation-x={-Math.PI / 2} position={toScene(134, 20, 0.01)} receiveShadow>
-        <planeGeometry args={[22, 520]} />
-        <meshStandardMaterial color={PALETTE.asphalt} roughness={0.95} />
-      </mesh>
-      <mesh rotation-x={-Math.PI / 2} position={toScene(40, -66, 0.012)} receiveShadow>
-        <planeGeometry args={[520, 22]} />
-        <meshStandardMaterial color={PALETTE.asphalt} roughness={0.95} />
-      </mesh>
-      {dashes.map((i) => (
-        <mesh key={`e${i}`} rotation-x={-Math.PI / 2} position={toScene(134, -230 + i * 13, 0.03)}>
-          <planeGeometry args={[0.3, 5]} />
-          <meshBasicMaterial color="#e8e1cf" />
-        </mesh>
-      ))}
-      {dashes.map((i) => (
-        <mesh key={`s${i}`} rotation-x={-Math.PI / 2} position={toScene(-220 + i * 13, -66, 0.03)}>
-          <planeGeometry args={[5, 0.3]} />
-          <meshBasicMaterial color="#e8e1cf" />
-        </mesh>
-      ))}
-      {/* Kerbs */}
-      <mesh position={toScene(123, 20, 0.12)} receiveShadow>
-        <boxGeometry args={[0.6, 0.25, 520]} />
-        <meshStandardMaterial color="#d9d4c7" />
-      </mesh>
-      <mesh position={toScene(40, -55, 0.12)} receiveShadow>
-        <boxGeometry args={[520, 0.25, 0.6]} />
-        <meshStandardMaterial color="#d9d4c7" />
-      </mesh>
-    </group>
-  );
-}
-
 function Sea() {
   return (
     <group>
-      <mesh rotation-x={-Math.PI / 2} position={toScene(0, 520, -0.02)}>
-        <planeGeometry args={[2400, 700]} />
+      <mesh rotation-x={-Math.PI / 2} position={toScene(0, 1170, -0.02)}>
+        <planeGeometry args={[4400, 2000]} />
         <meshStandardMaterial color={PALETTE.sea} roughness={0.25} metalness={0.1} />
       </mesh>
       <mesh rotation-x={-Math.PI / 2} position={toScene(0, 168, -0.01)}>
-        <planeGeometry args={[2400, 26]} />
+        <planeGeometry args={[4400, 26]} />
         <meshStandardMaterial color="#efe2c2" roughness={1} />
       </mesh>
     </group>
@@ -322,7 +285,7 @@ function Palm({ at, height = 9, seed = 0 }: { at: THREE.Vector3; height?: number
 function Palms() {
   const spots = useMemo(() => {
     const out: THREE.Vector3[] = [];
-    for (let y = -180; y <= 220; y += 16) out.push(toScene(147, y), toScene(121, y + 8));
+    for (let y = -180; y <= 132; y += 16) out.push(toScene(147, y), toScene(121, y + 8));
     for (let x = -200; x <= 240; x += 16) if (x < SITE.minX - 4 || x > SITE.maxX + 8) out.push(toScene(x, -78));
     for (let x = -200; x <= 240; x += 18) out.push(toScene(x + 6, -53));
     return out.filter((p) => !(p.x > SITE.minX - 2 && p.x < SITE.maxX + 3 && -p.z > SITE.minY - 2 && -p.z < SITE.maxY + 2));

@@ -1,3 +1,4 @@
+import { Truck } from './Truck';
 // Saadiyat Tower (the simulated site): the frame at level 12 with its core, edge protection,
 // netting, glazing on the lower floors, hoist, formwork on the deck and the pour; plus the
 // rebar shed, materials, welfare facilities and the concrete pump during the pour.
@@ -407,56 +408,34 @@ function Tent({ at }: { at: Zone }) {
 
 /** Concrete mixer and boom pump at the tower during the pour. */
 /** The mixer drives in from the east road, through the gate, to the pump, and leaves after the pour. */
-const ROUTE = [toScene(134, -220), toScene(134, -17), toScene(121, -17), toScene(80, -14), toScene(58, -14)];
+const mixerRoad = new THREE.CurvePath<THREE.Vector3>();
+mixerRoad.add(new THREE.LineCurve3(toScene(130, -220), toScene(130, -27)));
+mixerRoad.add(new THREE.QuadraticBezierCurve3(toScene(130, -27), toScene(130, -17), toScene(120, -17)));
+mixerRoad.add(new THREE.LineCurve3(toScene(120, -17), toScene(80, -14)));
+mixerRoad.add(new THREE.LineCurve3(toScene(80, -14), toScene(58, -14)));
 const DRIVE_MIN = 6;
-
-function routePoint(t: number): { p: THREE.Vector3; ahead: THREE.Vector3 } {
-  const lengths = ROUTE.slice(1).map((p, i) => p.distanceTo(ROUTE[i]!));
-  const total = lengths.reduce((a, b) => a + b, 0);
-  let d = THREE.MathUtils.clamp(t, 0, 1) * total;
-  for (let i = 0; i < lengths.length; i++) {
-    if (d <= lengths[i]! || i === lengths.length - 1) {
-      const a = ROUTE[i]!;
-      const b = ROUTE[i + 1]!;
-      return { p: a.clone().lerp(b, Math.min(1, d / lengths[i]!)), ahead: b };
-    }
-    d -= lengths[i]!;
-  }
-  return { p: ROUTE[ROUTE.length - 1]!.clone(), ahead: ROUTE[ROUTE.length - 1]! };
-}
 
 function Mixer({ minute, arrives, leaves }: { minute: number; arrives: number; leaves: number }) {
   const truck = useRef<THREE.Group>(null);
-  const drum = useRef<THREE.Mesh>(null);
+  const progress = useRef<number | null>(null);
   const visible = minute >= arrives - DRIVE_MIN && minute <= leaves + DRIVE_MIN;
   // Route progress: 0 → 1 driving in, 1 while parked, 1 → 0 driving out.
   const t = minute < arrives ? (minute - (arrives - DRIVE_MIN)) / DRIVE_MIN : minute <= leaves ? 1 : 1 - (minute - leaves) / DRIVE_MIN;
-  const goal = routePoint(t);
-  const outbound = minute > leaves;
   useFrame((_, dt) => {
-    const g = truck.current;
-    if (!g) return;
-    if (g.position.distanceTo(goal.p) > 60) g.position.copy(goal.p);
-    else g.position.lerp(goal.p, Math.min(1, dt * 2));
-    const look = outbound ? routePoint(Math.max(0, t - 0.05)).p : goal.ahead;
-    if (look.distanceTo(g.position) > 0.5) g.lookAt(look.x, 0, look.z);
-    if (drum.current) drum.current.rotation.y += dt * 1.6;
+    const vehicle = truck.current;
+    if (!vehicle) { progress.current = null; return; }
+    const previous = progress.current;
+    const current = previous === null || Math.abs(previous - t) > .3
+      ? t : THREE.MathUtils.damp(previous, t, 2, dt);
+    progress.current = current;
+    vehicle.position.copy(mixerRoad.getPoint(current));
+    const direction = mixerRoad.getTangent(current);
+    vehicle.rotation.y = Math.atan2(direction.x, direction.z) + (minute > leaves ? Math.PI : 0);
   });
   if (!visible) return null;
   return (
-    <group ref={truck} position={goal.p}>
-      <mesh position={[0, 1.6, 3.4]} castShadow>
-        <boxGeometry args={[2.5, 2.3, 2.3]} />
-        <meshStandardMaterial color="#eef1f3" />
-      </mesh>
-      <mesh position={[0, 0.7, 0]} castShadow>
-        <boxGeometry args={[2.5, 0.6, 9]} />
-        <meshStandardMaterial color="#3f454b" />
-      </mesh>
-      <mesh ref={drum} position={[0, 2.6, -1.2]} rotation-x={Math.PI / 2 - 0.25} castShadow>
-        <cylinderGeometry args={[1.1, 1.45, 5, 16]} />
-        <meshStandardMaterial color="#e07f2e" />
-      </mesh>
+    <group ref={truck}>
+      <Truck body="mixer" />
     </group>
   );
 }
@@ -469,10 +448,8 @@ function PourSet({ active, deckHeight }: { active: boolean; deckHeight: number }
     <group>
       {/* Boom pump with its arm reaching the deck */}
       <group position={toScene(50, 2)}>
-        <mesh position={[0, 1.4, 0]} castShadow>
-          <boxGeometry args={[2.6, 2.4, 10]} />
-          <meshStandardMaterial color="#d8dde0" />
-        </mesh>
+        <Truck body="pump" />
+        <mesh position={[0,2.15,0]} castShadow><cylinderGeometry args={[.83,1.02,1,16]}/><meshStandardMaterial color="#bd8e43"/></mesh>
         <group position={[0, 3, 0]} rotation-z={-boomAngle}>
           <mesh position={[-boomLength / 2, 0, 0]} castShadow>
             <boxGeometry args={[boomLength, 0.7, 0.7]} />

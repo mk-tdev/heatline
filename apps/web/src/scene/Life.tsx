@@ -1,3 +1,5 @@
+import { Truck } from './Truck';
+import { COAST_ROAD, CITY_EDGE } from './District';
 // Everything that makes the place feel inhabited: traffic on the roads, people on the
 // pavements, the neighbourhood across the south road, the crew on the phase-2 tower and birds.
 // Decorative only; none of it is simulated physiology.
@@ -22,17 +24,21 @@ export function Life() {
 
 const CAR_COLOURS = ['#f4f4f2', '#d8dcdf', '#1d1f23', '#9aa4ab', '#b8312f', '#f2f0ea', '#2f4f7a', '#e7e2d6'];
 
-interface Lane {
-  from: THREE.Vector3;
-  to: THREE.Vector3;
-}
-
-const LANES: Lane[] = [
-  { from: toScene(130, -260, 0), to: toScene(130, 300, 0) }, // east road, northbound
-  { from: toScene(138, 300, 0), to: toScene(138, -260, 0) }, // east road, southbound
-  { from: toScene(-240, -62, 0), to: toScene(320, -62, 0) }, // south road, eastbound
-  { from: toScene(320, -70, 0), to: toScene(-240, -70, 0) }, // south road, westbound
+// Northbound traffic follows the coast west. All route endpoints are in the distance.
+const coastalRoute = (offset: number) => [
+  toScene(134+offset,-CITY_EDGE), toScene(134+offset,COAST_ROAD-22),
+  toScene(129+offset,COAST_ROAD-7-offset), toScene(112,COAST_ROAD-offset),
+  toScene(-CITY_EDGE,COAST_ROAD-offset),
 ];
+const LANES = [
+  coastalRoute(-4), coastalRoute(4).reverse(),
+  [toScene(-CITY_EDGE,-62),toScene(CITY_EDGE,-62)],
+  [toScene(CITY_EDGE,-70),toScene(-CITY_EDGE,-70)],
+].map(points => {
+  const path = new THREE.CurvePath<THREE.Vector3>();
+  points.slice(1).forEach((point,i)=>path.add(new THREE.LineCurve3(points[i]!,point)));
+  return path;
+});
 
 /** Cars, pickups, a taxi and a water tanker looping along the two roads. */
 function Traffic() {
@@ -40,8 +46,8 @@ function Traffic() {
     () =>
       Array.from({ length: 22 }, (_, i) => ({
         lane: LANES[i % LANES.length]!,
-        offset: rand(i * 3.1),
-        speed: 0.018 + rand(i + 7) * 0.014,
+        offset: (rand(i * 3.1) - .5) * 560,
+        speed: 10 + rand(i + 7) * 7,
         colour: i % 9 === 4 ? '#e8b923' : CAR_COLOURS[i % CAR_COLOURS.length]!,
         kind: i % 11 === 5 ? 'tanker' : i % 4 === 1 ? 'pickup' : 'car',
       })),
@@ -52,9 +58,11 @@ function Traffic() {
     vehicles.forEach((v, i) => {
       const g = refs.current[i];
       if (!g) return;
-      const t = (v.offset + clock.elapsedTime * v.speed) % 1;
-      g.position.lerpVectors(v.lane.from, v.lane.to, t);
-      g.lookAt(v.lane.to.x, 0, v.lane.to.z);
+      const length = v.lane.getLength();
+      const t = ((CITY_EDGE + v.offset + clock.elapsedTime * v.speed) % length) / length;
+      g.position.copy(v.lane.getPoint(t));
+      const heading = v.lane.getTangent(t);
+      g.rotation.y = Math.atan2(heading.x, heading.z);
     });
   });
   return (
@@ -62,16 +70,7 @@ function Traffic() {
       {vehicles.map((v, i) => (
         <group key={i} ref={(g) => void (refs.current[i] = g)}>
           {v.kind === 'tanker' ? (
-            <>
-              <mesh position={[0, 1.4, 2.6]} castShadow>
-                <boxGeometry args={[2.4, 2.2, 2]} />
-                <meshStandardMaterial color="#f2f0ea" />
-              </mesh>
-              <mesh position={[0, 1.6, -1.2]} rotation-x={Math.PI / 2} castShadow>
-                <cylinderGeometry args={[1.1, 1.1, 5, 14]} />
-                <meshStandardMaterial color="#d7dde2" metalness={0.5} roughness={0.3} />
-              </mesh>
-            </>
+            <Truck />
           ) : (
             <>
               <mesh position={[0, 0.75, 0]} castShadow>

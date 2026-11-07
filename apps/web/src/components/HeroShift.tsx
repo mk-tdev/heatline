@@ -33,7 +33,24 @@ export function HeroShift() {
       <path d="M0 640 520 506 900 460 1440 525V820H0Z" fill="url(#panorama-land)"/>
       <path d="m-40 729 450-100 1030 91v84L410 699-40 800Z" fill="#183f50"/>
       <path d="m-40 764 450-100 1030 91" stroke="#bdc9b3" strokeWidth="2" strokeDasharray="18 22"/>
-      <g className="panorama-traffic"><path d="M105 720h70v21h-70Z" fill="#d7e7de"/><path d="m175 720 18 8v13h-18Z" fill="#f6b65f"/><path d="m178 723 11 6v5h-11Z" fill="#376471"/><circle cx="119" cy="743" r="6" fill="#102d3d"/><circle cx="178" cy="743" r="6" fill="#102d3d"/></g>
+      {/* The access street meets the boulevard at the foot of the site ramp. */}
+      <path d="M1510 477 1314 606 1088 724" stroke="#244854" strokeWidth="21"/>
+      <path d="M1510 477 1314 606 1088 724" stroke="#b4beb1" strokeWidth="1.8" strokeDasharray="10 14"/>
+      <g fill="#658589" stroke="#8aa4a0" strokeWidth="1.5" opacity=".85">
+        {[{x:550,y:516,h:34},{x:608,y:500,h:43},{x:681,y:494,h:27},{x:1315,y:524,h:43},{x:1388,y:535,h:32}].map(({x,y,h})=>
+          <g key={x} transform={`translate(${x} ${y})`}>
+            <path d={`M0 0v-${h}l26-8 29 9v${h}l-29 10Z`} />
+            <path d={`M0 -${h}l28 9 27-8M28 ${10}v-${h}`} />
+            {[10,19].map(d=><path key={d} d={`M4 -${h-d}l20 6m9 1 17-6`} stroke="#375962"/>)}
+          </g>)}
+      </g>
+      <g className="panorama-traffic">
+        <path d="M101 731h91v7h-91z" fill="#263b41"/>
+        <path d="M103 707h58v23h-58z" fill="#b5c3bd"/><path d="M103 707l6-4h52v4z" fill="#dce0d0"/>
+        <path d="M165 712h15l10 10v11h-25z" fill="#d9b67b"/><path d="M169 714h9l7 8h-16z" fill="#354e57"/>
+        <path d="M187 727h5v3h-5z" fill="#f3e7c5"/>
+        {[112,126,178].map(x=><g key={x}><circle cx={x} cy="736" r="6" fill="#242d31"/><circle cx={x} cy="736" r="2.8" fill="#8c9896"/></g>)}
+      </g>
       <g transform="translate(460 480)">
         <path d="m0 97 102 30 99-47-92-30Z" fill="#264c56" opacity=".35"/>
         <path d="M25 32v70m85-34v63m70-93v61" stroke="#b6cfc4" strokeWidth="4"/>
@@ -66,7 +83,15 @@ export function HeroShift() {
       <path d="M374 58h27v20h-27Z" fill="#c5d4cc"/>
       <path d="M336 59h16v15h-16Z" fill="#c1e7df" stroke="#ffc367" strokeWidth="3"/>
       <g className="vignette-lift"><path className="vignette-cable" d="M258 58v77" stroke="#dcf1e8" strokeWidth="1.5"/><g className="vignette-load"><path d="m244 137 14-7 20 9-14 8Z" fill="#eac88d"/><path d="m244 137 20 10v10l-20-10Z" fill="#ab8760"/><path d="m264 147 14-8v10l-14 8Z" fill="#d9b17b"/></g></g>
-      <g className="vignette-truck"><path d="m84 279 28 12 27-14-28-13Z" fill="#e6eee4"/><path d="m84 279 28 12v15l-28-13Z" fill="#d5e1d6"/><path d="m112 291 27-14v15l-27 14Z" fill="#8ba8a7"/><path d="m84 279-13-6-13 7 27 13Z" fill="#ffbd5f"/><path d="m58 280 27 13v15l-27-13Z" fill="#ed9c41"/><path d="m63 283 15 7v7l-15-7Z" fill="#1c5264"/><ellipse cx="69" cy="298" rx="4" ry="6" fill="#193f4a"/><ellipse cx="106" cy="312" rx="4" ry="6" fill="#193f4a"/></g>
+      <g className="vignette-truck">
+        <path d="m51 285 62 29 18-9-62-28Z" fill="#273f45"/>
+        <path d="m60 270 17-8 13 6-16 9Z" fill="#e0dfcf"/><path d="m60 270 14 7v16l-14-7Z" fill="#c1cdc6"/>
+        <path d="m74 277 16-9v17l-16 8Z" fill="#899e99"/><path d="m62 273 10 5v5l-10-5Zm14 6 11-6v6l-11 5Z" fill="#304d59"/>
+        <path d="m87 272 10-5q6-2 12 1l17 8q7 4 4 12l-5 6q-4 4-10 2l-26-12q-7-4-2-12Z" fill="#dad9c9" stroke="#758986" strokeWidth="1.1"/>
+        <path d="m103 268 6 2q-11 8-11 18l-5-2q0-10 10-18Z" fill="#b97649"/>
+        <path d="m128 285 7 2-1 5-6 3-3-2Z" fill="#8b9490"/>
+        {[{x:67,y:291},{x:103,y:307},{x:114,y:312}].map(({x,y})=><g key={x}><ellipse cx={x} cy={y} rx="4" ry="5.4" fill="#26373c"/><ellipse cx={x} cy={y} rx="1.9" ry="2.5" fill="#9ba9a6"/></g>)}
+      </g>
       <g><path d="m336 280 42 19 39-20-42-19Z" fill="#123e4d" opacity=".3"/><path d="M338 272v27m39-9v27m37-45v27" stroke="#c6dad0" strokeWidth="3"/><path d="m332 272 42-23 47 22-43 22Z" fill="#aadbd0" stroke="#d4f6e9" strokeWidth="2"/><path d="m332 272 46 21v7l-46-21Z" fill="#62a99f"/></g>
       {[0,1,2].map(i=><g key={i} className={`vignette-worker worker-${i}`} transform={`translate(${252+i*15} ${259+i*7})`}><ellipse cy="7" rx="6" ry="3" fill="#153e4a" opacity=".25"/><path d="M-2 2v6m5-6v6" stroke="#244b59" strokeWidth="2.5"/><path d="M0-7v9" stroke="#f6a744" strokeWidth="7"/><circle cy="-12" r="4" fill="#f2cd9e"/><path d="M-5-13q5-7 10 0" fill="#fff1c9"/></g>)}
       <path className="vignette-route" d="m272 280 48 23 29-15" stroke="#d9ffdb" strokeWidth="2" strokeDasharray="4 6"/>
