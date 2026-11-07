@@ -47,8 +47,8 @@ The times below restart at the beginning of this segment.
 | 0:00–0:15 | From the landing page, choose **Explore** under **The afternoon pour**, then **Deck**. This starts the scenario, unlike the opening playground. | “This is the site behind the warning.” |
 | 0:15–0:40 | Select **Anwar**, show his Bengali guidance and press **Listen**. Point to Noor’s crew-level brief while speech prepares. | “A warning only helps if the person understands it. This voice is AI-generated.” |
 | 0:40–1:15 | At **15:10**, playback pauses for the decision. Press **Ask Omar** with the default concrete-truck question. Point to the conditions and planning tool calls as they appear. | “He checks conditions and tests a proposed plan against the rules.” |
-| 1:15–1:40 | Show the policy result **and the independent NIOSH exposure screen**. If a plan was refused and revised, point to that trace. | “Passing the demonstration policy doesn’t certify safety. The remaining exposure stays visible.” |
-| 1:40–2:00 | For an accepted plan, click **Run this simulated plan**, then **Compare**. Highlight high-strain worker-minutes, exposure-screen findings and rest time. | “Same weather. Same people. One decision changed.” |
+| 1:15–1:40 | Read Omar’s verdict aloud, for example **“Allowed, and safer, but still too hot for part of the shift”**, and the line under it. If a plan was refused and revised, point to that step. | “Following the rules doesn’t make it safe. Heatline shows the heat that’s left.” |
+| 1:40–2:00 | For an accepted plan, click **Run this simulated plan**, then **Compare**. Highlight minutes in high heat strain, time over the safe heat limit, and rest time. | “Same weather. Same people. One decision changed.” |
 
 Read the actual displayed numbers. Do not promise a fixed reduction, a rejected plan, or a particular model response. A valid simulation plan may still leave substantial exposure concerns.
 

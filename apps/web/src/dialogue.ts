@@ -107,7 +107,7 @@ export function dialogueFor(scenario: Scenario, run: RunResult, branch: 'origina
     let last = -60;
     for (const rec of run.minutes) {
       const warning = rec.warnings.find((x) => x.worker === w.id)!;
-      if (warning.action === 'rest-cabin' && rec.minute - last > 40) {
+      if (warning.action === 'rest-cabin' && rec.minute - last > 40 && rec.minute < scenario.end - 10) {
         const say = REST[w.language];
         if (say) add(rec.minute + 1, w.id, say);
         last = rec.minute;

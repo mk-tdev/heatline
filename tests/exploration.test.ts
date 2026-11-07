@@ -49,3 +49,19 @@ it('boards, rides with the cage, and exits at the roof, scaffold and ground', ()
     expect(p.distanceTo(target)).toBeLessThan(.02);
   }
 });
+
+it('carries a whole crew up in one trip', () => {
+  const lift=new CrewHoist(), target=new Vector3(13,42.55,-5);
+  const crew=Array.from({length:8},(_,i)=>({id:`w${i}`,walk:new CrewWalk(0,i),p:new Vector3(46+i%4,0,-6-Math.floor(i/4))}));
+  let trips=0, lastDir=0, steps=0;
+  for(;steps<4000 && crew.some((c)=>c.p.distanceTo(target)>.5);steps++) {
+    const y=lift.height;
+    lift.tick(.05);
+    const dir=Math.sign(lift.height-y);
+    if(dir>0 && lastDir<=0 && [...lift.requests.values()].some((r)=>r.phase==='riding')) trips++;
+    if(dir) lastDir=dir;
+    for(const c of crew) c.walk.advance(c.id,c.p,target,lift,.05);
+  }
+  expect(crew.every((c)=>c.p.y>40)).toBe(true);
+  expect(trips).toBe(1);
+});

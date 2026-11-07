@@ -26,10 +26,10 @@ The midday break is over. A concrete truck is on its way. One worker is new to t
 | **Explore on foot** | Open a separate playground: walk the site, ride the construction lift to level 12, and rotate the crane, trolley and hook. The running shift is unchanged. |
 | **Make room for the scene** | Minimize either glass side panel independently and switch between named camera views. |
 | **Hear the worker’s side** | Preview multilingual guidance for six featured characters, including sensor-free fallback guidance. |
-| **Plan with Omar** | Ask for a revised shift, inspect the policy checks and independent exposure screen, then choose whether to run it. |
+| **Plan with Omar** | Ask for a safer plan, see each step he tries, read a plain verdict (allowed or refused, and whether it is still too hot), then choose whether to run it. |
 | **Keep the crew in view** | Noor summarizes crew needs; the worker guardian presents an individual’s guidance separately. |
 | **Rewind the decision** | Compare branches of the same simulated shift rather than comparing unrelated days. |
-| **Look beyond the good ending** | Open Evidence to inspect missed warnings, exposure screening, and sensitivity to model assumptions. |
+| **Look beyond the good ending** | Open Evidence to see missed warnings, time still over the safe heat limit, and what happens if our assumptions are wrong. |
 
 The landing page has an animated panorama: moving trucks, a lifting crane, a construction elevator, workers heading toward shade, coastal water, and swaying palms. Motion can be paused and respects reduced-motion preferences.
 
@@ -39,7 +39,7 @@ A short path through the demo:
 
 1. Start **The afternoon pour** in story mode.
 2. Meet the crew and follow the shift to the planning decision.
-3. Ask **Omar** for a plan. Read the checks, including any exposure-screen findings.
+3. Ask **Omar** for a plan. Read his verdict, including whether workers are still over the safe heat limit.
 4. Run the proposed plan, then rewind and compare the two outcomes.
 5. Open **Evidence** to see the month-long experiment and the assumptions behind it.
 
@@ -73,6 +73,8 @@ Guardian, Noor, Omar and multilingual speech are enabled in the live deployment.
 
 Vercel hosts the web app and API functions. GitHub pushes to `main` deploy the production project automatically; other branches receive preview deployments. The deployment works in rules-only mode without an API key. To enable model-backed assistants and speech, configure `OPENAI_API_KEY` and optional model settings in Vercel project environment variables, then redeploy.
 
+The public deployment limits each visitor (Omar: 6 plans per 10 minutes; guardian and Noor fall back to pre-written messages when busy), and the voice only reads messages the server itself wrote. Those limits live in each server instance's memory, so also set a monthly spend limit on the OpenAI key.
+
 ### Explore on foot — just for fun
 
 Click **Explore on foot** directly on the landing page to enter a standalone playground without starting a shift or calling an assistant. You can also open it inside a scenario. Use **WASD** to walk, **Shift** to move faster, and drag to look; arrow keys also turn and walk. Approach the lift or crane base and press **E**, or use the on-screen shortcuts. Ride to level 12 and step onto the roof; in the crane, use **A/D** to rotate, **W/S** for the trolley, and **Q/E** for the hook. **Esc** returns to your shift.
@@ -105,11 +107,11 @@ Open **http://127.0.0.1:5183**. The API runs on port **8787**.
 
 ```mermaid
 flowchart LR
-    Weather[Historical Abu Dhabi weather] --> Environment[Sun, shade and estimated WBGT]
-    Environment --> Simulation[Deterministic shift simulation]
+    Weather[Historical Abu Dhabi weather] --> Environment[Sun, shade and heat stress per work area]
+    Environment --> Simulation[Minute-by-minute shift simulation]
     Simulation --> Roles[Worker and crew views]
     Roles --> Assistants[Guardian · Noor · Omar]
-    Assistants --> Checks[Plan validation and exposure screening]
+    Assistants --> Checks[Site rules and safe heat-limit check]
     Checks --> Replay[Replay and compare]
     Simulation --> Evidence[Backtests and sensitivity analysis]
 ```
@@ -117,21 +119,22 @@ flowchart LR
 | Directory | Purpose |
 | --- | --- |
 | `apps/web` | React, Three.js / React Three Fiber, stories, glass panels, and evidence views |
-| `packages/climate` | Historical weather processing, solar position, heat index, and WBGT calculations |
-| `packages/sim` | Synthetic workers, site conditions, deterministic replay, and exposure screening |
-| `packages/rules` | Configurable demonstration policy and plan validation |
+| `packages/climate` | Turns weather into heat stress in sun and shade (WBGT, the standard heat-stress measure) |
+| `packages/sim` | Made-up workers, their bodies and the site, minute by minute; the August replay |
+| `packages/rules` | Site heat rules (midday break, work and rest, water, shade) and the plan checker |
 | `packages/agents` | Role-specific context, structured assistant outputs, and fallback guidance |
 | `packages/contracts` | Shared types and schemas |
-| `server` | Assistant endpoints and speech integration |
+| `server` | Talks to OpenAI so the key never reaches the browser; rate limits; voice |
 | `tests` | Climate, physiology, rules, projections, scenarios, and regression checks |
 
 ## 🔬 Built to show its assumptions
 
-Historical gridded weather is real. **The workers, physiology, and outcomes are synthetic.** This is a training and research prototype, not a clinically validated safety system.
+The weather is real. **The workers, their bodies and the outcomes are simulated.** This is a training and research prototype, not a clinically validated safety system.
 
-- The configurable demonstration policy is **not a WBGT-to-TWL conversion or UAE compliance certification**.
-- An independent **NIOSH exposure screen** can flag a plan that passes the demonstration policy.
-- The evidence view includes missed warnings and sensitivity variants, so a favorable demo is not the whole story.
+- The site rules are our reading of UAE and Sharjah guidance for a demo. They are **not a UAE safety certificate**.
+- A plan can follow the rules and still keep people over the US NIOSH safe heat-exposure limit. Omar's verdict and Compare say so when it happens.
+- Evidence shows missed warnings and what happens if our assumptions are wrong, so the good demo is not the whole story.
+- Site-wide flag breaks beat Heatline's phone warnings on their own (52 serious cases against 65 in the August replay). Heatline is meant to be used with a plan; with one, it is 0.
 - Role-specific views demonstrate information separation with synthetic data; production authentication and worker consent management are not implemented.
 - Translations, site operations, and clinical escalation require professional review before a pilot.
 
@@ -145,7 +148,7 @@ npm run build       # Production web build
 npm run backtest    # Regenerate the August experiment and sensitivity variants
 ```
 
-The test suite currently contains **90 tests**. The backtest covers **31 days × 3 windows × 4 policies**, plus five sensitivity variants: **2,232 simulated shift-policy runs**. These are simulation results, not field-validation results.
+The test suite has **95 tests**. The August replay covers **31 days × 3 shifts × 4 approaches**, plus five what-if variants: **2,232 simulated shifts**. These are simulation results, not field-validation results.
 
 The production build currently emits a large-bundle advisory for the 3D client. This remains a performance improvement opportunity.
 

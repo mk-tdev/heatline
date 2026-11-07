@@ -141,7 +141,6 @@ function SceneContents({ scenario, record, plan, pourProgress, pourActive, truck
             facing={spot.facing}
             look={lookFor(w.id, i, role, w.crew)}
             pose={atBus ? 'stand' : poseFor(t.activity, t.zone)}
-            spawn={sandbox ? undefined : spawnFor(scenario, i)}
             selected={w.id === selectedWorker}
             redFlag={redFlagWorkers.includes(w.id)}
             crewColour={CREW_COLOURS[w.crew] ?? '#888'}
@@ -149,6 +148,21 @@ function SceneContents({ scenario, record, plan, pourProgress, pourActive, truck
         );
       })}
     </CrewLift.Provider>
+  );
+}
+
+/** The crew frozen at one minute of the shift, for the walk-around playground (no lift, no labels). */
+export function StaticCrew({ scenario, record }: { scenario: Scenario; record: MinuteRecord }) {
+  const spots = useMemo(() => layoutPeople(scenario, record, new Map(scenario.zones.map((z) => [z.id, z]))), [scenario, record]);
+  return (
+    <>
+      {scenario.workers.map((w, i) => {
+        const t = record.truth.find((x) => x.worker === w.id)!;
+        const spot = spots.get(w.id)!;
+        const role = w.id === 'ahmed' ? 'foreman' : w.id === 'suresh' ? 'lead' : 'worker';
+        return <Person key={w.id} id={w.id} slot={i} anchor={false} target={spot.at} facing={spot.facing} look={lookFor(w.id, i, role, w.crew)} pose={poseFor(t.activity, t.zone)} crewColour={CREW_COLOURS[w.crew] ?? '#888'} />;
+      })}
+    </>
   );
 }
 
@@ -202,12 +216,6 @@ function SunLight({ direction, colour, intensity }: { direction: THREE.Vector3; 
       />
     </>
   );
-}
-
-/** Everyone starts the shift under the shade shelter (it is just after the midday break) and walks out. */
-function spawnFor(scenario: Scenario, index: number) {
-  const shelter = scenario.zones.find((z) => z.id === 'shelter')!;
-  return toScene(shelter.at.x - 6 + (index % 7) * 2, shelter.at.y - 6.5 - Math.floor(index / 7) * 1.1);
 }
 
 /** Where each person stands, sits or lies this minute, given their zone and what they are doing. */

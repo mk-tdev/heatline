@@ -46,12 +46,12 @@ export function fallbackSafetyBrief(crews: CrewSummary[]): SafetyBrief {
       const urgency: SafetyBrief['requests'][number]['urgency'] = urgent > 0 || c.needRest > 0 ? 'now' : c.levels.yellow > 0 ? 'soon' : 'watch';
       const text =
         c.levels.red > 0
-          ? `Crew ${c.crew}: ${c.levels.red} at red. Stop work in ${c.zoneLabel} and get first aid there now.`
+          ? `Crew ${c.crew}: ${c.levels.red} with serious warning signs. Stop work in ${c.zoneLabel} and get first aid there now.`
           : urgent > 0 || c.needRest > 0
             ? `Crew ${c.crew}: ${Math.max(urgent, c.needRest)} need rest now in ${c.zoneLabel} (${c.heatZone} risk); rotate and shade them.`
             : c.levels.yellow > 0
-              ? `Crew ${c.crew}: ${c.levels.yellow} rising; schedule water at ${c.waterRequiredLph} L/h and the next rest.`
-              : `Crew ${c.crew}: no additional action triggered by the demonstration policy.`;
+              ? `Crew ${c.crew}: ${c.levels.yellow} getting hot; give them ${c.waterRequiredLph} L of water an hour and plan the next rest.`
+              : `Crew ${c.crew}: nothing extra needed right now.`;
       return { crew: c.crew, urgency, text, score: c.levels.red * 100 + urgent * 10 + c.needRest + c.levels.yellow };
     })
     .sort((a, b) => b.score - a.score)
@@ -59,6 +59,6 @@ export function fallbackSafetyBrief(crews: CrewSummary[]): SafetyBrief {
   const atRisk = crews.reduce((s, c) => s + Math.max(c.levels.amber + c.levels.red, c.needRest, c.needWater), 0);
   return {
     requests: scored.map(({ crew, urgency, text }) => ({ crew, urgency, text })),
-    summary: atRisk ? `${atRisk} ${atRisk === 1 ? 'person needs' : 'people need'} action now across the site (crew-level estimate).` : 'No additional actions triggered by the demonstration policy right now.',
+    summary: atRisk ? `${atRisk} ${atRisk === 1 ? 'person needs' : 'people need'} action now across the site (crew-level estimate).` : 'Nothing extra needed right now.',
   };
 }

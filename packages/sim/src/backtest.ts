@@ -19,10 +19,10 @@ export const WINDOWS = [
 
 export type BacktestPolicy = 'no-action' | 'site-flags' | 'heatline-warnings' | 'heatline-plan';
 export const POLICIES: { id: BacktestPolicy; label: string }[] = [
-  { id: 'no-action', label: 'No intervention (original schedule)' },
-  { id: 'site-flags', label: 'Site-wide flag breaks (heat index)' },
-  { id: 'heatline-warnings', label: 'Heatline warnings, original schedule' },
-  { id: 'heatline-plan', label: 'Heatline warnings + protective plan' },
+  { id: 'no-action', label: 'Doing nothing (original schedule)' },
+  { id: 'site-flags', label: 'Site-wide flag breaks (common today)' },
+  { id: 'heatline-warnings', label: 'Heatline phone warnings only' },
+  { id: 'heatline-plan', label: 'Heatline warnings + approved plan' },
 ];
 
 export interface PolicyTotals {

@@ -12,6 +12,9 @@ h1{font-size:clamp(1.85rem,7vw,2.65rem);line-height:1.14;margin:.45rem 0 1rem;le
 p{margin:.65rem 0 1rem}.label{color:#45665f;font-weight:650;font-size:.83rem}button,a{font:inherit;font-weight:650}button{min-height:48px;width:100%;padding:.7rem .8rem;text-align:left;background:#134e46;color:white;border:1px solid #134e46;cursor:pointer;margin:.3rem 0}button.secondary{color:#14473f;background:transparent}button:focus-visible,a:focus-visible{outline:3px solid #cb680a;outline-offset:2px}
 aside{padding:1rem;border-left:4px solid #bb7913;background:#fff0c8}aside p{margin:.4rem 0}.bn{font-size:1.3rem}footer{border-top:1px solid #ccdad4;font-size:.85rem;color:#436058}footer p{margin:0 0 .6rem}a{color:inherit}output{font-weight:bold;font-size:2.4rem;display:block} [hidden]{display:none!important}
 #join-code{display:block;width:15rem;max-width:100%;height:auto;image-rendering:pixelated;margin:1rem 0;background:white}
+.note{font-size:.85rem;padding:.6rem .8rem;background:#fff0c8;border-left:4px solid #bb7913}
+/* On a laptop the judge scans from across the table: count and code side by side, code large. */
+@media (min-width:900px){main{max-width:62rem;display:grid;grid-template-columns:1fr 1fr}header,footer{grid-column:1/-1}output{font-size:6rem;line-height:1}#join-code{width:24rem}section+section{border-left:1px solid #ccdad4}}
 </style>
 <main><header><strong>Heatline</strong><small>Supervisor dashboard</small></header>
 <section><div class="label">Training shift · Crew B</div>
@@ -25,6 +28,7 @@ aside{padding:1rem;border-left:4px solid #bb7913;background:#fff0c8}aside p{marg
 <img id="join-code" alt="QR code for this shift’s worker link" hidden>
 <button id="copy">Copy worker link</button><a id="worker">Open worker link</a>
 <p id="copied" role="status"></p>
+<p id="local-note" class="note" hidden>This page is running on this computer only (localhost), so a phone cannot open the code. Use the deployed site for the phone demo.</p>
 </section><footer><a href="supervisor.html" id="fresh">Start a fresh demo shift</a> · <a href="/">Heatline home</a></footer></main>
 <script src="/worker/room.js"></script>
 <script>
@@ -67,4 +71,5 @@ code.make();
 const image = document.getElementById('join-code');
 image.src = code.createDataURL(6, 24);
 image.hidden = false;
+if (['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) document.getElementById('local-note').hidden = false;
 </script></html>

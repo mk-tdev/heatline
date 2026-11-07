@@ -60,6 +60,7 @@ const GuardianInput = z.strictObject({
   waterDeficitL: z.number().min(0).max(10),
   minutesWorkedWithoutRest: z.number().int().min(0).max(600),
   placeLabel: z.string().max(60),
+  indoors: z.boolean(),
   wbgt: z.number().min(0).max(50),
   ppe: z.string().max(60).nullable(),
   clothingAdjustC: z.number().min(0).max(5),

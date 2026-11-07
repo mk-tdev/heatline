@@ -30,7 +30,7 @@ describe('shared local and serverless HTTP handler', () => {
     const raw = await request('/api/safety', undefined, JSON.stringify(input));
     expect(parsed.status).toBe(200);
     expect(raw.status).toBe(200);
-    expect(parsed.json.summary).toBe('No additional actions triggered by the demonstration policy right now.');
+    expect(parsed.json.summary).toBe('Nothing extra needed right now.');
     expect(parsed.json.requests).toEqual([]);
     expect(raw.json.summary).toEqual(parsed.json.summary);
   });

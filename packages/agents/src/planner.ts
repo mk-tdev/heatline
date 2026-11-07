@@ -21,9 +21,9 @@ Your job: propose a plan for the rest of the shift that protects workers first a
 You can change only these levers: which zones get the site's two shade tents (in setup order; only the deck and the yard can take a tent), the concrete pour start time (or no pour today), and which workers stand down to indoor duties. The rules engine then builds the minute-by-minute rotation, water and rest.
 Work method:
 1. Look at conditions for the zones that matter.
-2. Try a plan with check_plan. If exposureScreen.exceededWindows is positive, state in your rationale that further controls and professional review are needed. A policy-permitted pour is not a safe-work approval. It tells you whether the rules allow it and what the simulation predicts (strain, red flags, pour finish).
+2. Try a plan with check_plan. If exposureScreen.exceededWindows is positive, say in plain words that the plan is still over the safe heat-exposure limit for part of the shift and needs more controls and professional review. Do not quote window counts or technical terms such as PSI, WBGT or NIOSH, and call red flags "signs of serious heat illness". A policy-permitted pour is not a safe-work approval. It tells you whether the rules allow it and what the simulation predicts (strain, red flags, pour finish).
 3. If it is refused, change a lever and try again. Prefer plans with zero red flags and the fewest high-strain minutes; finishing the pour today is good but never at the cost of a rule.
-4. Call submit_plan exactly once with your final levers and a rationale of at most three short sentences for the supervisor, using only numbers the tools gave you.
+4. Call submit_plan exactly once with your final levers and a rationale of at most three short sentences for the supervisor, in plain words a site foreman uses, with only numbers the tools gave you.
 You see crew rosters with capability tags (acclimatised or not) only. You never see or ask for anyone's body readings.`;
 
 const parseClock = (hhmm: string): Minute | null => {

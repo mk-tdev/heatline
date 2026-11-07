@@ -35,9 +35,12 @@ export function Intro({ onStart, onEvidence, onExploreFoot }: { onExploreFoot: (
           <h1>The heat doesn’t<br />stop at three.</h1>
           <p className="hero-description">The midday break is over. The people building tomorrow still need protecting. Step onto their site—and see what one better decision can change.</p>
           <div className="hero-actions"><button className="hero-start" onClick={() => onStart('afternoon-pour', 'story')}><span className="play-glyph" aria-hidden="true">▶</span> Step into the site</button><button className="hero-secondary" onClick={choose}>Explore the scenarios <span aria-hidden="true">↓</span></button></div>
-          <div className="hero-playground"><button className="hero-secondary" onClick={onExploreFoot}>Explore on foot</button><span>Walk, ride the lift, operate the crane.<br />Just for fun. No simulation started.</span></div>
-          <div className="hero-playground"><a className="hero-secondary" href="/worker/index.html">Open Anwar’s worker demo →</a><span>Try the offline warning on your phone.<br /><a href="/worker/supervisor.html">Open supervisor dashboard →</a></span></div>
-          <p className="hero-footnote">A playable 3D experience. Historical weather. Human decisions.</p>
+          <div className="hero-more">
+            <span>Or</span>
+            <button onClick={onExploreFoot} title="Walk the site, ride the lift, work the crane. No shift starts.">Walk the site on foot</button>
+            <a href="/worker/index.html" title="Anwar’s phone, working offline, in Bengali">Try the phone demo</a>
+            <a href="/worker/supervisor.html" title="The supervisor’s count of crew arrivals in shade">Supervisor dashboard</a>
+          </div>
         </div>
         <HeroShift />
         <p className="mobile-notice">The interactive simulator supports desktop and laptop. Explore the scenarios and evidence on any screen.</p>

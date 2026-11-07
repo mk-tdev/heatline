@@ -386,3 +386,24 @@
 .welcome .hero-playground button { flex-shrink: 0; padding: 11px 16px; min-height: 42px; background: #a9d9cd18; border-color: #a9d9cd88; color: #edf5ee; }
 .welcome .hero-playground button:hover:not(:disabled) { background: #a9d9cd; color: #153e50; }
 @media (max-width: 700px) { .hero-playground { flex-wrap: wrap; gap: 8px; } .hero-playground > span { font-size: 10px; } }
+
+/* Review fixes: one quiet row of secondary links, and text that never sits on busy art. */
+.hero-more { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; margin-top: 22px; font-size: 13px; color: #d5e5e9; }
+.hero-more > span { color: #b9cdd2; }
+.welcome .hero-more button, .hero-more a { color: #fff; background: none; border: 0; padding: 4px 0; font-size: 13px; text-decoration: none; border-bottom: 1px solid #ffffff66; border-radius: 0; cursor: pointer; }
+.welcome .hero-more button:hover, .hero-more a:hover { border-bottom-color: #fff; background: none; }
+.hero-vignette::after { background: linear-gradient(90deg,#123645f0 0%,#123645c8 36%,#12364566 50%,transparent 62%),linear-gradient(0deg,#123644e6,transparent 20%); }
+.hero-vignette .vignette-caption { background: #123645d9; padding: 12px 16px; backdrop-filter: blur(8px); box-sizing: border-box; }
+@media (max-width: 700px) { .hero-vignette::after { background: linear-gradient(0deg,#244f60,transparent 28%),linear-gradient(#285261,transparent 15%); } }
+.app .ask button { background: #1f5a63; color: #fff; border-color: #1f5a63; }
+.app .ask button:hover:not(:disabled) { background: #174850; }
+.app .ask button:disabled { background: #5f878d; color: #fff; border-color: #5f878d; opacity: 1; cursor: wait; }
+
+/* Readable on a projector: darker body text, nothing under 12px on the landing page. */
+.experience-step p { font-size: 13.5px; color: #3c535a; }
+.section-heading > p { font-size: 15px; color: #3c535a; }
+.experience-body > p { font-size: 13.5px; color: #3c535a; }
+.people-copy > p:not(.section-kicker) { color: #3c535a; font-size: 15px; }
+.welcome-footer p { font-size: 12px; color: #4a6268; }
+.connection-status { font-size: 12px; color: #355f66; }
+.hero-vignette .vignette-caption { width: auto; max-width: 340px; height: auto; }

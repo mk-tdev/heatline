@@ -9,11 +9,11 @@ const t0 = performance.now();
 const report = runBacktest(template as ScenarioTemplate, weather as OpenMeteoHourly);
 report.sensitivity = [];
 for (const variant of [
-  { label: 'Higher heat response', assumptions: 'Truth heat coefficient +25%; observer unchanged', uncertainty: { truthHeatScale: 1.25 } },
-  { label: 'Lower heat response', assumptions: 'Truth heat coefficient −25%; observer unchanged', uncertainty: { truthHeatScale: 0.75 } },
-  { label: 'Wearable under-reading', assumptions: 'All wearable core estimates −0.3 °C', uncertainty: { wearableBiasC: -0.3 } },
-  { label: 'Exposure underestimated', assumptions: 'Environment-only estimator WBGT −2 °C', uncertainty: { observationWbgtBiasC: -2 } },
-  { label: 'Combined adverse assumptions', assumptions: 'Truth +0.2 °C, heat response +25%, wearable −0.3 °C, estimator WBGT −2 °C', uncertainty: { truthCoreOffsetC: 0.2, truthHeatScale: 1.25, wearableBiasC: -0.3, observationWbgtBiasC: -2 } },
+  { label: 'Bodies heat up faster', assumptions: 'Workers heat up 25% faster than the model expects', uncertainty: { truthHeatScale: 1.25 } },
+  { label: 'Bodies heat up slower', assumptions: 'Workers heat up 25% slower than the model expects', uncertainty: { truthHeatScale: 0.75 } },
+  { label: 'Wearables read low', assumptions: 'Every wearable reads body temperature 0.3 °C too low', uncertainty: { wearableBiasC: -0.3 } },
+  { label: 'Heat underestimated', assumptions: 'Without a wearable, the site heat is guessed 2 °C too low', uncertainty: { observationWbgtBiasC: -2 } },
+  { label: 'All of these at once', assumptions: 'Workers start 0.2 °C warmer and heat up faster; wearables read low; heat guessed low', uncertainty: { truthCoreOffsetC: 0.2, truthHeatScale: 1.25, wearableBiasC: -0.3, observationWbgtBiasC: -2 } },
 ]) {
   const r = runBacktest(template as ScenarioTemplate, weather as OpenMeteoHourly, 31, variant.uncertainty);
   report.sensitivity.push({ label: variant.label, assumptions: variant.assumptions, detected: r.warning.detected, episodes: r.warning.episodes, falseAlarms: r.warning.falseAlarms, warningOnsets: r.warning.warningOnsets, baselineRedFlags: r.totals['no-action'].redFlags, planRedFlags: r.totals['heatline-plan'].redFlags });

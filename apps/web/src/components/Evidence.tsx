@@ -10,13 +10,13 @@ const pct = (a: number, b: number) => (b ? `${Math.round((100 * a) / b)}%` : '�
 const fmt = (n: number) => n.toLocaleString('en-GB');
 
 const MEASURES: { label: string; get: (t: PolicyTotals) => number; lowerIsBetter: boolean; hint: string }[] = [
-  { label: 'Simulated red-flag events', get: (t) => t.redFlags, lowerIsBetter: true, hint: 'incidents' },
-  { label: 'Worker-minutes at severe strain (PSI ≥ 9)', get: (t) => t.workerMinutesPsi9, lowerIsBetter: true, hint: 'exposure' },
-  { label: 'Worker-minutes at high strain (PSI ≥ 7)', get: (t) => t.workerMinutesPsi7, lowerIsBetter: true, hint: 'exposure' },
-  { label: 'Rule-violation episodes', get: (t) => t.violationEpisodes, lowerIsBetter: true, hint: 'demonstration policy' },
-  { label: 'NIOSH screening exceedances', get: (t) => t.nioshExceededWindows, lowerIsBetter: true, hint: `${fmt(r.totals['heatline-plan'].nioshAssessedWindows)} overlapping windows per policy; first 59 min excluded` },
-  { label: 'Rest worker-minutes', get: (t) => t.restWorkerMinutes, lowerIsBetter: false, hint: 'lost work time (the cost)' },
-  { label: 'Pours completed', get: (t) => t.poursFinished, lowerIsBetter: false, hint: 'productivity' },
+  { label: 'People with signs of serious heat illness', get: (t) => t.redFlags, lowerIsBetter: true, hint: 'simulated cases' },
+  { label: 'Minutes in severe heat strain', get: (t) => t.workerMinutesPsi9, lowerIsBetter: true, hint: 'added up across all workers' },
+  { label: 'Minutes in high heat strain', get: (t) => t.workerMinutesPsi7, lowerIsBetter: true, hint: 'added up across all workers' },
+  { label: 'Times a site rule was broken', get: (t) => t.violationEpisodes, lowerIsBetter: true, hint: 'work-rest, water, shade, working alone' },
+  { label: 'Minutes over the safe heat-exposure limit', get: (t) => t.nioshExceededWindows, lowerIsBetter: true, hint: `minutes when the hour before was over the US NIOSH limit, out of ${fmt(r.totals['heatline-plan'].nioshAssessedWindows)}` },
+  { label: 'Minutes spent resting', get: (t) => t.restWorkerMinutes, lowerIsBetter: false, hint: 'the cost: time not working' },
+  { label: 'Concrete pours finished', get: (t) => t.poursFinished, lowerIsBetter: false, hint: 'the work that got done' },
 ];
 
 export function Evidence({ onClose }: { onClose: () => void }) {
@@ -28,40 +28,43 @@ export function Evidence({ onClose }: { onClose: () => void }) {
       <div className="evidence">
         <header>
           <div>
-            <strong>August 2025 simulation evidence</strong>
+            <strong>What happened across August 2025</strong>
             <small>
-              {r.days} days × {r.windows.length} shift windows ({r.windows.map((x) => x.label).join(', ')}) × {r.policies.length} policies = {shifts} shifts per policy, 20 workers each. Real ERA5 weather for Saadiyat.
+              Every day of the month, three shifts a day ({r.windows.map((x) => x.label).join(', ')}): {shifts} shifts of 20 workers, each played four ways. Real weather for Saadiyat Island.
             </small>
           </div>
           <button onClick={onClose}>Close</button>
         </header>
 
-        <p className="science-note">Synthetic workers, historical gridded weather and an illustrative physiology model. These are scenario experiments, not measured health outcomes. A plan can pass the demonstration policy and still exceed an independent exposure screen.</p>
+        <p className="science-note">The weather is real. The workers and their bodies are simulated, so these are experiments, not measured health outcomes. A plan can follow the site rules and still be over the safe heat-exposure limit; both are shown.</p>
         <section className="ev-kpis">
           <div>
             <b>{pct(w.detected, w.episodes)}</b>
             <span>
-              of {fmt(w.episodes)} high-strain episodes warned in advance (amber or red 1–60 min before)
+              of {fmt(w.episodes)} times a worker got into high heat strain, their phone had warned them first
             </span>
           </div>
           <div>
             <b>{median(lead)} min</b>
-            <span>median warning lead time · 1 in 10 under {lead[Math.floor(lead.length * 0.1)]} min</span>
+            <span>typical warning time before it happened (1 in 10 warnings came less than {lead[Math.floor(lead.length * 0.1)]} min ahead)</span>
           </div>
           <div>
             <b>{pct(w.falseAlarms, w.warningOnsets)}</b>
             <span>
-              false-alert fraction: {fmt(w.falseAlarms)} of {fmt(w.warningOnsets)} assessable amber/red onsets without high strain within an hour
+              of warnings were false alarms ({fmt(w.falseAlarms)} of {fmt(w.warningOnsets)}: no high strain followed within an hour)
             </span>
           </div>
           <div>
             <b>
               {r.totals['no-action'].redFlags} → {r.totals['heatline-plan'].redFlags}
             </b>
-            <span>red flags, no intervention → Heatline with an approved plan</span>
+            <span>people with signs of serious heat illness: doing nothing → Heatline with an approved plan</span>
           </div>
         </section>
 
+        <p className="science-note">
+          <b>Why warnings alone are not enough.</b> Site-wide flag breaks ({r.totals['site-flags'].redFlags} cases) do better than Heatline&apos;s warnings on the original schedule ({r.totals['heatline-warnings'].redFlags}). A flag stops everyone at once; a phone warning relies on each person stopping, and in the simulation some workers keep going, as real crews do. Heatline is meant to be used with a plan: warnings plus a plan the supervisor approves gives {r.totals['heatline-plan'].redFlags}.
+        </p>
         <table>
           <thead>
             <tr>
@@ -93,7 +96,7 @@ export function Evidence({ onClose }: { onClose: () => void }) {
             })}
             <tr>
               <td>
-                Median minutes to cooling after a red flag<small>escalation</small>
+                Typical minutes until a collapsed worker is being cooled<small>how fast help arrives</small>
               </td>
               {r.policies.map((p) => (
                 <td key={p.id}>{median(r.totals[p.id].minutesToCooling) ?? '—'}</td>
@@ -102,11 +105,11 @@ export function Evidence({ onClose }: { onClose: () => void }) {
           </tbody>
         </table>
 
-        <h4>Red flags by shift window</h4>
+        <h4>Serious heat-illness cases by time of day</h4>
         <table className="compact-table">
           <thead>
             <tr>
-              <th>Window</th>
+              <th>Shift</th>
               {r.policies.map((p) => (
                 <th key={p.id}>{p.label}</th>
               ))}
@@ -124,19 +127,19 @@ export function Evidence({ onClose }: { onClose: () => void }) {
           </tbody>
         </table>
 
-        <h4>Sensitivity to unvalidated assumptions</h4>
-        <p className="science-note">Each variant repeats all 93 shifts with the same policies. Perturbations are engineering stress tests, not confidence intervals. The observer and simulated truth still share a model family; independent field validation remains outstanding.</p>
-        <table><thead><tr><th>Assumption tested</th><th>Advance warnings</th><th>False-alert fraction</th><th>Red flags: baseline / plan</th></tr></thead><tbody>
+        <h4>What if our assumptions are wrong?</h4>
+        <p className="science-note">We replayed all 93 shifts again with the body model or the sensors deliberately made worse. These are stress tests, not error bars. Only a field trial with real workers can validate the model.</p>
+        <table><thead><tr><th>What we changed</th><th>Warned in advance</th><th>False alarms</th><th>Serious cases: doing nothing / with a plan</th></tr></thead><tbody>
           {r.sensitivity?.map((s) => <tr key={s.label}><td>{s.label}<small>{s.assumptions}</small></td><td>{pct(s.detected, s.episodes)}<small>{s.detected} / {s.episodes}</small></td><td>{pct(s.falseAlarms, s.warningOnsets)}<small>{s.falseAlarms} / {s.warningOnsets}</small></td><td>{s.baselineRedFlags} / {s.planRedFlags}</td></tr>)}
         </tbody></table>
         <div className="ev-notes">
-          <p><b>Accounting.</b> {w.simultaneous} episodes were warned only at onset; {w.missed} had no warning by onset. {w.leftCensored} workers already had high strain at shift start and are excluded from detection. {w.rightCensored} warning onsets lack an outcome and a full follow-up hour and are excluded from the false-alert denominator. Lead-time statistics include detected episodes only; episodes are not independent workers.</p>
-          <p><b>Independent screen.</b> Rolling 60-minute mean WBGT (including clothing adjustment and rest location) and mean metabolic workload are compared with NIOSH REL/RAL curves. The first 59 minutes have insufficient prior exposure history. This is occupational screening on synthetic inputs, not UAE compliance certification. <a href="https://www.cdc.gov/niosh/docs/2016-106/pdfs/2016-106.pdf" target="_blank" rel="noreferrer">NIOSH criteria</a>.</p>
+          <p><b>Missed warnings.</b> {fmt(w.missed)} times the warning had not arrived when strain started, and {fmt(w.simultaneous)} times it arrived at the same moment. {w.leftCensored ? `${w.leftCensored} workers started the shift already strained and are left out. ` : ''}{fmt(w.rightCensored)} warnings near the end of a shift could not be followed for a full hour and are left out of the false-alarm count.</p>
+          <p><b>The safe exposure limit.</b> For each worker, we average the heat they were in (allowing for heavy clothing and where they rested) and how hard they worked over each hour, and compare that with the US <a href="https://www.cdc.gov/niosh/docs/2016-106/pdfs/2016-106.pdf" target="_blank" rel="noreferrer">NIOSH heat-stress limits</a>. The first hour of a shift has no full hour behind it and is skipped. This is a screening check on simulated workers, not UAE certification.</p>
           <p>
-            <b>What this shows.</b> In this model, scheduled shade, rotation and rest reduce simulated strain. The default protective-plan runs produce {r.totals['heatline-plan'].redFlags} red flags, with more rest and {r.totals['heatline-plan'].shifts - r.totals['heatline-plan'].poursFinished} shifts without a completed pour. This does not establish injury prevention or permission to work.
+            <b>What this shows.</b> In the simulation, planned shade, crew rotation and rest cut serious cases to {r.totals['heatline-plan'].redFlags}. The cost is more rest and {r.totals['heatline-plan'].shifts - r.totals['heatline-plan'].poursFinished} shifts where the pour was moved off the day. It does not prove that real injuries would be prevented.
           </p>
           <p>
-            <b>How it is measured.</b> Lead time and false alarms come from runs with no intervention, comparing the warning system (which sees only noisy wearables or estimates) against the simulation’s true strain. {r.note}
+            <b>How it is measured.</b> The warning system only sees what a phone could see: a noisy wearable reading, or an estimate from the weather and the work when there is no wearable. We compare its warnings with what the simulation says was really happening in each worker&apos;s body.
           </p>
         </div>
       </div>

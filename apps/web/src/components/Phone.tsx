@@ -69,7 +69,7 @@ export function Phone({
           </span>
         </div>
         <div className="action" style={{ borderColor: LEVEL_COLOURS[ctx.level] }}>
-          {ACTION_TEXT[ctx.action]}
+          {ctx.action === 'continue' && ctx.indoors ? `Indoors in the ${ctx.placeLabel.replace(/\s*\(.*\)$/, '').toLowerCase()} · keep drinking` : ACTION_TEXT[ctx.action]}
         </div>
         <div className={`guardian lang-${ctx.language}${stale ? ' stale' : ''}`} dir={RTL.has(ctx.language) ? 'rtl' : 'ltr'}>
           {message ? message.message : <span className="muted">…</span>}
@@ -91,13 +91,13 @@ export function Phone({
             <b>{ctx.waterDeficitL >= 1 ? 'Needs attention' : 'Keep drinking'}</b>
           </div>
           <div>
-            <span>Worked</span>
+            <span>Since last break</span>
             <b>{ctx.minutesWorkedWithoutRest} min</b>
           </div>
         </div>
         {ctx.ppe && (
           <div className="ppe">
-            Wearing: {ctx.ppe} · WBGT clothing adjustment +{ctx.clothingAdjustC}°C
+            Wearing: {ctx.ppe} · traps heat, counted as {ctx.clothingAdjustC}°C hotter
           </div>
         )}
         <small className="muted">

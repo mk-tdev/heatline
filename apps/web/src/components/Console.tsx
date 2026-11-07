@@ -1,7 +1,7 @@
 // Supervisor console: crew-level information only (the privacy boundary), Noor's brief, the
 // decision with Omar's streamed reasoning, and the site log.
 
-import type { CrewSummary, RedFlagDisclosure, SafetyBrief } from '@heatline/agents';
+import type { CrewSummary, PlanCheck, RedFlagDisclosure, SafetyBrief } from '@heatline/agents';
 import type { SimEvent } from '@heatline/contracts';
 import { formatClock } from '@heatline/contracts';
 import type { AgentSource, PlannerEvent } from '../model';
@@ -41,7 +41,7 @@ export function CrewCards({ crews }: { crews: CrewSummary[] }) {
   );
 }
 
-export function NoorBrief({ brief, loading }: { brief: (SafetyBrief & AgentSource & { clock: string }) | null; loading: boolean }) {
+export function NoorBrief({ brief, loading, ended = false }: { brief: (SafetyBrief & AgentSource & { clock: string }) | null; loading: boolean; ended?: boolean }) {
   return (
     <section className="card">
       <header>
@@ -52,7 +52,9 @@ export function NoorBrief({ brief, loading }: { brief: (SafetyBrief & AgentSourc
         </div>
         {loading && <span className="spinner" />}
       </header>
-      {brief ? (
+      {ended ? (
+        <p className="muted">Shift over. Everyone is heading to the bus; anyone in first aid stays with the first-aider.</p>
+      ) : brief ? (
         <>
           <ul className="requests">
             {brief.requests.map((r, i) => (
@@ -100,8 +102,13 @@ export function DecisionCard({
   onKeep,
   setAsk,
   clock,
+  baseline,
+  workers,
 }: {
   clock: string;
+  /** the original schedule's exposure screen, for "down from" */
+  baseline: { exceededWindows: number; assessedWindows: number };
+  workers: { id: string; name: string }[];
   state: DecisionState;
   onAsk: () => void;
   onApprove: () => void;
@@ -129,9 +136,7 @@ export function DecisionCard({
       {(steps.length > 0 || state.running) && (
         <ol className="steps">
           {steps.map((s, i) => (
-            <li key={i}>
-              <code>{s.name}</code> {describeTool(s)}
-            </li>
+            <li key={i}>{describeTool(s)}</li>
           ))}
           {state.running && status && <li className="muted">{status.text}</li>}
         </ol>
@@ -140,22 +145,32 @@ export function DecisionCard({
       {final && (
         <div className={`plan ${final.check.ok ? 'ok' : 'refused'}`}>
           <div className="plan-head">
-            <strong>{final.check.ok ? 'Passes demonstration policy' : 'Plan refused by the rules'}</strong>
+            <strong>{verdict(final.check)}</strong>
             <small>{final.source === 'model' ? `by ${final.model}` : `rules-only (${final.reason})`}</small>
           </div>
+          {final.check.ok && final.check.exposureScreen && (
+            <p className="verdict-detail">
+              {final.check.exposureScreen.exceededWindows === 0
+                ? 'Every worker stays under the safe heat-exposure limit for their workload.'
+                : `Workers are over the safe heat-exposure limit for ${pct(final.check.exposureScreen)} of their working time, down from ${pct(baseline)} on the original schedule. It needs more shade or rest, and a professional review, before real work.`}
+            </p>
+          )}
           <p>{final.rationale}</p>
-          {final.check.exposureScreen && <p className="science-note"><b>Independent NIOSH screen</b><br />{final.check.exposureScreen.exceededWindows} of {final.check.exposureScreen.assessedWindows} rolling worker-hour windows exceed the screening limit (maximum {final.check.exposureScreen.maxExcessC.toFixed(1)} °C above). Full-shift screen includes pre-decision exposure; first 59 minutes lack prior history. {final.check.exposureScreen.exceededWindows > 0 ? 'Further controls and professional review are needed before real work.' : 'Passing this screen does not certify safety.'}</p>}
           <ul className="levers">
-            <li>Tents: {(final.check.plan.tents.map((t) => `${t.zone} at ${formatClock(t.readyAt)}`).join(', ')) || 'none'}</li>
-            <li>Pour: {final.check.plan.pourStart === null ? 'not today' : `starts ${formatClock(final.check.plan.pourStart)}`}</li>
-            <li>Stand down: {((final.levers.standDown as string[] | undefined) ?? []).join(', ') || 'rules decide (anyone not yet used to the heat)'}</li>
+            <li>Shade tents: {(final.check.plan.tents.map((t) => `${ZONE_NAMES[t.zone] ?? t.zone}, up by ${formatClock(t.readyAt)}`).join('; ')) || 'none'}</li>
+            <li>Concrete pour: {final.check.plan.pourStart === null ? 'not today' : `starts ${formatClock(final.check.plan.pourStart)}`}</li>
+            <li>Indoor duties instead: {((final.levers.standDown as string[] | undefined) ?? []).map((id) => workers.find((w) => w.id === id)?.name ?? id).join(', ') || 'anyone not yet used to the heat'}</li>
           </ul>
           {final.check.forecast && (
             <div className="forecast">
-              <span>Teaching-model outcome to shift end</span>
-              <b>{final.check.forecast.minutesPsi7}</b> high-strain worker-min · <b>{final.check.forecast.redFlags}</b> red flags · pour {final.check.forecast.pourStart ?? '—'}–{final.check.forecast.pourFinish ?? '—'}
+              <span>If you run it (simulation, to the end of the shift)</span>
+              <b>{final.check.forecast.redFlags}</b> {final.check.forecast.redFlags === 1 ? 'person' : 'people'} with signs of serious heat illness · <b>{final.check.forecast.minutesPsi7}</b> worker-minutes in high heat strain{final.check.forecast.pourStart ? ` · pour ${final.check.forecast.pourStart}–${final.check.forecast.pourFinish ?? '—'}` : ' · no pour'}
             </div>
           )}
+          <details className="how-checked">
+            <summary>How this is checked</summary>
+            The site rules (UAE midday break, work and rest limits, shade, water, no working alone) decide whether a plan is allowed. Separately, each worker&apos;s average heat over every hour is compared with the US NIOSH exposure limit for their workload. This is a simulation with made-up workers, not a safety certificate.
+          </details>
           <div className="buttons">
             <button className="primary" onClick={onApprove} disabled={!final.check.ok}>
               Run this simulated plan
@@ -173,15 +188,25 @@ export function DecisionCard({
   );
 }
 
+const ZONE_NAMES: Record<string, string> = { deck: 'level 12 deck', yard: 'rebar yard', facade: 'façade scaffold' };
+const pct = (s: { exceededWindows: number; assessedWindows: number }) => `${Math.round((100 * s.exceededWindows) / Math.max(1, s.assessedWindows))}%`;
+
+function verdict(check: PlanCheck): string {
+  if (!check.ok) return 'The site rules refused this plan';
+  if (check.exposureScreen && check.exposureScreen.exceededWindows > 0) return 'Allowed, and safer, but still too hot for part of the shift';
+  return 'Allowed by the site rules';
+}
+
 function describeTool(s: Extract<PlannerEvent, { type: 'tool' }>): string {
   const r = s.result as Record<string, unknown>;
-  if (s.name === 'get_conditions') return `→ ${String(s.args.zone)} forecast`;
-  if (s.name === 'get_roster') return '→ crews and capability tags';
+  if (s.name === 'get_conditions') return `Checked the heat on the ${ZONE_NAMES[String(s.args.zone)] ?? String(s.args.zone)}`;
+  if (s.name === 'get_roster') return 'Read the crew list (who is used to the heat)';
   const args = s.args as { tents?: string[]; pourStart?: string | null; standDown?: string[] };
-  const lever = `tents ${args.tents?.join('+') || 'none'}, pour ${args.pourStart ?? 'none'}${args.standDown?.length ? `, stand down ${args.standDown.join(', ')}` : ''}`;
-  if (r && r.ok === false) return `${lever} → refused (${((r.violations as { rule: string }[]) ?? []).map((v) => v.rule).join(', ') || String(r.note ?? '')})`;
+  const lever = `tents on ${args.tents?.map((t) => ZONE_NAMES[t] ?? t).join(' and ') || 'nothing'}, pour ${args.pourStart ?? 'not today'}${args.standDown?.length ? `, indoor duties for ${args.standDown.map((id) => id.charAt(0).toUpperCase() + id.slice(1)).join(', ')}` : ''}`;
+  const verb = s.name === 'submit_plan' ? 'Proposed' : 'Tested';
+  if (r && r.ok === false) return `${verb}: ${lever}. Refused (${((r.violations as { rule: string }[]) ?? []).map((v) => v.rule.replaceAll('-', ' ')).join(', ') || String(r.note ?? '')})`;
   const f = r?.forecast as { minutesPsi7: number; redFlags: number } | null;
-  return `${lever} → allowed${f ? `, ${f.minutesPsi7} high-strain min, ${f.redFlags} red flags` : ''}`;
+  return `${verb}: ${lever}. Allowed${f ? `; ${f.redFlags} serious heat-illness signs in the simulation` : ''}`;
 }
 
 export function SiteLog({ events, minute }: { events: SimEvent[]; minute: number }) {

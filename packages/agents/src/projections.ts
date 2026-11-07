@@ -103,6 +103,8 @@ export interface GuardianContext {
   waterDeficitL: number;
   minutesWorkedWithoutRest: number;
   placeLabel: string;
+  /** in an air-conditioned room (cabin, tool store, first aid), not out in the heat */
+  indoors: boolean;
   wbgt: number;
   /** protective clothing being worn and its WBGT adjustment, if any */
   ppe: string | null;
@@ -131,6 +133,7 @@ export function guardianContext(scenario: Scenario, rec: MinuteRecord, workerId:
     waterDeficitL: round1(o.deficitL),
     minutesWorkedWithoutRest: o.continuousWorkMin,
     placeLabel: place.label,
+    indoors: place.kind === 'cabin',
     wbgt: round1(rec.zones.find((z) => z.zone === o.zone)!.wbgt),
     ppe: profile.ppe ?? null,
     clothingAdjustC: profile.clothingAdjustC ?? 0,

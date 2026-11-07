@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-06T17:03:57.385Z",
+ "generated": "2026-11-07T08:49:25.508Z",
  "days": 31,
  "windows": [
   {
@@ -24,19 +24,19 @@
  "policies": [
   {
    "id": "no-action",
-   "label": "No intervention (original schedule)"
+   "label": "Doing nothing (original schedule)"
   },
   {
    "id": "site-flags",
-   "label": "Site-wide flag breaks (heat index)"
+   "label": "Site-wide flag breaks (common today)"
   },
   {
    "id": "heatline-warnings",
-   "label": "Heatline warnings, original schedule"
+   "label": "Heatline phone warnings only"
   },
   {
    "id": "heatline-plan",
-   "label": "Heatline warnings + protective plan"
+   "label": "Heatline warnings + approved plan"
   }
  ],
  "totals": {
@@ -4453,8 +4453,8 @@
  "note": "Simulation results from a teaching physiology model driven by real ERA5 weather for August 2025 near Saadiyat. They show how the warning and planning logic behaves across real conditions; they are not evidence of injuries prevented in the real world.",
  "sensitivity": [
   {
-   "label": "Higher heat response",
-   "assumptions": "Truth heat coefficient +25%; observer unchanged",
+   "label": "Bodies heat up faster",
+   "assumptions": "Workers heat up 25% faster than the model expects",
    "detected": 2996,
    "episodes": 4393,
    "falseAlarms": 296,
@@ -4463,8 +4463,8 @@
    "planRedFlags": 0
   },
   {
-   "label": "Lower heat response",
-   "assumptions": "Truth heat coefficient −25%; observer unchanged",
+   "label": "Bodies heat up slower",
+   "assumptions": "Workers heat up 25% slower than the model expects",
    "detected": 4124,
    "episodes": 4361,
    "falseAlarms": 426,
@@ -4473,8 +4473,8 @@
    "planRedFlags": 0
   },
   {
-   "label": "Wearable under-reading",
-   "assumptions": "All wearable core estimates −0.3 °C",
+   "label": "Wearables read low",
+   "assumptions": "Every wearable reads body temperature 0.3 °C too low",
    "detected": 3584,
    "episodes": 4449,
    "falseAlarms": 361,
@@ -4483,8 +4483,8 @@
    "planRedFlags": 0
   },
   {
-   "label": "Exposure underestimated",
-   "assumptions": "Environment-only estimator WBGT −2 °C",
+   "label": "Heat underestimated",
+   "assumptions": "Without a wearable, the site heat is guessed 2 °C too low",
    "detected": 3231,
    "episodes": 4449,
    "falseAlarms": 361,
@@ -4493,8 +4493,8 @@
    "planRedFlags": 0
   },
   {
-   "label": "Combined adverse assumptions",
-   "assumptions": "Truth +0.2 °C, heat response +25%, wearable −0.3 °C, estimator WBGT −2 °C",
+   "label": "All of these at once",
+   "assumptions": "Workers start 0.2 °C warmer and heat up faster; wearables read low; heat guessed low",
    "detected": 2439,
    "episodes": 4219,
    "falseAlarms": 138,

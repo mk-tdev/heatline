@@ -1154,7 +1154,8 @@ button.primary:hover:not(:disabled) { background: #174ac1; }
 .decision { padding: 14px; margin: 0 -5px; border: 1px solid #b9cdf4; background: #f7faff; border-radius: 0; box-shadow: none; }
 .ask { flex-direction: column; }
 .ask textarea { width: 100%; min-height: 82px; line-height: 1.5; background: white; font-size: 12px; }
-.ask button { background: #245edb; color: white; }
+.ask button { background: #1f5a63; color: white; }
+.ask button:disabled { background: #6f9399; color: #fff; opacity: 1; cursor: wait; }
 .buttons { flex-wrap: wrap; }
 .buttons button { font-size: 12px; }
 .steps { max-height: 160px; overflow: auto; line-height: 1.5; }
@@ -1262,3 +1263,6 @@ button.primary:hover:not(:disabled) { background: #174ac1; }
 .tour-location { left: 24px; top: 118px; border-radius: 0; padding: 8px 15px; font-size: 13px; }
 .tour-crosshair { position: absolute; left: 50%; top: 45%; transform: translate(-50%,-50%); color: #fff; text-shadow: 0 1px 3px #153e50; font-size: 23px; pointer-events: none; }
 @media (max-width: 700px) { .tour-header { top: 10px; left: 10px; right: 10px; padding: 12px; } .tour-header strong { font-size: 16px; } .tour-header p { max-width: 200px; font-size: 11px; } .tour-controls { bottom: 10px; width: calc(100% - 20px); padding: 14px; max-height: 45vh; overflow: auto; } .tour-location { top: 110px; left: 10px; } }
+.verdict-detail { font-weight: 600; margin: 4px 0 6px; }
+.how-checked { font-size: 11px; color: var(--muted, #5b6b70); margin-top: 8px; }
+.how-checked summary { cursor: pointer; }

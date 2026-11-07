@@ -4,23 +4,41 @@ import { clearPath, route, type Rect, type Point } from './worksiteRoutes';
 
 export const CrewLift = createContext<CrewHoist | null>(null);
 interface Ride { from:number; to:number; phase:'waiting'|'boarding'|'riding'|'exiting' }
+/** The construction lift. It carries everyone waiting for the same trip together (a cage holds
+ *  a crew), so moving a crew between the ground and the deck takes one ride, not one per person. */
 export class CrewHoist {
   height=.4;
   groundEquipment: Rect[]=[];
   requests=new Map<string,Ride>();
-  active='';
+  private trip: { from:number; to:number } | null=null;
+  private dwell=0;
   tick(dt:number) {
-    if(!this.active) this.active=this.requests.keys().next().value ?? '';
-    const ride=this.requests.get(this.active);
-    if(!ride || ride.phase==='boarding' || ride.phase==='exiting') return;
-    const destination=.4+3.5*(ride.phase==='waiting'?ride.from:ride.to);
+    if(!this.trip) {
+      const first=[...this.requests.values()].find((r)=>r.phase==='waiting');
+      if(!first) return;
+      this.trip={from:first.from,to:first.to};
+    }
+    const {from,to}=this.trip;
+    const members=[...this.requests.values()].filter((r)=>r.from===from && r.to===to);
+    if(!members.length) { this.trip=null; return; }
+    const atFrom=this.height===.4+3.5*from;
+    // At the boarding floor, hold the door a moment so the rest of the crew can step in.
+    if(atFrom) for(const r of members) if(r.phase==='waiting') { r.phase='boarding'; this.dwell=0; }
+    // Wait while anyone is stepping in or out.
+    if(members.some((r)=>r.phase==='boarding' || r.phase==='exiting')) return;
+    const riding=members.some((r)=>r.phase==='riding');
+    if(riding && atFrom && (this.dwell+=dt)<2) return;
+    const destination=.4+3.5*(riding?to:from);
     const diff=destination-this.height;
-    this.height+=Math.sign(diff)*Math.min(Math.abs(diff),dt*7);
-    if(this.height===destination) ride.phase=ride.phase==='waiting'?'boarding':'exiting';
+    this.height+=Math.sign(diff)*Math.min(Math.abs(diff),dt*14);
+    if(this.height!==destination) return;
+    for(const r of members) {
+      if(riding && r.phase==='riding') r.phase='exiting';
+      else if(!riding && r.phase==='waiting') r.phase='boarding';
+    }
   }
   release(id:string) {
     this.requests.delete(id);
-    if(this.active===id) this.active='';
   }
 }
 
@@ -63,7 +81,7 @@ export class CrewWalk {
           if(Math.hypot(p.x-door.x,p.z-door.z)>.05) return false;
           this.atDoor=true;
         }
-        if(move({x:43.7,z:-10.05},false)) return true;
+        if(move({x:43.7+(((this.slot+1)%3)-1)*.45,z:-10.05+(((Math.floor(this.slot/3)+1)%3)-1)*.45},false)) return true;
         ride.phase='riding';
       } else if(ride.phase==='exiting') {
         this.level=ride.to;

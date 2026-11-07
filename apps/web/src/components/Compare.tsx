@@ -4,16 +4,16 @@ import { formatClock } from '@heatline/contracts';
 import type { Branch } from '../model';
 
 const rowsFor = (at: number): { label: string; get: (b: Branch) => string | number; better: 'lower' | 'higher' | 'none' }[] => [
-  { label: 'Worker-minutes at high strain (PSI ≥ 7)', get: (b) => b.metrics.minutesPsi7, better: 'lower' },
-  { label: 'Worker-minutes at severe strain (PSI ≥ 9)', get: (b) => b.metrics.minutesPsi9, better: 'lower' },
-  { label: 'NIOSH screen: hourly windows above limit', get: (b) => `${b.screen.exceededWindows} / ${b.screen.assessedWindows}`, better: 'none' },
-  { label: 'Largest hourly WBGT exceedance', get: (b) => `${b.screen.maxExcessC.toFixed(1)} °C`, better: 'none' },
-  { label: 'Red flags', get: (b) => b.metrics.redFlags, better: 'lower' },
-  { label: 'Minutes to cooling after a red flag', get: (b) => (b.metrics.minutesToCooling.length ? b.metrics.minutesToCooling.join(', ') : '—'), better: 'none' },
-  { label: `Rule-violation episodes after ${formatClock(at)}`, get: (b) => b.run.violations.filter((v) => v.minute >= at).length, better: 'lower' },
-  { label: 'Unacclimatised exposure over cap (min)', get: (b) => b.metrics.unacclimatisedOverCapMin, better: 'lower' },
-  { label: 'Pour', get: (b) => (b.metrics.pourStartedAt === null ? 'not poured' : `${formatClock(b.metrics.pourStartedAt)}–${b.metrics.pourFinishedAt === null ? 'unfinished' : formatClock(b.metrics.pourFinishedAt)}`), better: 'none' },
-  { label: 'Rest worker-minutes (the cost)', get: (b) => b.metrics.restMinutes, better: 'none' },
+  { label: 'Minutes in high heat strain (all workers)', get: (b) => b.metrics.minutesPsi7, better: 'lower' },
+  { label: 'Minutes in severe heat strain (all workers)', get: (b) => b.metrics.minutesPsi9, better: 'lower' },
+  { label: 'Share of working time over the safe heat-exposure limit', get: (b) => `${Math.round((100 * b.screen.exceededWindows) / Math.max(1, b.screen.assessedWindows))}%`, better: 'none' },
+  { label: 'Worst hour: how far over the limit', get: (b) => `${b.screen.maxExcessC.toFixed(1)} °C`, better: 'none' },
+  { label: 'People with signs of serious heat illness', get: (b) => b.metrics.redFlags, better: 'lower' },
+  { label: 'Minutes until they were being cooled', get: (b) => (b.metrics.minutesToCooling.length ? b.metrics.minutesToCooling.join(', ') : '—'), better: 'none' },
+  { label: `Times a site rule was broken after ${formatClock(at)}`, get: (b) => b.run.violations.filter((v) => v.minute >= at).length, better: 'lower' },
+  { label: 'Minutes new workers spent over their heat limit', get: (b) => b.metrics.unacclimatisedOverCapMin, better: 'lower' },
+  { label: 'Concrete pour', get: (b) => (b.metrics.pourStartedAt === null ? 'not poured' : `${formatClock(b.metrics.pourStartedAt)}–${b.metrics.pourFinishedAt === null ? 'unfinished' : formatClock(b.metrics.pourFinishedAt)}`), better: 'none' },
+  { label: 'Minutes spent resting (the cost)', get: (b) => b.metrics.restMinutes, better: 'none' },
 ];
 
 export function Compare({ a, b, onClose, onWatch, title, decisionAt }: { a: Branch; b: Branch; onClose: () => void; onWatch: (id: Branch['id']) => void; title: string; decisionAt: number }) {
@@ -26,7 +26,7 @@ export function Compare({ a, b, onClose, onWatch, title, decisionAt }: { a: Bran
             <strong>
               Rewind · {title}, decision at {formatClock(decisionAt)}
             </strong>
-            <small>Same weather, same people, same events. One decision changed. Simulation outcomes from a teaching model, not clinical predictions. NIOSH screening uses rolling 60-minute exposure; the first 59 minutes lack prior history. It is not UAE compliance certification.</small>
+            <small>Same weather, same people, same events. One decision changed. These are simulation results with made-up workers, not medical predictions. The safe exposure limit is the US NIOSH limit, checked hour by hour from the second hour of the shift. Not a UAE safety certificate.</small>
           </div>
           <button onClick={onClose}>Close</button>
         </header>

@@ -121,7 +121,7 @@ export function App({ scenarioId, startMode, onBrief, onEvidence }: { scenarioId
   useEffect(() => {
     const slot = minute === DECISION_AT ? DECISION_AT : Math.floor((minute - scenario.start) / 20) * 20 + scenario.start;
     const key = slot * 10 + (active === 'plan' ? 1 : 0) + (record.networkUp ? 0 : 2);
-    if (key === lastBrief.current || briefLoading) return;
+    if (key === lastBrief.current || briefLoading || minute >= scenario.end - 6) return;
     lastBrief.current = key;
     setBriefLoading(true);
     const at = formatClock(minute);
@@ -129,7 +129,7 @@ export function App({ scenarioId, startMode, onBrief, onEvidence }: { scenarioId
       .then((b) => setBrief({ ...b, clock: at }))
       .catch(() => {})
       .finally(() => setBriefLoading(false));
-  }, [minute, crews, active, scenario.start, briefLoading, DECISION_AT, record.networkUp]);
+  }, [minute, crews, active, scenario.start, scenario.end, briefLoading, DECISION_AT, record.networkUp]);
 
   // ---- Guardian: the selected worker's phone, refreshed when their level or action changes ---
   const gctx = useMemo(() => guardianContext(scenario, record, selected), [scenario, record, selected]);
@@ -281,7 +281,7 @@ export function App({ scenarioId, startMode, onBrief, onEvidence }: { scenarioId
           <small>{longDate(scenario.date)} · real weather</small>
         </div>
         <div className="stat">
-          <span>Estimated WBGT sun / shade</span>
+          <span>Heat stress (WBGT) sun / shade</span>
           <b>
             {env.wbgtSun.toFixed(1)} / {env.wbgtShade.toFixed(1)}°C
           </b>
@@ -362,10 +362,9 @@ export function App({ scenarioId, startMode, onBrief, onEvidence }: { scenarioId
         <div className="panel-heading"><div className="panel-title"><h2>Site operations</h2><p>Crew needs, not individual health data</p></div><button className="panel-toggle" onClick={() => setOperationsCollapsed(!operationsCollapsed)} aria-expanded={!operationsCollapsed} aria-controls="operations-content" aria-label={operationsCollapsed ? 'Expand site operations' : 'Minimize site operations'} title={operationsCollapsed ? 'Expand site operations' : 'Minimize site operations'}>{operationsCollapsed ? '›' : '‹'}</button></div>
         {operationsCollapsed && <span className="panel-rail-label">Site operations{showDecision ? ' · Decision waiting' : ''}{flags.length ? ' · Action needed' : ''}</span>}
         <div id="operations-content" hidden={operationsCollapsed}>
-        <a href="/worker/supervisor.html" target="_blank" rel="noopener">Open live shade confirmations ↗</a>
         <RedFlags flags={flags} />
-        {showDecision && <DecisionCard clock={formatClock(DECISION_AT)} state={decision} onAsk={ask} onApprove={approve} onKeep={keep} setAsk={(s) => setDecision((d) => ({ ...d, ask: s }))} />}
-        <NoorBrief brief={brief} loading={briefLoading} />
+        {showDecision && <DecisionCard clock={formatClock(DECISION_AT)} baseline={original.screen} workers={scenario.workers} state={decision} onAsk={ask} onApprove={approve} onKeep={keep} setAsk={(s) => setDecision((d) => ({ ...d, ask: s }))} />}
+        <NoorBrief brief={brief} loading={briefLoading} ended={minute >= scenario.end - 6} />
         <details className="panel-section" open><summary>Crew overview <span>{crews.length} crews</span></summary><CrewCards crews={crews} /></details>
         <details className="panel-section"><summary>Shift activity</summary><SiteLog events={branch.run.events} minute={minute} /></details>
         </div>

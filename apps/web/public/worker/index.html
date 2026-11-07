@@ -19,7 +19,9 @@ aside{padding:1rem;border-left:4px solid #bb7913;background:#fff0c8}aside p{marg
 <h1 tabindex="-1">Wearable sharing</h1>
 <p lang="bn">পরিধানযোগ্য যন্ত্রের তথ্য শেয়ার করা আপনার ইচ্ছা। তথ্য শেয়ার না করলেও তাপের সতর্কতা পাবেন।</p>
 <p>You can use warnings based on site conditions and your assigned work. This demo uses a stored training shift. Your choice stays on this device.</p>
+<button id="share"><span lang="bn">শেয়ার করব</span> · Share my wearable</button>
 <button id="decline"><span lang="bn">শেয়ার করব না</span> · Decline sharing</button>
+<p class="label">Either way you get the same warnings. Sharing only makes them more personal.</p>
 </section>
 <section id="warning" hidden>
 <div class="label">Anwar · Level 12 deck · 09:40 replay</div>
@@ -27,7 +29,7 @@ aside{padding:1rem;border-left:4px solid #bb7913;background:#fff0c8}aside p{marg
 <aside><strong lang="bn">হলুদ সতর্কতা</strong> · Yellow warning
 <p class="bn" lang="bn">আনোয়ার, এখনই ছায়ায় একটু বিশ্রাম নিন এবং পানি পান করুন।</p>
 <p>Anwar, take a short rest in the shade now and drink water.</p></aside>
-<p>Wearable sharing is off. The replay uses the deck’s estimated heat exposure and Anwar’s work history.</p>
+<p id="sharing-note">Wearable sharing is off. The replay uses the deck’s estimated heat exposure and Anwar’s work history.</p>
 <p>Confirming adds one to Crew B’s count when connected. Your name and wearable choice stay on this phone.</p>
 <button id="ack"><span lang="bn">আমি ছায়ায় পৌঁছেছি</span> · I reached shade</button>
 </section>
@@ -52,6 +54,9 @@ function render(state, focus = false) {
   el('reset').hidden = state.stage === 'choice' || state.delivery === 'pending';
   el('delivery').textContent = state.delivery === 'sent' ? 'Delivered to the crew dashboard.' :
     'Saved on this phone. Waiting to send. If you close the page, reopen it when connected.';
+  el('sharing-note').textContent = state.sharing
+    ? 'Wearable sharing is on. The replay adds Anwar’s simulated wearable reading to the deck’s heat and his work history.'
+    : 'Wearable sharing is off. The replay uses the deck’s estimated heat exposure and Anwar’s work history.';
   if (focus) el(state.stage).querySelector('h1').focus();
 }
 async function change(fn, focus = false) {
@@ -65,7 +70,8 @@ async function sync() {
   try { await flushReceipts(); } catch { /* The durable queue is retried on reconnect or reopen. */ }
   finally { syncing = false; await change(() => {}); }
 }
-el('decline').onclick = () => change(s => { s.stage = 'warning'; }, true);
+el('share').onclick = () => change(s => { s.stage = 'warning'; s.sharing = true; }, true);
+el('decline').onclick = () => change(s => { s.stage = 'warning'; s.sharing = false; }, true);
 el('ack').onclick = async () => {
   await change(s => { s.stage = 'receipt'; if (s.delivery !== 'sent') s.delivery = 'pending'; }, true);
   void sync();
