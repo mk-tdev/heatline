@@ -14,7 +14,7 @@ It’s three in the afternoon. The midday break is over—but the heat isn’t.
 
 A concrete truck is coming. The deck is exposed. And Anwar is only on his second day.
 
-On his phone, Anwar can decline wearable sharing. A stored Bengali warning still works offline. He confirms he reached shade, and the local supervisor preview shows one crew confirmation.
+On his phone, Anwar can decline wearable sharing. A stored Bengali warning still works offline. He confirms he reached shade, and when the phone reconnects the supervisor’s dashboard shows one crew confirmation.
 
 Inside this live 3D construction site, historical weather drives twenty synthetic workers. Guardian explains each worker’s guidance in their language—and speaks it aloud. Noor shows supervisors what their crews need. Omar checks conditions, tests plans, and shows his work.
 

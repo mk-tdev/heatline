@@ -63,7 +63,7 @@ A short path through the demo:
 
 </details>
 
-On a phone, open [Anwar’s worker demo](https://heatline-plum.vercel.app/worker/index.html) and wait for **Ready for offline use**. Disconnect and reload, decline wearable sharing, read the Bengali warning, and confirm arrival in shade. The supervisor preview shows Crew B’s confirmation count on the same device. **Reset this demo** clears the saved step.
+On a phone, open [Anwar’s worker demo](https://heatline-plum.vercel.app/worker/index.html) and wait for **Ready for offline use**. Disconnect and reload, decline wearable sharing, read the Bengali warning, and confirm arrival in shade. For two devices, start a fresh shift on the [supervisor dashboard](https://heatline-plum.vercel.app/worker/supervisor.html) and use its worker link on the phone. Reconnect the phone to deliver the queued confirmation. Retries and replaying on the same browser count once per shift. Local development uses a temporary filesystem store; Vercel uses private Blob storage.
 
 ## 🌍 Live demo
 

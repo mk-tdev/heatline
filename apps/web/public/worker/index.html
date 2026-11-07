@@ -28,56 +28,60 @@ aside{padding:1rem;border-left:4px solid #bb7913;background:#fff0c8}aside p{marg
 <p class="bn" lang="bn">আনোয়ার, এখনই ছায়ায় একটু বিশ্রাম নিন এবং পানি পান করুন।</p>
 <p>Anwar, take a short rest in the shade now and drink water.</p></aside>
 <p>Wearable sharing is off. The replay uses the deck’s estimated heat exposure and Anwar’s work history.</p>
+<p>Confirming adds one to Crew B’s count when connected. Your name and wearable choice stay on this phone.</p>
 <button id="ack"><span lang="bn">আমি ছায়ায় পৌঁছেছি</span> · I reached shade</button>
 </section>
 <section id="receipt" hidden>
 <div class="label">Anwar · Worker confirmation</div>
 <h1 tabindex="-1" lang="bn">ছায়ায় পৌঁছেছি</h1>
-<p>You confirmed you reached shade. This is a self-report. Only this device holds the confirmation.</p>
-<button id="preview">See supervisor preview →</button>
-</section>
-<section id="crew" hidden>
-<div class="label">Local supervisor preview</div>
-<h1 tabindex="-1">Crew B</h1>
-<output id="count"></output> shade arrivals confirmed
-<p>This crew count is the full preview. Delivery to a supervisor’s device is outside this demo.</p>
-<button id="back" class="secondary">Return to worker receipt</button>
+<p>You confirmed you reached shade.</p>
+<p id="delivery" role="status"></p>
+<a id="dashboard">Open this shift’s supervisor dashboard →</a>
 </section>
 <footer><p id="ready" role="status">Preparing for offline use…</p><p id="storage" role="status"></p><button id="reset" class="secondary" hidden>Reset this demo</button><a href="/">Heatline home</a></footer>
 </main>
+<script src="/worker/room.js"></script>
+<script src="/worker/outbox.js"></script>
 <script type="module">
 const el = id => document.getElementById(id);
-const key = 'heatline.worker.replay.v1';
+const room = shiftRoom();
 const stages = ['choice','warning','receipt'];
-let stage = 'choice';
-try {
-  const saved = localStorage.getItem(key);
-  if (stages.includes(saved)) stage = saved;
-} catch { el('storage').textContent = 'Storage unavailable. Keep this tab open.'; }
-function show(view, focus = true) {
-  if (view === 'crew') el('count').value = stage === 'receipt' ? '1' : '0';
-  for (const id of [...stages,'crew']) el(id).hidden = id !== view;
-  el('reset').hidden = view === 'choice';
-  if (focus) el(view).querySelector('h1').focus();
+el('dashboard').href = '/worker/supervisor.html#' + room;
+function render(state, focus = false) {
+  for (const id of stages) el(id).hidden = id !== state.stage;
+  el('reset').hidden = state.stage === 'choice' || state.delivery === 'pending';
+  el('delivery').textContent = state.delivery === 'sent' ? 'Delivered to the crew dashboard.' :
+    'Saved on this phone. Waiting to send. If you close the page, reopen it when connected.';
+  if (focus) el(state.stage).querySelector('h1').focus();
 }
-function save(next) {
-  stage = next;
-  try {
-    if (next === 'choice') localStorage.removeItem(key);
-    else localStorage.setItem(key,next);
-  } catch { el('storage').textContent = 'Storage unavailable. This receipt lasts for this tab only.'; }
-  show(stage);
+async function change(fn, focus = false) {
+  try { render(await updateShift(room, fn), focus); }
+  catch { el('storage').textContent = 'Device storage unavailable. Allow browser storage to save and send a confirmation.'; }
 }
-el('decline').onclick = () => save('warning');
-el('ack').onclick = () => save('receipt');
-el('preview').onclick = () => show('crew');
-el('back').onclick = () => show('receipt');
-el('reset').onclick = () => save('choice');
+let syncing = false;
+async function sync() {
+  if (!navigator.onLine || syncing) return;
+  syncing = true;
+  try { await flushReceipts(); } catch { /* The durable queue is retried on reconnect or reopen. */ }
+  finally { syncing = false; await change(() => {}); }
+}
+el('decline').onclick = () => change(s => { s.stage = 'warning'; }, true);
+el('ack').onclick = async () => {
+  await change(s => { s.stage = 'receipt'; if (s.delivery !== 'sent') s.delivery = 'pending'; }, true);
+  void sync();
+  const registration = await navigator.serviceWorker?.getRegistration();
+  try { await registration?.sync?.register('shade-receipts'); } catch { /* Foreground retry remains available. */ }
+};
+el('reset').onclick = () => change(s => { s.stage = 'choice'; }, true);
 function connection() { el('connection').textContent = navigator.onLine ? 'Online' : 'Offline'; }
-window.addEventListener('online',connection);
+window.addEventListener('online', () => { connection(); void sync(); });
 window.addEventListener('offline',connection);
+window.addEventListener('pageshow', sync);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) void sync(); });
+setInterval(() => { if (!document.hidden) void sync(); }, 10000);
 connection();
-show(stage,false);
+await change(() => {});
+void sync();
 try {
   await navigator.serviceWorker.register('/worker/sw.js', {scope:'/worker/'});
   await navigator.serviceWorker.ready;

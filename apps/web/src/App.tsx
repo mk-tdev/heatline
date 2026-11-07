@@ -362,6 +362,7 @@ export function App({ scenarioId, startMode, onBrief, onEvidence }: { scenarioId
         <div className="panel-heading"><div className="panel-title"><h2>Site operations</h2><p>Crew needs, not individual health data</p></div><button className="panel-toggle" onClick={() => setOperationsCollapsed(!operationsCollapsed)} aria-expanded={!operationsCollapsed} aria-controls="operations-content" aria-label={operationsCollapsed ? 'Expand site operations' : 'Minimize site operations'} title={operationsCollapsed ? 'Expand site operations' : 'Minimize site operations'}>{operationsCollapsed ? '›' : '‹'}</button></div>
         {operationsCollapsed && <span className="panel-rail-label">Site operations{showDecision ? ' · Decision waiting' : ''}{flags.length ? ' · Action needed' : ''}</span>}
         <div id="operations-content" hidden={operationsCollapsed}>
+        <a href="/worker/supervisor.html" target="_blank" rel="noopener">Open live shade confirmations ↗</a>
         <RedFlags flags={flags} />
         {showDecision && <DecisionCard clock={formatClock(DECISION_AT)} state={decision} onAsk={ask} onApprove={approve} onKeep={keep} setAsk={(s) => setDecision((d) => ({ ...d, ask: s }))} />}
         <NoorBrief brief={brief} loading={briefLoading} />

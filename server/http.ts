@@ -6,6 +6,7 @@
 
 import { type IncomingMessage, type ServerResponse } from 'node:http';
 import OpenAI from 'openai';
+import { recordShade, shadeCount } from './shade';
 import { zodTextFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
 import template from '../data/scenario/saadiyat-tower.json' with { type: 'json' };
@@ -276,6 +277,16 @@ async function speak(text: string, language: z.infer<typeof Language>): Promise<
 export async function handler(req: IncomingMessage, res: ServerResponse) {
   const url = new URL(req.url ?? '/', 'http://localhost');
   try {
+    if (url.pathname === '/api/shade') {
+      const room = z.uuidv4().safeParse(req.headers['x-heatline-shift']);
+      if (!room.success) return send(res, 400, { error: 'invalid shift' });
+      if (req.method === 'GET') return send(res, 200, { crew: 'B', confirmed: await shadeCount(room.data) });
+      if (req.method !== 'POST') return send(res, 405, { error: 'unsupported method' });
+      const input = z.strictObject({ receipt: z.uuidv4() }).safeParse(await readJson(req, 128));
+      if (!input.success) return send(res, 400, { error: 'invalid receipt' });
+      await recordShade(room.data, input.data.receipt);
+      return send(res, 200, { received: true });
+    }
     if (req.method === 'GET' && url.pathname === '/api/health') return send(res, 200, { ai: !!openai, model: openai ? MODEL : null });
     if (req.method === 'POST' && url.pathname === '/api/guardian') {
       const parsed = GuardianInput.safeParse(await readJson(req));

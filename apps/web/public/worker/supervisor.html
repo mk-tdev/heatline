@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Crew dashboard · Heatline</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#e6eeea;color:#173837;font:1rem/1.55 system-ui,sans-serif}
+main{max-width:34rem;margin:clamp(0rem,5vw,3rem) auto;background:#fbfcf8;border:1px solid #b9cbc4}
+header,section,footer{padding:1.25rem clamp(1rem,5vw,2rem)}header{background:#123e3c;color:white;display:flex;align-items:center;justify-content:space-between;gap:1rem}header strong{font-size:1.25rem}header small{color:#cce8dc}
+h1{font-size:clamp(1.85rem,7vw,2.65rem);line-height:1.14;margin:.45rem 0 1rem;letter-spacing:-.035em}h1:focus{outline:none}
+p{margin:.65rem 0 1rem}.label{color:#45665f;font-weight:650;font-size:.83rem}button,a{font:inherit;font-weight:650}button{min-height:48px;width:100%;padding:.7rem .8rem;text-align:left;background:#134e46;color:white;border:1px solid #134e46;cursor:pointer;margin:.3rem 0}button.secondary{color:#14473f;background:transparent}button:focus-visible,a:focus-visible{outline:3px solid #cb680a;outline-offset:2px}
+aside{padding:1rem;border-left:4px solid #bb7913;background:#fff0c8}aside p{margin:.4rem 0}.bn{font-size:1.3rem}footer{border-top:1px solid #ccdad4;font-size:.85rem;color:#436058}footer p{margin:0 0 .6rem}a{color:inherit}output{font-weight:bold;font-size:2.4rem;display:block} [hidden]{display:none!important}
+</style>
+<main><header><strong>Heatline</strong><small>Supervisor dashboard</small></header>
+<section><div class="label">Training shift · Crew B</div>
+<h1>Shade confirmations</h1>
+<output id="count" aria-label="Crew B shade confirmations">—</output>
+<p>Self-reported arrivals in shade</p>
+<p id="status" role="status">Checking crew count…</p>
+</section>
+<section><h2>Connect the worker phone</h2>
+<p>Open this shift’s worker link on the phone before disconnecting it. Keep this dashboard open to see the count update.</p>
+<button id="copy">Copy worker link</button><a id="worker">Open worker link</a>
+<p id="copied" role="status"></p>
+</section><footer><a href="supervisor.html" id="fresh">Start a fresh demo shift</a> · <a href="/">Heatline home</a></footer></main>
+<script src="/worker/room.js"></script>
+<script>
+const room = shiftRoom();
+const worker = document.getElementById('worker');
+worker.href = '/worker/index.html#' + room;
+document.getElementById('fresh').onclick = event => {
+  event.preventDefault();
+  location.hash = crypto.randomUUID();
+  location.reload();
+};
+document.getElementById('copy').onclick = async () => {
+  try { await navigator.clipboard.writeText(worker.href); document.getElementById('copied').textContent = 'Worker link copied.'; }
+  catch { document.getElementById('copied').textContent = 'Copy the address of Open worker link.'; }
+};
+let loading = false;
+async function refresh() {
+  if (loading || document.hidden) return;
+  loading = true;
+  try {
+    const res = await fetch('/api/shade', {headers:{'X-Heatline-Shift':room},credentials:'omit',cache:'no-store',signal:AbortSignal.timeout(8000)});
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    if (data.crew !== 'B' || !Number.isSafeInteger(data.confirmed)) throw new Error();
+    document.getElementById('count').value = data.confirmed;
+    document.getElementById('status').textContent = 'Connected · refreshes every five seconds';
+  } catch { document.getElementById('status').textContent = 'Update unavailable. Waiting to refresh the count.'; }
+  finally { loading = false; }
+}
+setInterval(refresh,5000);
+document.addEventListener('visibilitychange',refresh);
+window.addEventListener('online',refresh);
+refresh();
+</script></html>

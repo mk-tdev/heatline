@@ -31,12 +31,12 @@ Return to slides **2–3** for the worker introduction and rooftop visual. Use s
 
 ## Anwar’s phone — 35 seconds
 
-Before presenting, open [the worker demo](https://heatline-plum.vercel.app/worker/index.html) online on a phone, reset any previous run and wait for **Ready for offline use**. Keep the presentation laptop connected.
+Before presenting, open the [supervisor dashboard](https://heatline-plum.vercel.app/worker/supervisor.html) on the laptop and choose **Start a fresh demo shift**. Verify Crew B shows zero. Use **Copy worker link** and open that exact link on the phone while connected. Wait for **Ready for offline use**. Keep the laptop connected.
 
 1. Disconnect the phone from Wi-Fi and cellular data. Reload the worker page. Point out the offline indicator.
 2. Tap **Decline sharing**. “Anwar can decline the wearable and still receive this warning.” Show the Bengali instruction to rest in shade and drink water. This replays a stored yellow warning from the morning shift at 09:40.
-3. Tap **I reached shade → See supervisor preview**. “Crew B shows one self-reported arrival. The confirmation stays on this phone.” This is a local preview of the crew count.
-4. At slide **5**, move to the connected laptop. “That was Anwar’s morning. Now the supervisor has an afternoon pour to plan.” Reconnect the phone when convenient.
+3. Tap **I reached shade** while offline. Show the queued receipt and the laptop count of zero. Reconnect the phone with the page open. When the phone shows **Delivered**, the dashboard refreshes to one within its next successful poll. “The supervisor sees one arrival in Crew B. The phone sent a random receipt. Anwar’s name, wearable choice and health readings stayed off the dashboard.”
+4. At slide **5**, move to the connected laptop. “That was Anwar’s morning. Now the supervisor has an afternoon pour to plan.” If delivery is delayed, leave the receipt queued and return to the dashboard after the AI segment.
 
 ## AI and heat-safety sequence — two minutes
 

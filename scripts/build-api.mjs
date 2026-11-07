@@ -8,5 +8,5 @@ await build({
   platform: 'node',
   format: 'esm',
   target: 'node22',
-  external: ['openai', 'openai/*', 'zod', 'zod/*'],
+  external: ['@vercel/blob', 'openai', 'openai/*', 'zod', 'zod/*'],
 });
