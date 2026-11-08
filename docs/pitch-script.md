@@ -41,7 +41,7 @@ Heatline. Different stories. The same right to go home well.
 Show **slide 1**, deliver the opening cue and run the **25-second standalone first-person segment**. Return to **slides 2–3** for the human story. Use **slide 4** to invite the judge and open the live dashboard. Give them time to reconnect and see the count change. At **slide 5**, run the **two-minute AI and heat-safety demo**. Return to **6, 8 and 9** for evidence, the partnership ask and the closing. Keep slide 7, crane operation and the sources appendix for questions. Deliver the script’s final three paragraphs after the AI demo. Allow roughly four and a half minutes overall, including transitions.
 
 - [First-person opening, AI demo flow and backup plan](demo-flow.md)
-- [Google Slides with speaker notes](https://docs.google.com/presentation/d/1U0cnRU4kcdr1z3TvDzAg8BzZWnwEI871LIf-HcL61D0/edit)
+- [Google Slides with speaker notes](https://docs.google.com/presentation/d/1FMFLC-zGr_YUq21n0I0qrHFjGM7i1EPf86BKGodEv2A/edit)
 - [Live demo](https://heatline-plum.vercel.app)
 - [Scientific basis and limitations](scientific-basis.md)
 

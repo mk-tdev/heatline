@@ -100,7 +100,7 @@ This is a disposable copy of the visible site. Exploration has its own camera an
 
 - **[Short pitch script](docs/pitch-script.md)** — about 75 seconds, with slide cues and the closing ask.
 - **[Judges’ demo flow](docs/demo-flow.md)** — a 25-second first-person opening, a 35-second offline phone replay, then two minutes of AI and heat-safety decisions, with presenter lines and a backup plan.
-- **[Google Slides](https://docs.google.com/presentation/d/1U0cnRU4kcdr1z3TvDzAg8BzZWnwEI871LIf-HcL61D0/edit)** — visual pitch, live AI screenshot and speaker notes. Deck access may require permission from its owner.
+- **[Google Slides](https://docs.google.com/presentation/d/1FMFLC-zGr_YUq21n0I0qrHFjGM7i1EPf86BKGodEv2A/edit)** — visual pitch, live AI screenshot and speaker notes. Deck access may require permission from its owner.
 
 ## 🚀 Run it locally
 

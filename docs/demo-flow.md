@@ -4,7 +4,7 @@ A **25-second first-person opening**, a **35-second offline phone replay**, then
 
 Start with the site at human height. Then hear Anwar, watch Omar test a plan, and compare the shift.
 
-[Open the live demo](https://heatline-plum.vercel.app) · [Pitch script](pitch-script.md) · [Google Slides](https://docs.google.com/presentation/d/1U0cnRU4kcdr1z3TvDzAg8BzZWnwEI871LIf-HcL61D0/edit)
+[Open the live demo](https://heatline-plum.vercel.app) · [Pitch script](pitch-script.md) · [Google Slides](https://docs.google.com/presentation/d/1FMFLC-zGr_YUq21n0I0qrHFjGM7i1EPf86BKGodEv2A/edit)
 
 ## Before presenting
 
