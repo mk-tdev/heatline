@@ -108,7 +108,7 @@ On a phone, open [Anwar’s worker demo](https://heatline-plum.vercel.app/worker
 
 **[Open Heatline](https://heatline-plum.vercel.app)** on desktop to enter the 3D site. The **[shift planner](https://heatline-plum.vercel.app/#plan)**, the phone demo and the evidence work on any screen.
 
-Guardian, Noor, Omar and multilingual speech are enabled in the live deployment. Functional checks on **7 November 2026** confirmed model-generated responses, a checked planner result and valid speech audio.
+Guardian, Noor, Omar and multilingual speech are enabled in the live deployment. Functional checks on **12 November 2026** confirmed the shift planner with a live forecast and with the stored day, a model-written guardian message and a planner result accepted by the site rules. Speech was last checked on 7 November.
 
 Vercel hosts the web app and API functions. GitHub pushes to `main` deploy the production project automatically; other branches receive preview deployments. The deployment works in rules-only mode without an API key. To enable model-backed assistants and speech, configure `OPENAI_API_KEY` and optional model settings in Vercel project environment variables, then redeploy.
 

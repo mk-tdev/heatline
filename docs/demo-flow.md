@@ -88,7 +88,11 @@ From the landing page, use **Explore on foot → Crane base → Enter crane cab*
 
 Historical weather drives synthetic workers and a teaching model. The prototype is not clinically validated or UAE safety certification. Role-specific views demonstrate information separation; production authentication and consent management are not implemented. See the [scientific basis](scientific-basis.md).
 
-## Verified baseline — 7 November 2026
+## Verified baseline — 12 November 2026
+
+After the deployment of commit `e107b50`, the live shift planner loaded tomorrow’s forecast and the stored day, the landing page showed the real-weather finding, and the production guardian and planner returned model-written results (`gpt-6-luna`; the plan was accepted by the site rules). Speech was not re-checked.
+
+## Earlier baseline — 7 November 2026
 
 Production Guardian, Noor and Omar returned model-generated responses using `gpt-6-luna`. A planner test returned `check.ok: true`. Speech returned HTTP 200 with a valid MP3, and the browser showed the connected assistant, model attribution, Listen interaction and a completed planning flow. These are functional checks, not clinical validation or guarantees of future uptime. Production deploys automatically from GitHub `main`.
 
