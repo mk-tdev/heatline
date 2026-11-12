@@ -2,6 +2,22 @@
 
 About 75 seconds, excluding the live demo. Rehearse aloud and leave space for the opening and closing lines.
 
+## Recorded video
+
+For the three-minute submission video, use the running order and lines in [demo-flow.md](demo-flow.md#three-minute-recorded-video-for-the-submission). It opens with the real-weather finding and the shift planner, because judges watching alone need the problem and the product in the first minute. The script below is for a live room.
+
+## One-paragraph pitch
+
+The UAE’s midday break covers two and a half hours. Across the last two summers, the heat near Saadiyat Island was over the safe limit for steady outdoor work for about 13 of 14 working hours a day. Heatline plans the shift around the heat that is left: a forecast for any site becomes hour-by-hour work and rest limits, the coolest pour window and a crew briefing in seven languages, with no hardware. On the day, each worker is warned in their own language, offline, and the supervisor sees crews, never individuals. And before any plan reaches real people, it is rehearsed on a 3D site with synthetic workers, where the rules, not the AI, have the last word.
+
+## Questions to be ready for
+
+- **“Is any of this validated on real workers?”** No. The weather analysis is real; the workers in the 3D site are simulated; the translations are drafts. The pilot plan in [pilot.md](pilot.md) says what must be reviewed first.
+- **“Why NIOSH and not the Thermal Work Limit?”** TWL needs on-site measurements we do not have. NIOSH limits can be worked out from weather, so they are a fair screen for planning. A pilot would compare both on site.
+- **“Why do your warnings alone do worse than flag breaks?”** A flag stops everyone at once; a phone warning relies on each person stopping. Heatline is meant to be used with a plan.
+- **“Your simulation shows a lot of heat illness.”** Yes, far more than real sites report. We use it to compare approaches on the same day, not to predict cases. The headline evidence is the weather analysis, which has no simulation in it.
+- **“What does the AI actually decide?”** Nothing. Rules set every warning level and action and check every plan. In 30 recorded runs under pressure the rules refused 30 of the AI’s proposals and no rule-breaking plan reached the supervisor ([record](eval/README.md)).
+
 ## Opening cue — before the 25-second first-person demo
 
 “Before we talk about heat, step onto the site with me.”

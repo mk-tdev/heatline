@@ -1,0 +1,427 @@
+{
+ "generated": "2026-11-11T15:07:09.611Z",
+ "site": {
+  "label": "Saadiyat Island, Abu Dhabi",
+  "latitude": 24.54,
+  "longitude": 54.43,
+  "utcOffsetHours": 4,
+  "grid": "24.499 N, 54.423 E"
+ },
+ "source": "Open-Meteo Historical Weather API (ERA5-based reanalysis), hourly; WBGT by Liljegren et al. (2008)",
+ "season": "15 June – 15 September (UAE midday break, 12:30–15:00)",
+ "workingDay": "05:00–19:00",
+ "limits": {
+  "moderateContinuousC": 28.2,
+  "heavyContinuousC": 26.6,
+  "basis": "NIOSH 2016-106 recommended exposure limit, acclimatised workers, continuous work"
+ },
+ "years": [
+  {
+   "year": 2025,
+   "days": 93,
+   "workingHours": 1302,
+   "hoursOverModerateLimit": 1206,
+   "hoursOverModerateLimitPct": 92.6,
+   "overLimitHoursInsideBreakPct": 19.3,
+   "overLimitHoursPerDay": 13,
+   "overLimitHoursPerDayOutsideBreak": 10.5,
+   "afterBreak": {
+    "window": "15:00–18:00",
+    "meanWbgtSun": 32.5,
+    "meanWbgtShade": 31.4,
+    "hoursOverModerateLimitPct": 99.6,
+    "daysEveryHourOverModerateLimitPct": 98.9,
+    "shadeHoursOverModerateLimitPct": 98.6,
+    "daysNoHeavyWorkWithShadeRestPct": 24.7,
+    "meanHeavyMinShade": 7,
+    "meanHeavyMinCoolRoom": 35
+   },
+   "hottestDay": {
+    "date": "2025-07-21",
+    "peakWbgtSun": 38.1
+   },
+   "typicalDay": {
+    "date": "2025-08-09",
+    "peakWbgtSun": 34.5
+   },
+   "mildestDay": {
+    "date": "2025-07-08",
+    "peakWbgtSun": 31
+   },
+   "byHour": [
+    {
+     "from": 300,
+     "meanWbgtSun": 28.3,
+     "meanWbgtShade": 28.2,
+     "maxWbgtSun": 31.5,
+     "daysOverModerateLimitPct": 49.5,
+     "daysOverHeavyLimitPct": 81.7,
+     "meanHeavyMinCoolRoom": 49,
+     "meanHeavyMinShade": 35,
+     "meanModerateMinCoolRoom": 55,
+     "meanModerateMinShade": 47
+    },
+    {
+     "from": 360,
+     "meanWbgtSun": 29,
+     "meanWbgtShade": 28.5,
+     "maxWbgtSun": 33.1,
+     "daysOverModerateLimitPct": 66.7,
+     "daysOverHeavyLimitPct": 92.5,
+     "meanHeavyMinCoolRoom": 46,
+     "meanHeavyMinShade": 30,
+     "meanModerateMinCoolRoom": 53,
+     "meanModerateMinShade": 42
+    },
+    {
+     "from": 420,
+     "meanWbgtSun": 30.3,
+     "meanWbgtShade": 29.4,
+     "maxWbgtSun": 35,
+     "daysOverModerateLimitPct": 83.9,
+     "daysOverHeavyLimitPct": 100,
+     "meanHeavyMinCoolRoom": 42,
+     "meanHeavyMinShade": 21,
+     "meanModerateMinCoolRoom": 48,
+     "meanModerateMinShade": 32
+    },
+    {
+     "from": 480,
+     "meanWbgtSun": 31.6,
+     "meanWbgtShade": 30,
+     "maxWbgtSun": 36.3,
+     "daysOverModerateLimitPct": 100,
+     "daysOverHeavyLimitPct": 100,
+     "meanHeavyMinCoolRoom": 38,
+     "meanHeavyMinShade": 14,
+     "meanModerateMinCoolRoom": 44,
+     "meanModerateMinShade": 22
+    },
+    {
+     "from": 540,
+     "meanWbgtSun": 32.6,
+     "meanWbgtShade": 30.5,
+     "maxWbgtSun": 37.5,
+     "daysOverModerateLimitPct": 100,
+     "daysOverHeavyLimitPct": 100,
+     "meanHeavyMinCoolRoom": 35,
+     "meanHeavyMinShade": 11,
+     "meanModerateMinCoolRoom": 41,
+     "meanModerateMinShade": 16
+    },
+    {
+     "from": 600,
+     "meanWbgtSun": 33.2,
+     "meanWbgtShade": 31,
+     "maxWbgtSun": 37.7,
+     "daysOverModerateLimitPct": 100,
+     "daysOverHeavyLimitPct": 100,
+     "meanHeavyMinCoolRoom": 34,
+     "meanHeavyMinShade": 8,
+     "meanModerateMinCoolRoom": 39,
+     "meanModerateMinShade": 12
+    },
+    {
+     "from": 660,
+     "meanWbgtSun": 33.7,
+     "meanWbgtShade": 31.4,
+     "maxWbgtSun": 37.5,
+     "daysOverModerateLimitPct": 100,
+     "daysOverHeavyLimitPct": 100,
+     "meanHeavyMinCoolRoom": 33,
+     "meanHeavyMinShade": 6,
+     "meanModerateMinCoolRoom": 37,
+     "meanModerateMinShade": 9
+    },
+    {
+     "from": 720,
+     "meanWbgtSun": 33.9,
+     "meanWbgtShade": 31.7,
+     "maxWbgtSun": 37.8,
+     "daysOverModerateLimitPct": 100,
+     "daysOverHeavyLimitPct": 100,
+     "meanHeavyMinCoolRoom": 32,
+     "meanHeavyMinShade": 5,
+     "meanModerateMinCoolRoom": 37,
+     "meanModerateMinShade": 7
+    },
+    {
+     "from": 780,
+     "meanWbgtSun": 33.9,
+     "meanWbgtShade": 31.8,
+     "maxWbgtSun": 37,
+     "daysOverModerateLimitPct": 100,
+     "daysOverHeavyLimitPct": 100,
+     "meanHeavyMinCoolRoom": 32,
+     "meanHeavyMinShade": 4,
+     "meanModerateMinCoolRoom": 37,
+     "meanModerateMinShade": 7
+    },
+    {
+     "from": 840,
+     "meanWbgtSun": 33.6,
+     "meanWbgtShade": 31.8,
+     "maxWbgtSun": 36.7,
+     "daysOverModerateLimitPct": 100,
+     "daysOverHeavyLimitPct": 100,
+     "meanHeavyMinCoolRoom": 33,
+     "meanHeavyMinShade": 5,
+     "meanModerateMinCoolRoom": 37,
+     "meanModerateMinShade": 7
+    },
+    {
+     "from": 900,
+     "meanWbgtSun": 33.2,
+     "meanWbgtShade": 31.7,
+     "maxWbgtSun": 36.1,
+     "daysOverModerateLimitPct": 100,
+     "daysOverHeavyLimitPct": 100,
+     "meanHeavyMinCoolRoom": 33,
+     "meanHeavyMinShade": 5,
+     "meanModerateMinCoolRoom": 39,
+     "meanModerateMinShade": 9
+    },
+    {
+     "from": 960,
+     "meanWbgtSun": 32.6,
+     "meanWbgtShade": 31.4,
+     "maxWbgtSun": 35.3,
+     "daysOverModerateLimitPct": 100,
+     "daysOverHeavyLimitPct": 100,
+     "meanHeavyMinCoolRoom": 35,
+     "meanHeavyMinShade": 6,
+     "meanModerateMinCoolRoom": 40,
+     "meanModerateMinShade": 11
+    },
+    {
+     "from": 1020,
+     "meanWbgtSun": 31.7,
+     "meanWbgtShade": 31.1,
+     "maxWbgtSun": 34.6,
+     "daysOverModerateLimitPct": 98.9,
+     "daysOverHeavyLimitPct": 100,
+     "meanHeavyMinCoolRoom": 37,
+     "meanHeavyMinShade": 9,
+     "meanModerateMinCoolRoom": 43,
+     "meanModerateMinShade": 15
+    },
+    {
+     "from": 1080,
+     "meanWbgtSun": 30.9,
+     "meanWbgtShade": 30.6,
+     "maxWbgtSun": 33.8,
+     "daysOverModerateLimitPct": 97.8,
+     "daysOverHeavyLimitPct": 98.9,
+     "meanHeavyMinCoolRoom": 39,
+     "meanHeavyMinShade": 13,
+     "meanModerateMinCoolRoom": 46,
+     "meanModerateMinShade": 21
+    }
+   ]
+  },
+  {
+   "year": 2026,
+   "days": 93,
+   "workingHours": 1302,
+   "hoursOverModerateLimit": 1233,
+   "hoursOverModerateLimitPct": 94.7,
+   "overLimitHoursInsideBreakPct": 18.9,
+   "overLimitHoursPerDay": 13.3,
+   "overLimitHoursPerDayOutsideBreak": 10.8,
+   "afterBreak": {
+    "window": "15:00–18:00",
+    "meanWbgtSun": 32.9,
+    "meanWbgtShade": 31.7,
+    "hoursOverModerateLimitPct": 100,
+    "daysEveryHourOverModerateLimitPct": 100,
+    "shadeHoursOverModerateLimitPct": 99.3,
+    "daysNoHeavyWorkWithShadeRestPct": 31.2,
+    "meanHeavyMinShade": 5,
+    "meanHeavyMinCoolRoom": 34
+   },
+   "hottestDay": {
+    "date": "2026-08-22",
+    "peakWbgtSun": 38.3
+   },
+   "typicalDay": {
+    "date": "2026-07-18",
+    "peakWbgtSun": 35.2
+   },
+   "mildestDay": {
+    "date": "2026-06-16",
+    "peakWbgtSun": 32.1
+   },
+   "byHour": [
+    {
+     "from": 300,
+     "meanWbgtSun": 28.5,
+     "meanWbgtShade": 28.4,
+     "maxWbgtSun": 31.9,
+     "daysOverModerateLimitPct": 54.8,
+     "daysOverHeavyLimitPct": 92.5,
+     "meanHeavyMinCoolRoom": 48,
+     "meanHeavyMinShade": 33,
+     "meanModerateMinCoolRoom": 55,
+     "meanModerateMinShade": 47
+    },
+    {
+     "from": 360,
+     "meanWbgtSun": 29.4,
+     "meanWbgtShade": 28.8,
+     "maxWbgtSun": 32.4,
+     "daysOverModerateLimitPct": 75.3,
+     "daysOverHeavyLimitPct": 98.9,
+     "meanHeavyMinCoolRoom": 44,
+     "meanHeavyMinShade": 26,
+     "meanModerateMinCoolRoom": 52,
+     "meanModerateMinShade": 40
+    },
+    {
+     "from": 420,
+     "meanWbgtSun": 30.8,
+     "meanWbgtShade": 29.7,
+     "maxWbgtSun": 34,
+     "daysOverModerateLimitPct": 97.8,
+     "daysOverHeavyLimitPct": 100,
+     "meanHeavyMinCoolRoom": 40,
+     "meanHeavyMinShade": 17,
+     "meanModerateMinCoolRoom": 46,
+     "meanModerateMinShade": 27
+    },
+    {
+     "from": 480,
+     "meanWbgtSun": 32.2,
+     "meanWbgtShade": 30.3,
+     "maxWbgtSun": 35.7,
+     "daysOverModerateLimitPct": 100,
+     "daysOverHeavyLimitPct": 100,
+     "meanHeavyMinCoolRoom": 36,
+     "meanHeavyMinShade": 11,
+     "meanModerateMinCoolRoom": 42,
+     "meanModerateMinShade": 18
+    },
+    {
+     "from": 540,
+     "meanWbgtSun": 33.2,
+     "meanWbgtShade": 30.8,
+     "maxWbgtSun": 37.1,
+     "daysOverModerateLimitPct": 100,
+     "daysOverHeavyLimitPct": 100,
+     "meanHeavyMinCoolRoom": 33,
+     "meanHeavyMinShade": 9,
+     "meanModerateMinCoolRoom": 39,
+     "meanModerateMinShade": 13
+    },
+    {
+     "from": 600,
+     "meanWbgtSun": 34,
+     "meanWbgtShade": 31.2,
+     "maxWbgtSun": 37.5,
+     "daysOverModerateLimitPct": 100,
+     "daysOverHeavyLimitPct": 100,
+     "meanHeavyMinCoolRoom": 32,
+     "meanHeavyMinShade": 6,
+     "meanModerateMinCoolRoom": 37,
+     "meanModerateMinShade": 10
+    },
+    {
+     "from": 660,
+     "meanWbgtSun": 34.4,
+     "meanWbgtShade": 31.7,
+     "maxWbgtSun": 37.4,
+     "daysOverModerateLimitPct": 100,
+     "daysOverHeavyLimitPct": 100,
+     "meanHeavyMinCoolRoom": 31,
+     "meanHeavyMinShade": 4,
+     "meanModerateMinCoolRoom": 36,
+     "meanModerateMinShade": 7
+    },
+    {
+     "from": 720,
+     "meanWbgtSun": 34.5,
+     "meanWbgtShade": 32.1,
+     "maxWbgtSun": 37.2,
+     "daysOverModerateLimitPct": 100,
+     "daysOverHeavyLimitPct": 100,
+     "meanHeavyMinCoolRoom": 31,
+     "meanHeavyMinShade": 3,
+     "meanModerateMinCoolRoom": 35,
+     "meanModerateMinShade": 5
+    },
+    {
+     "from": 780,
+     "meanWbgtSun": 34.4,
+     "meanWbgtShade": 32.2,
+     "maxWbgtSun": 36.9,
+     "daysOverModerateLimitPct": 100,
+     "daysOverHeavyLimitPct": 100,
+     "meanHeavyMinCoolRoom": 32,
+     "meanHeavyMinShade": 3,
+     "meanModerateMinCoolRoom": 36,
+     "meanModerateMinShade": 5
+    },
+    {
+     "from": 840,
+     "meanWbgtSun": 34,
+     "meanWbgtShade": 32.1,
+     "maxWbgtSun": 35.7,
+     "daysOverModerateLimitPct": 100,
+     "daysOverHeavyLimitPct": 100,
+     "meanHeavyMinCoolRoom": 32,
+     "meanHeavyMinShade": 3,
+     "meanModerateMinCoolRoom": 37,
+     "meanModerateMinShade": 5
+    },
+    {
+     "from": 900,
+     "meanWbgtSun": 33.7,
+     "meanWbgtShade": 32,
+     "maxWbgtSun": 35.7,
+     "daysOverModerateLimitPct": 100,
+     "daysOverHeavyLimitPct": 100,
+     "meanHeavyMinCoolRoom": 32,
+     "meanHeavyMinShade": 3,
+     "meanModerateMinCoolRoom": 37,
+     "meanModerateMinShade": 6
+    },
+    {
+     "from": 960,
+     "meanWbgtSun": 33,
+     "meanWbgtShade": 31.8,
+     "maxWbgtSun": 35.5,
+     "daysOverModerateLimitPct": 100,
+     "daysOverHeavyLimitPct": 100,
+     "meanHeavyMinCoolRoom": 34,
+     "meanHeavyMinShade": 5,
+     "meanModerateMinCoolRoom": 39,
+     "meanModerateMinShade": 8
+    },
+    {
+     "from": 1020,
+     "meanWbgtSun": 32.1,
+     "meanWbgtShade": 31.3,
+     "maxWbgtSun": 34.3,
+     "daysOverModerateLimitPct": 100,
+     "daysOverHeavyLimitPct": 100,
+     "meanHeavyMinCoolRoom": 36,
+     "meanHeavyMinShade": 7,
+     "meanModerateMinCoolRoom": 41,
+     "meanModerateMinShade": 12
+    },
+    {
+     "from": 1080,
+     "meanWbgtSun": 31.2,
+     "meanWbgtShade": 30.8,
+     "maxWbgtSun": 33.3,
+     "daysOverModerateLimitPct": 97.8,
+     "daysOverHeavyLimitPct": 100,
+     "meanHeavyMinCoolRoom": 38,
+     "meanHeavyMinShade": 10,
+     "meanModerateMinCoolRoom": 45,
+     "meanModerateMinShade": 18
+    }
+   ]
+  }
+ ],
+ "note": "Gridded reanalysis near the site, not an instrument on a site. Real sites differ (radiating concrete, wind shadow, work at height). No workers are simulated here."
+}

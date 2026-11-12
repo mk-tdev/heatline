@@ -83,9 +83,9 @@ const TEMPLATES: Record<WarningAction, Record<Language, string>> = {
   'stop-work': {
     en: '{name}, no more heat work today. Go to the tool store for indoor work.',
     ar: '{name}، لا مزيد من العمل في الحر اليوم. اذهب إلى مخزن الأدوات للعمل في الداخل.',
-    hi: '{name}, आज धूप में और काम नहीं। अंदर के काम के लिए टूल स्टोर जाएँ।',
-    ur: '{name}، آج دھوپ میں مزید کام نہیں۔ اندر کے کام کے لیے ٹول اسٹور جائیں۔',
-    bn: '{name}, আজ আর রোদে কাজ নয়। ভেতরের কাজের জন্য টুল স্টোরে যান।',
+    hi: '{name}, आज गर्मी में और काम नहीं। अंदर के काम के लिए टूल स्टोर जाएँ।',
+    ur: '{name}، آج گرمی میں مزید کام نہیں۔ اندر کے کام کے لیے ٹول اسٹور جائیں۔',
+    bn: '{name}, আজ আর গরমের মধ্যে কাজ নয়। ভেতরের কাজের জন্য টুল স্টোরে যান।',
     ml: '{name}, ഇന്ന് ഇനി ചൂടിൽ ജോലി വേണ്ട. അകത്തെ ജോലിക്കായി ടൂൾ സ്റ്റോറിലേക്ക് പോകുക.',
     tl: '{name}, wala nang trabaho sa init ngayong araw. Pumunta sa tool store para sa trabaho sa loob.',
   },

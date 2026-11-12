@@ -6,6 +6,21 @@ Start with the site at human height. Then hear Anwar, watch Omar test a plan, an
 
 [Open the live demo](https://heatline-plum.vercel.app) · [Pitch script](pitch-script.md) · [Google Slides](https://docs.google.com/presentation/d/1FMFLC-zGr_YUq21n0I0qrHFjGM7i1EPf86BKGodEv2A/edit)
 
+## Three-minute recorded video (for the submission)
+
+Judges will most likely watch this without us in the room, so it leads with the problem and the product. The live-room order further down still works for an in-person pitch.
+
+| Time | On screen | Say |
+| --- | --- | --- |
+| 0:00–0:20 | Landing page hero, then scroll to **The break ends. The heat does not.** | “The UAE stops outdoor work from 12:30 to 3. Across the last two summers, the heat near Saadiyat was over the safe limit for steady work for 13 of 14 working hours a day. The break covers a fifth of them. This is real weather, not a simulation.” |
+| 0:20–1:05 | **Plan tomorrow’s shift**. Pick **Hottest day of summer 2026**. Point to the four cards, the chart, the hour table. Switch **Crews rest in** to **Shade only** and back. Open the briefing in Bengali, then Arabic. | “Heatline turns a forecast for any site into work and rest limits for every hour. With shade alone, there is no safe heavy work that afternoon. With a cooled room, twenty-five minutes an hour. It finds the coolest pour window and writes the crew briefing in seven languages. It needs a location. No wearables, no worker data.” |
+| 1:05–1:35 | Phone recording of Anwar’s page: offline indicator, **Decline sharing**, the Bengali warning, **I reached shade**, then the dashboard count going from 0 to 1. | “On the day, each worker gets a warning in their own language, offline, with or without a wearable. The supervisor sees one more person in shade. Not his name, not his readings.” |
+| 1:35–2:30 | 3D site, **Explore** under **The afternoon pour**, **Deck** view. At 15:10 press **Ask Omar**. Show the steps, then the verdict card. **Run this simulated plan**, then **Compare**. | “Before a plan reaches real people, we rehearse it. Twenty synthetic workers, a real August afternoon, a truck on its way. Omar proposes; the site rules check every proposal and refuse the ones that break them. Read the verdict as shown. Then the same afternoon, one decision changed.” |
+| 2:30–2:50 | **Evidence**: part 1, then the AI check numbers in the README. | “We tested the AI under pressure: thirty plans, none that broke a rule reached the supervisor. Sixty messages in six languages, all kept the action the rules chose.” |
+| 2:50–3:00 | Landing page, **A pilot for summer 2027**. | “This is a prototype with simulated workers and draft translations. We are looking for one contractor and an occupational hygienist to pilot it next summer. Heatline. The same right to go home well.” |
+
+Recording notes. Record at 1280×720 or larger with the browser zoomed so text is readable. Record Omar once and keep the take: his answer varies from run to run, and in our checks the headline question was answered with a 15:30 pour once and a cancelled pour twice. Read out whatever the card shows. The planner’s **Stored sample (offline)** button works with no connection if the weather service is slow. Keep the first-person walk and the crane for questions, not the video.
+
 ## Before presenting
 
 - Use a desktop or laptop with a browser window at least 1024 pixels wide. Test the venue’s sound and connection.

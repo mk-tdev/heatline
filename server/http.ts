@@ -35,7 +35,7 @@ import {
   type PlannerWorld,
 } from '@heatline/agents';
 
-const MODEL = process.env.OPENAI_MODEL || 'gpt-6-luna';
+export const MODEL = process.env.OPENAI_MODEL || 'gpt-6-luna';
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({ maxRetries: 1 }) : null;
 const TTS_MODEL = process.env.HEATLINE_MODEL_TTS || 'gpt-4o-mini-tts';
 const TTS_VOICE = process.env.HEATLINE_TTS_VOICE || 'coral';
@@ -137,7 +137,7 @@ function world(scenarioId: string, effectiveAt: number, unavailable: string[]): 
 
 // ---- Agents -------------------------------------------------------------------------------
 
-async function guardian(ctx: GuardianContext) {
+export async function guardian(ctx: GuardianContext) {
   const t0 = performance.now();
   if (!openai || ctx.action === 'emergency') return { ...fallbackGuardianMessage(ctx), source: 'rules', ms: 0 };
   try {
@@ -191,7 +191,7 @@ async function safety(clock: string, crews: CrewSummary[]) {
 }
 
 /** Omar's tool loop, streamed as NDJSON so the console can show each step as it happens. */
-async function planner(input: z.infer<typeof PlannerInput>, res: ServerResponse) {
+export async function planner(input: z.infer<typeof PlannerInput>, res: Pick<ServerResponse, 'writeHead' | 'write' | 'end'>) {
   res.writeHead(200, { 'content-type': 'application/x-ndjson; charset=utf-8', 'cache-control': 'no-store' });
   const write = (event: unknown) => res.write(`${JSON.stringify(event)}\n`);
   const w = world(input.scenario, input.effectiveAt, input.unavailable);

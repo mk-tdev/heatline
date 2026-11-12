@@ -1,6 +1,17 @@
 # Heatline status
 
-Updated 7 November 2026. The section below supersedes older milestone claims.
+Updated 11 November 2026. The sections below supersede older milestone claims.
+
+## Product framing, shift planner and recorded evidence (11 Nov)
+
+- **Shift planner** at `/#plan`: forecast or past weather for any coordinates (Open-Meteo, fetched in the browser), hourly WBGT in sun and shade, NIOSH work and rest minutes for light, moderate and heavy work and for unacclimatised workers, rest in shade or a cooled room, clothing adjustment, coolest pour window, crew briefing in seven languages, print layout, shareable links, a stored day that works offline. Phone layout checked at 390 px. `packages/sim/src/dayplan.ts`, `briefing.ts`, `apps/web/src/planner/`.
+- **Ban-season analysis** (`npm run season`): 186 days of 2025 and 2026 reanalysis weather; 94% of working hours over the NIOSH moderate-work limit, 19% of them inside the midday break. Shown on the landing page and first in Evidence.
+- **Landing page and README** now lead with the product (plan, warn, rehearse), the real-weather finding and the path to a pilot ([pilot.md](pilot.md)). The simulated "197 → 0" is no longer a headline; Evidence states that the body model over-produces cases.
+- **Omar's verdict** appears as a large card over the site view instead of inside the side panel.
+- **Agent evaluation recorded** ([eval/README.md](eval/README.md)): 60/60 guardian messages kept the action; 30/30 planner results accepted by the rules, 0 rule-breaking plans reached the supervisor; 90 pre-written lines back-translated, three wording problems fixed.
+- Verification: 109 tests and TypeScript pass; production build passes. Planner checked in the browser with tomorrow's live forecast, the hottest and a typical day of summer 2026, and the stored day.
+- **Still open:** native-speaker review of every translation and of the spoken audio; the phone guardian is not yet driven by the day's plan; no sign-in or consent management; forecast accuracy against site measurements is untested.
+
 
 ## Current presentation and device support
 

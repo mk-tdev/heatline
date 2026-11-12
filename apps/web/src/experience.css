@@ -407,3 +407,24 @@
 .welcome-footer p { font-size: 12px; color: #4a6268; }
 .connection-status { font-size: 12px; color: #355f66; }
 .hero-vignette .vignette-caption { width: auto; max-width: 340px; height: auto; }
+
+/* Landing: real-weather finding, product parts and path to pilot */
+.season-finding { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 28px; padding: 62px 0 54px; border-bottom: 1px solid #173b451c; align-items: start; }
+.season-copy h2 { font-size: clamp(30px, 3.2vw, 44px); line-height: 1.1; letter-spacing: -1.4px; font-weight: 550; margin: 0 0 16px; }
+.season-copy > p:not(.section-kicker) { font-size: 14px; line-height: 1.7; color: #587078; max-width: 420px; margin: 0 0 22px; }
+.welcome .season-copy button { background: #1c5960; border: 1px solid #1c5960; color: #fff; padding: 13px 18px; font-size: 13px; }
+.welcome .season-copy button:hover:not(:disabled) { background: #123e46; border-color: #123e46; }
+.welcome .season-copy button span { padding-left: 10px; }
+.season-stat { border-top: 3px solid #1c5960; padding-top: 16px; }
+.season-stat b { display: block; font-size: clamp(30px, 2.9vw, 42px); font-weight: 550; letter-spacing: -1.4px; line-height: 1.1; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.season-stat span { display: block; margin-top: 12px; font-size: 13px; line-height: 1.6; color: #587078; }
+.welcome .step-link { display: inline-block; margin-top: 10px; padding: 0 0 2px; border: 0; border-bottom: 1px solid #1c596088; background: none; color: #1c5960; font-size: 13px; font-weight: 600; text-decoration: none; cursor: pointer; }
+.welcome .step-link:hover:not(:disabled) { border-bottom-color: #123e46; color: #123e46; background: none; }
+.pilot-path { margin: 90px 0 70px; }
+.pilot-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+.pilot-steps > div { border-top: 3px solid #1c5960; padding-top: 16px; }
+.pilot-steps span { font-size: 12px; color: #54747a; }
+.pilot-steps h3 { font-size: 20px; font-weight: 600; letter-spacing: -.4px; margin: 8px 0; }
+.pilot-steps p { font-size: 13px; line-height: 1.65; color: #587078; margin: 0; }
+@media (max-width: 1100px) { .season-finding { grid-template-columns: 1fr 1fr 1fr; } .season-copy { grid-column: 1 / -1; } .pilot-steps { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 700px) { .season-finding { grid-template-columns: 1fr; padding: 44px 0 38px; } .pilot-steps { grid-template-columns: 1fr; } .pilot-path { margin: 60px 0 40px; } }

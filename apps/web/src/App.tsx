@@ -6,7 +6,7 @@ import { dubaiFlag } from '@heatline/climate';
 import { formatClock } from '@heatline/contracts';
 import { Site } from './scene/Site';
 import type { CameraView } from './scene/CameraRig';
-import { CrewCards, DecisionCard, NoorBrief, RedFlags, SiteLog, type DecisionState } from './components/Console';
+import { CrewCards, DecisionCard, NoorBrief, PlanVerdict, RedFlags, SiteLog, finalOf, type DecisionState } from './components/Console';
 import { Phone } from './components/Phone';
 import { Compare } from './components/Compare';
 import { StoryCard } from './components/StoryCard';
@@ -355,7 +355,8 @@ export function App({ scenarioId, startMode, onBrief, onEvidence }: { scenarioId
             </button>
           ))}
         </div>
-        {beat && mode === 'story' && <StoryCard beat={beat} ctx={ctx} metrics={branch.metrics} onContinue={continueStory} onDecideAgain={decideAgain} onCompare={() => { setPlaying(false); setShowCompare(true); }} onExplore={explore} canCompare={!!planBranch} decisionAt={DECISION_AT} />}
+        {showDecision && finalOf(decision) && <PlanVerdict final={finalOf(decision)!} baseline={original.screen} workers={scenario.workers} clock={formatClock(DECISION_AT)} onApprove={approve} onKeep={keep} />}
+        {beat && mode === 'story' && !(showDecision && finalOf(decision)) && <StoryCard beat={beat} ctx={ctx} metrics={branch.metrics} onContinue={continueStory} onDecideAgain={decideAgain} onCompare={() => { setPlaying(false); setShowCompare(true); }} onExplore={explore} canCompare={!!planBranch} decisionAt={DECISION_AT} />}
       </main>
 
       <aside className="console">
@@ -363,7 +364,7 @@ export function App({ scenarioId, startMode, onBrief, onEvidence }: { scenarioId
         {operationsCollapsed && <span className="panel-rail-label">Site operations{showDecision ? ' · Decision waiting' : ''}{flags.length ? ' · Action needed' : ''}</span>}
         <div id="operations-content" hidden={operationsCollapsed}>
         <RedFlags flags={flags} />
-        {showDecision && <DecisionCard clock={formatClock(DECISION_AT)} baseline={original.screen} workers={scenario.workers} state={decision} onAsk={ask} onApprove={approve} onKeep={keep} setAsk={(s) => setDecision((d) => ({ ...d, ask: s }))} />}
+        {showDecision && <DecisionCard clock={formatClock(DECISION_AT)} state={decision} onAsk={ask} onApprove={approve} onKeep={keep} setAsk={(s) => setDecision((d) => ({ ...d, ask: s }))} />}
         <NoorBrief brief={brief} loading={briefLoading} ended={minute >= scenario.end - 6} />
         <details className="panel-section" open><summary>Crew overview <span>{crews.length} crews</span></summary><CrewCards crews={crews} /></details>
         <details className="panel-section"><summary>Shift activity</summary><SiteLog events={branch.run.events} minute={minute} /></details>

@@ -8,3 +8,5 @@ export { SCENARIOS, scenarioSpec, buildCatalogScenario, type ScenarioSpec } from
 export { runBacktest, warningPerformance, WINDOWS, POLICIES, type BacktestReport, type BacktestPolicy, type PolicyTotals, type WarningPerformance } from './backtest';
 
 export { nioshLimitC, screenExposure, type ExposureScreen } from './screening';
+export { buildDayPlan, maxWorkMinutes, weatherRows, type DayPlan, type DayPlanInput, type HourRow, type PourWindow, type RestPlace, type DayLevel, type WorkMinutes } from './dayplan';
+export { briefing, briefingFacts, BRIEFING_LANGUAGES } from './briefing';

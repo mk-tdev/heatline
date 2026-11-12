@@ -102,20 +102,15 @@ export function DecisionCard({
   onKeep,
   setAsk,
   clock,
-  baseline,
-  workers,
 }: {
   clock: string;
-  /** the original schedule's exposure screen, for "down from" */
-  baseline: { exceededWindows: number; assessedWindows: number };
-  workers: { id: string; name: string }[];
   state: DecisionState;
   onAsk: () => void;
   onApprove: () => void;
   onKeep: () => void;
   setAsk: (s: string) => void;
 }) {
-  const final = state.events.find((e): e is Extract<PlannerEvent, { type: 'final' }> => e.type === 'final');
+  const final = finalOf(state);
   const steps = state.events.filter((e) => e.type === 'tool') as Extract<PlannerEvent, { type: 'tool' }>[];
   const status = [...state.events].reverse().find((e) => e.type === 'status') as Extract<PlannerEvent, { type: 'status' }> | undefined;
   return (
@@ -143,48 +138,58 @@ export function DecisionCard({
       )}
       {state.error && <p className="error">{state.error}</p>}
       {final && (
-        <div className={`plan ${final.check.ok ? 'ok' : 'refused'}`}>
-          <div className="plan-head">
-            <strong>{verdict(final.check)}</strong>
-            <small>{final.source === 'model' ? `by ${final.model}` : `rules-only (${final.reason})`}</small>
-          </div>
-          {final.check.ok && final.check.exposureScreen && (
-            <p className="verdict-detail">
-              {final.check.exposureScreen.exceededWindows === 0
-                ? 'Every worker stays under the safe heat-exposure limit for their workload.'
-                : `Workers are over the safe heat-exposure limit for ${pct(final.check.exposureScreen)} of their working time, down from ${pct(baseline)} on the original schedule. It needs more shade or rest, and a professional review, before real work.`}
-            </p>
-          )}
-          <p>{final.rationale}</p>
-          <ul className="levers">
-            <li>Shade tents: {(final.check.plan.tents.map((t) => `${ZONE_NAMES[t.zone] ?? t.zone}, up by ${formatClock(t.readyAt)}`).join('; ')) || 'none'}</li>
-            <li>Concrete pour: {final.check.plan.pourStart === null ? 'not today' : `starts ${formatClock(final.check.plan.pourStart)}`}</li>
-            <li>Indoor duties instead: {((final.levers.standDown as string[] | undefined) ?? []).map((id) => workers.find((w) => w.id === id)?.name ?? id).join(', ') || 'anyone not yet used to the heat'}</li>
-          </ul>
-          {final.check.forecast && (
-            <div className="forecast">
-              <span>If you run it (simulation, to the end of the shift)</span>
-              <b>{final.check.forecast.redFlags}</b> {final.check.forecast.redFlags === 1 ? 'person' : 'people'} with signs of serious heat illness · <b>{final.check.forecast.minutesPsi7}</b> worker-minutes in high heat strain{final.check.forecast.pourStart ? ` · pour ${final.check.forecast.pourStart}–${final.check.forecast.pourFinish ?? '—'}` : ' · no pour'}
-            </div>
-          )}
-          <details className="how-checked">
-            <summary>How this is checked</summary>
-            The site rules (UAE midday break, work and rest limits, shade, water, no working alone) decide whether a plan is allowed. Separately, each worker&apos;s average heat over every hour is compared with the US NIOSH exposure limit for their workload. This is a simulation with made-up workers, not a safety certificate.
-          </details>
-          <div className="buttons">
-            <button className="primary" onClick={onApprove} disabled={!final.check.ok}>
-              Run this simulated plan
-            </button>
-            <button onClick={onKeep}>Keep original schedule</button>
-          </div>
+        <div className={`plan plan-pointer ${final.check.ok ? 'ok' : 'refused'}`}>
+          <strong>{verdict(final.check)}</strong>
+          <small>The full verdict and the choice are on the site view.</small>
         </div>
       )}
-      {!final && !state.running && (
+      {!state.running && (
         <div className="buttons">
+          {final && <button className="primary" onClick={onApprove} disabled={!final.check.ok}>Run this simulated plan</button>}
           <button onClick={onKeep}>Keep original schedule</button>
         </div>
       )}
     </section>
+  );
+}
+
+export type PlannerFinal = Extract<PlannerEvent, { type: 'final' }>;
+export const finalOf = (state: DecisionState): PlannerFinal | undefined => state.events.find((e): e is PlannerFinal => e.type === 'final');
+
+/** Omar's verdict, large, over the site: the moment the supervisor decides. */
+export function PlanVerdict({ final, baseline, workers, clock, onApprove, onKeep }: { final: PlannerFinal; baseline: { exceededWindows: number; assessedWindows: number }; workers: { id: string; name: string }[]; clock: string; onApprove: () => void; onKeep: () => void }) {
+  const screen = final.check.exposureScreen;
+  const tone = !final.check.ok ? 'refused' : screen && screen.exceededWindows > 0 ? 'caution' : 'ok';
+  return (
+    <div className={`verdict-card tone-${tone}`} role="dialog" aria-label="Omar’s plan and verdict">
+      <div className="verdict-top">
+        <span className="avatar omar">O</span>
+        <small>{clock} · Omar’s plan · {final.source === 'model' ? `written by ${final.model}, checked by the site rules` : `rules-only plan (${final.reason})`}</small>
+      </div>
+      <h3>{verdict(final.check)}</h3>
+      {final.check.ok && screen && (
+        <div className="verdict-numbers">
+          <div><b>{pct(baseline)} → {pct(screen)}</b><span>of working time over the safe heat-exposure limit: original schedule → this plan</span></div>
+          {final.check.forecast && <div><b>{final.check.forecast.redFlags}</b><span>{final.check.forecast.redFlags === 1 ? 'person' : 'people'} with signs of serious heat illness if you run it (simulation)</span></div>}
+          {final.check.forecast && <div><b>{final.check.forecast.pourStart ? `${final.check.forecast.pourStart}–${final.check.forecast.pourFinish ?? '—'}` : 'No pour'}</b><span>{final.check.forecast.pourStart ? 'the concrete pour' : 'the truck is sent back today'}</span></div>}
+        </div>
+      )}
+      {final.check.ok && screen && screen.exceededWindows > 0 && <p className="verdict-detail">Following the rules does not make it safe. This plan needs more shade or rest, and a professional review, before real work.</p>}
+      <p className="verdict-rationale">{final.rationale}</p>
+      <ul className="levers">
+        <li>Shade tents: {(final.check.plan.tents.map((t) => `${ZONE_NAMES[t.zone] ?? t.zone}, up by ${formatClock(t.readyAt)}`).join('; ')) || 'none'}</li>
+        <li>Concrete pour: {final.check.plan.pourStart === null ? 'not today' : `starts ${formatClock(final.check.plan.pourStart)}`}</li>
+        <li>Indoor duties instead: {((final.levers.standDown as string[] | undefined) ?? []).map((id) => workers.find((w) => w.id === id)?.name ?? id).join(', ') || 'anyone not yet used to the heat'}</li>
+      </ul>
+      <details className="how-checked">
+        <summary>How this is checked</summary>
+        The site rules (UAE midday break, work and rest limits, shade, water, no working alone) decide whether a plan is allowed. Separately, each worker&apos;s average heat over every hour is compared with the US NIOSH exposure limit for their workload. This is a simulation with made-up workers, not a safety certificate.
+      </details>
+      <div className="buttons">
+        <button className="primary" onClick={onApprove} disabled={!final.check.ok}>Run this simulated plan</button>
+        <button onClick={onKeep}>Keep original schedule</button>
+      </div>
+    </div>
   );
 }
 

@@ -1,6 +1,6 @@
 # Scientific basis and claim boundaries
 
-Updated 7 November 2026. Heatline is a worker-first planning and training prototype, demonstrated with synthetic workers. It is not a medical device, a certified exposure monitor, or a UAE compliance assessment.
+Updated 11 November 2026. Heatline is a worker-first planning and training prototype, demonstrated with synthetic workers. It is not a medical device, a certified exposure monitor, or a UAE compliance assessment.
 
 ## What is supported
 
@@ -8,6 +8,25 @@ Updated 7 November 2026. Heatline is a worker-first planning and training protot
 - The Liljegren implementation is regression-checked against ECMWF thermofeel on 744 hours. This verifies numerical agreement, not site accuracy or physiology.
 - NIOSH acclimatisation guidance supports gradual exposure: new workers 20% on day one with increases of no more than 20% daily; experienced returning workers 50/60/80/100%. The current scenario assumes an eight-hour usual exposure day and a conservative 14-day acclimatised classification. These are explicit scenario assumptions, not universal clinical cutoffs.
 - Emergency and warning actions are deterministic. Emergency text is fixed; it does not recommend oral fluids to potentially confused workers. Draft translations still require native-speaker and occupational-health review.
+
+## Shift planner: weather to work and rest minutes
+
+`packages/sim/src/dayplan.ts` builds a day plan from 24 hours of weather and a location. It uses no simulated workers and none of the teaching physiology.
+
+- WBGT in sun and shade is computed with the same Liljegren code as the 3D site, averaged over each hour from six samples.
+- For each hour it finds the longest work period, in five-minute steps, for which the hour's time-weighted WBGT is at or below the NIOSH limit for the hour's time-weighted metabolic rate: the REL for acclimatised workers and the RAL for unacclimatised workers. Work is in the sun at 180, 300 or 415 W; rest is at 115 W in shade or in a cooled room taken as 21 °C WBGT. This follows the time-weighted-average method in NIOSH 2016-106.
+- A clothing adjustment (0, +1 or +3 °C) is added to the WBGT while working.
+- The pour window is the start time, on a 15-minute grid outside the midday break, with the lowest mean WBGT in the sun. It is checked as continuous heavy work, because a pour cannot pause.
+- The hour's risk word describes how much steady moderate work it allows with only shade to rest in (all hour, at least half, at least ten minutes, less). The four bands are our presentation choice, not a published scale.
+- Water guidance (about one cup every 15–20 minutes) is the NIOSH recommendation for work in the heat.
+
+Limits. Forecast and reanalysis weather describe a grid square of several kilometres, not the site; forecast error is not shown. The 21 °C cooled-room value, the metabolic rates and the clothing adjustments are assumptions to be checked for each site and job. NIOSH limits are screening limits for healthy workers and do not replace the Thermal Work Limit assessment that Abu Dhabi's code requires. The briefing sentences are fixed text with numbers from the plan; the translations are drafts.
+
+## Ban-season weather analysis
+
+`npm run season` computes the same hourly quantities for every day from 15 June to 15 September in 2025 and 2026 at the grid point nearest Saadiyat Island (186 days, 2,604 working hours from 05:00 to 19:00) and writes `data/season/abu-dhabi-ban-season.json`. Results: 94% of working hours were above the NIOSH limit for continuous moderate work in the sun (28.2 °C WBGT); 19% of those hours lie inside the 12:30–15:00 break; from 15:00 to 18:00, 99.8% of hours were above the limit in the sun and 99% in shade; the mean heavy-work allowance in those hours was 6 minutes per hour with rest in shade and 35 with rest in a cooled room.
+
+What this does and does not show. It shows that, on this weather record and against this limit, the midday break leaves most over-limit hours to be managed by work and rest cycles and cooling. It does not show how many workers were harmed, and it is not a measurement on any site. "Above the limit" means controls are needed, not that work is prohibited. Two seasons at one grid point are not a climatology.
 
 ## Demonstration policy is not TWL
 

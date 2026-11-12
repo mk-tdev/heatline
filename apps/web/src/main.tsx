@@ -4,6 +4,7 @@ import { App, type Mode } from './App';
 import { Intro } from './components/Intro';
 import { LandingExplore } from './scene/LandingExplore';
 import { Evidence } from './components/Evidence';
+import { Planner } from './planner/Planner';
 import './styles.css';
 import './experience.css';
 
@@ -24,11 +25,21 @@ function Root() {
   const [desktopNotice, setDesktopNotice] = useState(false);
   const [evidence, setEvidence] = useState(false);
   const [playground, setPlayground] = useState(false);
+  // The shift planner has its own address (#plan) so it can be linked and opened on a phone.
+  const [planner, setPlanner] = useState(() => window.location.hash.startsWith('#plan'));
+  useEffect(() => {
+    const sync = () => setPlanner(window.location.hash.startsWith('#plan'));
+    window.addEventListener('hashchange', sync);
+    return () => window.removeEventListener('hashchange', sync);
+  }, []);
+  const openPlanner = () => { window.location.hash = '#plan'; };
+  const closePlanner = () => { history.replaceState(null, '', window.location.pathname); setPlanner(false); };
   const needsDesktop = () => window.innerWidth < 1024 || /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   return (
     <>
       {run && <App key={run.key} scenarioId={run.scenario} startMode={run.mode} onBrief={() => setRun(null)} onEvidence={() => setEvidence(true)} />}
-      {!run && <Intro onExploreFoot={() => { if (needsDesktop()) setDesktopNotice(true); else setPlayground(true); }} onStart={(scenario, mode) => { if (needsDesktop()) setDesktopNotice(true); else setRun({ scenario, mode, key: Date.now() }); }} onEvidence={() => setEvidence(true)} />}
+      {planner && !run && <Planner onClose={closePlanner} onRehearse={() => { closePlanner(); if (needsDesktop()) setDesktopNotice(true); else setRun({ scenario: 'afternoon-pour', mode: 'story', key: Date.now() }); }} />}
+      {!run && !planner && <Intro onPlan={openPlanner} onExploreFoot={() => { if (needsDesktop()) setDesktopNotice(true); else setPlayground(true); }} onStart={(scenario, mode) => { if (needsDesktop()) setDesktopNotice(true); else setRun({ scenario, mode, key: Date.now() }); }} onEvidence={() => setEvidence(true)} />}
       {playground && <LandingExplore onClose={() => setPlayground(false)} />}
       {desktopNotice && <DesktopNotice onClose={() => setDesktopNotice(false)} />}
       {evidence && <Evidence onClose={() => setEvidence(false)} />}

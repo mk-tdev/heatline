@@ -3,6 +3,8 @@
 
 import report from '../../../../data/backtest/august-2025.json';
 import type { BacktestReport, PolicyTotals } from '@heatline/sim';
+import { formatClock } from '@heatline/contracts';
+import { season } from '../season';
 
 const r = report as unknown as BacktestReport;
 const median = (xs: number[]) => (xs.length ? [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)]! : null);
@@ -28,15 +30,64 @@ export function Evidence({ onClose }: { onClose: () => void }) {
       <div className="evidence">
         <header>
           <div>
-            <strong>What happened across August 2025</strong>
-            <small>
-              Every day of the month, three shifts a day ({r.windows.map((x) => x.label).join(', ')}): {shifts} shifts of 20 workers, each played four ways. Real weather for Saadiyat Island.
-            </small>
+            <strong>The evidence</strong>
+            <small>First, what real weather says on its own. Then what a month of simulated shifts adds, and where it could be wrong.</small>
           </div>
           <button onClick={onClose}>Close</button>
         </header>
 
-        <p className="science-note">The weather is real. The workers and their bodies are simulated, so these are experiments, not measured health outcomes. A plan can follow the site rules and still be over the safe heat-exposure limit; both are shown.</p>
+        <h3 className="ev-part">1 · Real weather, no simulation</h3>
+        <p className="ev-lead">
+          Every working hour (05:00–19:00) of the {season.yearsLabel} midday-break seasons near Saadiyat Island: {season.days} days. Heat stress (WBGT) is calculated from reanalysis weather and compared with the US NIOSH limit for steady moderate work by people used to the heat ({season.limitModerate.toFixed(1)} °C). No workers are simulated here.
+        </p>
+        <section className="ev-kpis">
+          <div>
+            <b>{season.overLimitPct}%</b>
+            <span>of working hours were over the limit for steady moderate work in the sun: about {Math.round(season.overLimitHoursPerDay)} of {season.hoursPerDay} hours a day</span>
+          </div>
+          <div>
+            <b>{season.insideBreakPct}%</b>
+            <span>of those over-limit hours fall inside the 12:30–15:00 midday break. The rest have to be managed on site</span>
+          </div>
+          <div>
+            <b>{season.afterBreakOverPct}%</b>
+            <span>of hours from 15:00 to 18:00 were still over the limit in the sun; {season.afterBreakShadeOverPct}% were over it even in shade</span>
+          </div>
+          <div>
+            <b>{season.heavyMinShade} → {season.heavyMinCoolRoom} min</b>
+            <span>of heavy work per hour within the limit after 15:00: resting in shade, and resting in a cooled room</span>
+          </div>
+        </section>
+        <table className="compact-table">
+          <thead>
+            <tr>
+              <th>Hour</th>
+              {season.report.years.map((y) => <th key={y.year}>{y.year}: mean WBGT in sun / shade</th>)}
+              {season.report.years.map((y) => <th key={y.year}>{y.year}: days over the limit</th>)}
+              <th>Heavy work per hour: cooled room / shade</th>
+            </tr>
+          </thead>
+          <tbody>
+            {season.report.years[0]!.byHour.map((h, i) => (
+              <tr key={h.from} className={h.from === 780 || h.from === 840 ? 'ev-break' : ''}>
+                <td>{formatClock(h.from)}{h.from === 780 || h.from === 840 ? <small>midday break</small> : null}</td>
+                {season.report.years.map((y) => <td key={y.year}>{y.byHour[i]!.meanWbgtSun.toFixed(1)}° / {y.byHour[i]!.meanWbgtShade.toFixed(1)}°</td>)}
+                {season.report.years.map((y) => <td key={y.year}>{Math.round(y.byHour[i]!.daysOverModerateLimitPct)}%</td>)}
+                <td>{Math.round(season.report.years.reduce((sum, y) => sum + y.byHour[i]!.meanHeavyMinCoolRoom, 0) / season.report.years.length)} / {Math.round(season.report.years.reduce((sum, y) => sum + y.byHour[i]!.meanHeavyMinShade, 0) / season.report.years.length)} min</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div className="ev-notes">
+          <p><b>What this means.</b> The midday break removes the hottest two and a half hours. The hours either side still need work and rest cycles, and shade alone leaves almost no room for heavy work. A cooled rest room is what makes afternoon work possible within the limit. That is the planning problem Heatline addresses.</p>
+          <p><b>Limits of this finding.</b> The weather is a reanalysis for a grid square of several kilometres, not an instrument on a site, and real sites can be hotter. Being over the limit means work needs controls, not that it is banned. Abu Dhabi’s own code asks for a Thermal Work Limit assessment, which this is not. Regenerate with <code>npm run season</code>.</p>
+        </div>
+
+        <h3 className="ev-part">2 · A month of simulated shifts</h3>
+        <p className="ev-lead">
+          Every day of August 2025, three shifts a day ({r.windows.map((x) => x.label).join(', ')}): {shifts} shifts of 20 synthetic workers, each played four ways on the real weather.
+        </p>
+        <p className="science-note">The workers and their bodies are simulated with a simple teaching model, so these are experiments, not measured health outcomes. The model produces far more serious cases than real sites report. Use it to compare one approach with another on the same day, not to predict how many people would fall ill.</p>
         <section className="ev-kpis">
           <div>
             <b>{pct(w.detected, w.episodes)}</b>
@@ -56,9 +107,9 @@ export function Evidence({ onClose }: { onClose: () => void }) {
           </div>
           <div>
             <b>
-              {r.totals['no-action'].redFlags} → {r.totals['heatline-plan'].redFlags}
+              {pct(r.totals['no-action'].nioshExceededWindows, r.totals['no-action'].nioshAssessedWindows)} → {pct(r.totals['heatline-plan'].nioshExceededWindows, r.totals['heatline-plan'].nioshAssessedWindows)}
             </b>
-            <span>people with signs of serious heat illness: doing nothing → Heatline with an approved plan</span>
+            <span>of worker time over the NIOSH exposure limit: original schedule → Heatline with an approved plan. This check does not use the body model</span>
           </div>
         </section>
 
