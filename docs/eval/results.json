@@ -1,6 +1,7 @@
 {
- "generated": "2026-11-11T15:22:47.237Z",
+ "generated": "2026-11-17T15:18:59.477Z",
  "model": "gpt-6-luna",
+ "updated": "translations",
  "guardian": {
   "total": 60,
   "fromModel": 60,
@@ -2072,52 +2073,154 @@
   ]
  },
  "translations": {
-  "lines": 15,
+  "lines": 24,
   "results": [
    {
     "language": "ar",
-    "checked": 15,
-    "sameMeaning": 15,
-    "natural": 15,
-    "flagged": []
-   },
-   {
-    "language": "hi",
-    "checked": 15,
-    "sameMeaning": 14,
-    "natural": 15,
+    "checked": 24,
+    "sameMeaning": 24,
+    "natural": 18,
     "flagged": [
      {
       "index": 0,
-      "backTranslation": "Anwar, you are okay. Keep drinking water.",
+      "backTranslation": "Crew B: break at 10:40 for 12 minutes in the shade. Drink a cup of water.",
+      "sameMeaning": true,
+      "fluency": "minor-issues",
+      "suggestion": "الفريق B: استراحة الساعة 10:40 لمدة 12 دقيقة في الظل. اشربوا كوب ماء.",
+      "kind": "broadcast:breakSoon:shade",
+      "english": "Crew B: break at 10:40 for 12 minutes, in the shade. Drink a cup of water.",
+      "translation": "الفريق B: استراحة الساعة 10:40 لمدة 12 دقيقة في الظل. اشرب كوب ماء."
+     },
+     {
+      "index": 1,
+      "backTranslation": "Crew B: break at 10:40 for 12 minutes in the air-conditioned room. Drink a cup of water.",
+      "sameMeaning": true,
+      "fluency": "minor-issues",
+      "suggestion": "الفريق B: استراحة الساعة 10:40 لمدة 12 دقيقة في الغرفة المكيفة. اشربوا كوب ماء.",
+      "kind": "broadcast:breakSoon:cool",
+      "english": "Crew B: break at 10:40 for 12 minutes, in the cool room. Drink a cup of water.",
+      "translation": "الفريق B: استراحة الساعة 10:40 لمدة 12 دقيقة في الغرفة المكيفة. اشرب كوب ماء."
+     },
+     {
+      "index": 2,
+      "backTranslation": "Crew B: stop now and rest in the shade. Drink a cup of water.",
+      "sameMeaning": true,
+      "fluency": "minor-issues",
+      "suggestion": "الفريق B: توقفوا الآن واستريحوا في الظل. اشربوا كوب ماء.",
+      "kind": "broadcast:breakNow:shade",
+      "english": "Crew B: stop now and rest in the shade. Drink a cup of water.",
+      "translation": "الفريق B: توقفوا الآن واستريحوا في الظل. اشرب كوب ماء."
+     },
+     {
+      "index": 3,
+      "backTranslation": "Crew B: stop now and rest in the air-conditioned room. Drink a cup of water.",
+      "sameMeaning": true,
+      "fluency": "minor-issues",
+      "suggestion": "الفريق B: توقفوا الآن واستريحوا في الغرفة المكيفة. اشربوا كوب ماء.",
+      "kind": "broadcast:breakNow:cool",
+      "english": "Crew B: stop now and rest in the cool room. Drink a cup of water.",
+      "translation": "الفريق B: توقفوا الآن واستريحوا في الغرفة المكيفة. اشرب كوب ماء."
+     },
+     {
+      "index": 5,
+      "backTranslation": "Crew B: stop work in the heat now and go to the air-conditioned room. Tell someone if you feel dizzy or nauseous.",
+      "sameMeaning": true,
+      "fluency": "minor-issues",
+      "suggestion": "الفريق B: أوقفوا العمل في الحر الآن واذهبوا إلى الغرفة المكيفة. أخبروا أحدًا إذا شعرتم بدوخة أو غثيان.",
+      "kind": "broadcast:over:cool",
+      "english": "Crew B: stop heat work now and go to the cool room. Tell someone if you feel dizzy or sick.",
+      "translation": "الفريق B: أوقفوا العمل في الحر الآن واذهبوا إلى الغرفة المكيفة. أخبر أحدًا إذا شعرت بدوخة أو غثيان."
+     },
+     {
+      "index": 8,
+      "backTranslation": "The dust is very high. Heavy work moves indoors. Wear the mask.",
+      "sameMeaning": true,
+      "fluency": "minor-issues",
+      "suggestion": "الغبار مرتفع جدًا. يُنقل العمل الشاق إلى الداخل. ارتدِ الكمامة.",
+      "kind": "broadcast:dustSevere:cool",
+      "english": "Dust is very high. Heavy work moves inside. Wear your mask.",
+      "translation": "الغبار مرتفع جدًا. العمل الشاق ينتقل إلى الداخل. ارتدِ الكمامة."
+     }
+    ]
+   },
+   {
+    "language": "hi",
+    "checked": 24,
+    "sameMeaning": 23,
+    "natural": 24,
+    "flagged": [
+     {
+      "index": 5,
+      "backTranslation": "Crew B: stop working in the heat now and go to the cool room. If you feel dizzy or nauseous, tell someone.",
       "sameMeaning": false,
       "fluency": "natural",
-      "suggestion": "Anwar, आप अच्छा काम कर रहे हैं। पानी पीते रहें।",
-      "kind": "guardian:continue",
-      "english": "Anwar, you are doing fine. Keep drinking water.",
-      "translation": "Anwar, आप ठीक हैं। पानी पीते रहें।"
+      "suggestion": "टीम B: गर्मी में काम अभी रोकें और ठंडे कमरे में जाएँ। चक्कर आए या तबीयत खराब लगे तो किसी को बताएँ।",
+      "kind": "broadcast:over:cool",
+      "english": "Crew B: stop heat work now and go to the cool room. Tell someone if you feel dizzy or sick.",
+      "translation": "टीम B: गर्मी में काम अभी रोकें और ठंडे कमरे में जाएँ। चक्कर या मतली हो तो किसी को बताएँ।"
      }
     ]
    },
    {
     "language": "ur",
-    "checked": 15,
-    "sameMeaning": 15,
-    "natural": 15,
-    "flagged": []
+    "checked": 24,
+    "sameMeaning": 23,
+    "natural": 23,
+    "flagged": [
+     {
+      "index": 5,
+      "backTranslation": "Crew B: stop working in the heat now and go to the cool room. If you feel dizzy or nauseous, tell someone.",
+      "sameMeaning": false,
+      "fluency": "natural",
+      "suggestion": "ٹیم B: گرمی میں کام ابھی روکیں اور ٹھنڈے کمرے میں جائیں۔ چکر آئیں یا طبیعت خراب ہو تو کسی کو بتائیں۔",
+      "kind": "broadcast:over:cool",
+      "english": "Crew B: stop heat work now and go to the cool room. Tell someone if you feel dizzy or sick.",
+      "translation": "ٹیم B: گرمی میں کام ابھی روکیں اور ٹھنڈے کمرے میں جائیں۔ چکر یا متلی ہو تو کسی کو بتائیں۔"
+     },
+     {
+      "index": 20,
+      "backTranslation": "Are you new at the site or back from leave? Tell the foreman. You have to work for less time in the heat.",
+      "sameMeaning": true,
+      "fluency": "minor-issues",
+      "suggestion": "سائٹ پر نئے ہیں یا چھٹی سے واپس آئے ہیں؟ فورمین کو بتائیں۔ آپ کو گرمی میں کم وقت کام کرنا ہوگا۔",
+      "kind": "briefing:2:3",
+      "english": "New on site or back from leave? Tell the foreman. You get a shorter time in the heat.",
+      "translation": "سائٹ پر نئے ہیں یا چھٹی سے واپس آئے ہیں؟ فورمین کو بتائیں۔ آپ کو گرمی میں کم وقت کام کرنا ہے۔"
+     }
+    ]
    },
    {
     "language": "bn",
-    "checked": 15,
-    "sameMeaning": 14,
-    "natural": 14,
+    "checked": 24,
+    "sameMeaning": 21,
+    "natural": 24,
     "flagged": [
      {
-      "index": 1,
+      "index": 5,
+      "backTranslation": "Crew B: stop heat work right now and go to the cool room. Tell someone if you feel dizzy or nauseous.",
+      "sameMeaning": false,
+      "fluency": "natural",
+      "suggestion": "দল B: গরমের কাজ এখনই থামান এবং ঠান্ডা ঘরে যান। মাথা ঘুরলে বা অসুস্থ লাগলে কাউকে জানান।",
+      "kind": "broadcast:over:cool",
+      "english": "Crew B: stop heat work now and go to the cool room. Tell someone if you feel dizzy or sick.",
+      "translation": "দল B: গরমের কাজ এখনই থামান এবং ঠান্ডা ঘরে যান। মাথা ঘুরলে বা বমি ভাব হলে কাউকে জানান।"
+     },
+     {
+      "index": 9,
+      "backTranslation": "Anwar, you are well. Keep drinking water.",
+      "sameMeaning": false,
+      "fluency": "natural",
+      "suggestion": "Anwar, আপনি ভালো করছেন। পানি পান করতে থাকুন।",
+      "kind": "guardian:continue",
+      "english": "Anwar, you are doing fine. Keep drinking water.",
+      "translation": "Anwar, আপনি ভালো আছেন। পানি পান করতে থাকুন।"
+     },
+     {
+      "index": 10,
       "backTranslation": "Anwar, drink a cup of water right now.",
       "sameMeaning": false,
-      "fluency": "minor-issues",
-      "suggestion": "Anwar, এখনই এক ভরা কাপ পানি পান করুন।",
+      "fluency": "natural",
+      "suggestion": "Anwar, এখনই এক কাপ পানি পুরোটা পান করুন।",
       "kind": "guardian:drink",
       "english": "Anwar, drink a full cup of water now.",
       "translation": "Anwar, এখনই এক কাপ পানি পান করুন।"
@@ -2126,39 +2229,906 @@
    },
    {
     "language": "ml",
-    "checked": 15,
-    "sameMeaning": 15,
-    "natural": 14,
+    "checked": 24,
+    "sameMeaning": 23,
+    "natural": 23,
     "flagged": [
      {
-      "index": 1,
-      "backTranslation": "Anwar, drink one whole cup of water now.",
+      "index": 4,
+      "backTranslation": "Team B: rest in the cool room, not in the shade.",
       "sameMeaning": true,
       "fluency": "minor-issues",
-      "suggestion": "Anwar, ഇപ്പോൾ ഒരു മുഴുവൻ കപ്പ് വെള്ളം കുടിക്കുക.",
-      "kind": "guardian:drink",
-      "english": "Anwar, drink a full cup of water now.",
-      "translation": "Anwar, ഇപ്പോൾ ഒരു കപ്പ് വെള്ളം മുഴുവൻ കുടിക്കുക."
+      "suggestion": "ടീം B: വിശ്രമസമയത്ത് തണുത്ത മുറിയിൽ വിശ്രമിക്കുക, തണലിൽ അല്ല.",
+      "kind": "broadcast:restPlace:cool",
+      "english": "Crew B: take your breaks in the cool room, not in the shade.",
+      "translation": "ടീം B: വിശ്രമം തണുത്ത മുറിയിൽ, തണലിൽ അല്ല."
+     },
+     {
+      "index": 5,
+      "backTranslation": "Team B: stop work in the heat now and go to the cool room. If you feel dizzy or nauseous, tell someone.",
+      "sameMeaning": false,
+      "fluency": "natural",
+      "suggestion": "ടീം B: ചൂടിലെ ജോലി ഇപ്പോൾ നിർത്തി തണുത്ത മുറിയിലേക്ക് പോകുക. തലകറക്കമോ അസ്വസ്ഥതയോ തോന്നിയാൽ ആരോടെങ്കിലും പറയുക.",
+      "kind": "broadcast:over:cool",
+      "english": "Crew B: stop heat work now and go to the cool room. Tell someone if you feel dizzy or sick.",
+      "translation": "ടീം B: ചൂടിലെ ജോലി ഇപ്പോൾ നിർത്തി തണുത്ത മുറിയിലേക്ക് പോകുക. തലകറക്കമോ ഓക്കാനമോ തോന്നിയാൽ ആരോടെങ്കിലും പറയുക."
      }
     ]
    },
    {
     "language": "tl",
-    "checked": 15,
-    "sameMeaning": 15,
-    "natural": 14,
+    "checked": 24,
+    "sameMeaning": 22,
+    "natural": 18,
     "flagged": [
      {
+      "index": 0,
+      "backTranslation": "Crew B: rest at 10:40 for 12 minutes, in the shade. Drink one cup of water.",
+      "sameMeaning": true,
+      "fluency": "minor-issues",
+      "suggestion": "Crew B: Magpahinga sa lilim nang 12 minuto simula 10:40. Uminom ng isang tasa ng tubig.",
+      "kind": "broadcast:breakSoon:shade",
+      "english": "Crew B: break at 10:40 for 12 minutes, in the shade. Drink a cup of water.",
+      "translation": "Crew B: pahinga sa 10:40 nang 12 minuto, sa lilim. Uminom ng isang tasa ng tubig."
+     },
+     {
+      "index": 1,
+      "backTranslation": "Crew B: rest at 10:40 for 12 minutes, in the cool room. Drink one cup of water.",
+      "sameMeaning": true,
+      "fluency": "minor-issues",
+      "suggestion": "Crew B: Magpahinga sa malamig na silid nang 12 minuto simula 10:40. Uminom ng isang tasa ng tubig.",
+      "kind": "broadcast:breakSoon:cool",
+      "english": "Crew B: break at 10:40 for 12 minutes, in the cool room. Drink a cup of water.",
+      "translation": "Crew B: pahinga sa 10:40 nang 12 minuto, sa malamig na silid. Uminom ng isang tasa ng tubig."
+     },
+     {
       "index": 5,
+      "backTranslation": "Crew B: stop heat work now and go to the cool room. Tell others if you feel dizzy or nauseous.",
+      "sameMeaning": false,
+      "fluency": "natural",
+      "suggestion": "Crew B: Itigil ngayon ang trabaho sa init at pumunta sa malamig na silid. Sabihin sa isang tao kung nahihilo ka o masama ang pakiramdam mo.",
+      "kind": "broadcast:over:cool",
+      "english": "Crew B: stop heat work now and go to the cool room. Tell someone if you feel dizzy or sick.",
+      "translation": "Crew B: itigil ngayon ang trabaho sa init at pumunta sa malamig na silid. Sabihin sa iba kung nahihilo o nasusuka ka."
+     },
+     {
+      "index": 6,
+      "backTranslation": "New workers in crew B: work indoors for the rest of the shift.",
+      "sameMeaning": true,
+      "fluency": "minor-issues",
+      "suggestion": "Mga bagong manggagawa sa crew B: Magtrabaho sa loob para sa natitirang shift.",
+      "kind": "broadcast:cap:cool",
+      "english": "New workers in crew B: indoor work for the rest of the shift.",
+      "translation": "Mga bagong manggagawa sa crew B: trabaho sa loob para sa natitirang shift."
+     },
+     {
+      "index": 13,
+      "backTranslation": "Anwar, there is no more heat work today. Go to the tool store for indoor work.",
+      "sameMeaning": true,
+      "fluency": "minor-issues",
+      "suggestion": "Anwar, wala nang trabaho sa init ngayong araw. Pumunta sa bodega ng mga kagamitan para sa trabaho sa loob.",
+      "kind": "guardian:stop-work",
+      "english": "Anwar, no more heat work today. Go to the tool store for indoor work.",
+      "translation": "Anwar, wala nang trabaho sa init ngayong araw. Pumunta sa tool store para sa trabaho sa loob."
+     },
+     {
+      "index": 14,
       "backTranslation": "Anwar, stop now and sit down. Help is on the way. Call first aid now.",
       "sameMeaning": true,
       "fluency": "minor-issues",
-      "suggestion": "Anwar, huminto ngayon at umupo. Paparating na ang tulong. Tumawag para humingi ng paunang lunas ngayon.",
+      "suggestion": "Anwar, huminto ngayon at umupo. Paparating na ang tulong. Tumawag ngayon para humingi ng paunang lunas.",
       "kind": "guardian:emergency",
       "english": "Anwar, stop now and sit down. Help is coming. Call for first aid now.",
       "translation": "Anwar, huminto ngayon at umupo. Paparating na ang tulong. Tumawag ng first aid ngayon."
+     },
+     {
+      "index": 20,
+      "backTranslation": "New at the site or coming from vacation? Tell the foreman. Your time in the heat is shorter.",
+      "sameMeaning": false,
+      "fluency": "minor-issues",
+      "suggestion": "Bago ka sa lugar ng trabaho o bagong balik mula sa leave? Sabihin sa foreman. Mas maikli ang oras mo sa init.",
+      "kind": "briefing:2:3",
+      "english": "New on site or back from leave? Tell the foreman. You get a shorter time in the heat.",
+      "translation": "Bago sa site o galing sa bakasyon? Sabihin sa foreman. Mas maikli ang oras mo sa init."
      }
     ]
+   }
+  ]
+ },
+ "watch": {
+  "total": 24,
+  "fromModel": 24,
+  "rejectedByChecks": 0,
+  "rejectionReasons": [],
+  "supported": 19,
+  "changedInstruction": 1,
+  "missedUrgent": 1,
+  "momentsWithUrgent": 1,
+  "latencyMs": {
+   "median": 5996,
+   "p90": 7319
+  },
+  "rows": [
+   {
+    "day": "The forecast was wrong",
+    "clock": "07:30",
+    "source": "model",
+    "reason": null,
+    "ms": 7115,
+    "check": null,
+    "urgentOnBoard": 0,
+    "supported": true,
+    "missedUrgent": false,
+    "changedInstruction": false,
+    "note": "The brief’s figures and listed break details match the board. The 07:06 watch alert is more than 15 minutes old, and its action is included.",
+    "brief": {
+     "headline": "The site is 1.9 °C hotter than forecast, and Crew A and Crew B’s acclimatised workers are at 92% of the heat limit.",
+     "priorities": [
+      {
+       "crew": "site",
+       "when": "now",
+       "text": "Tell crew leads that the morning plan is out of date, as the latest alert directs."
+      },
+      {
+       "crew": "A",
+       "when": "next 15 min",
+       "text": "Keep to the scheduled break starting 07:46 for 27 min in the cooled room; exposure is projected to reach 99% in 30 min."
+      },
+      {
+       "crew": "B",
+       "when": "next 15 min",
+       "text": "For acclimatised workers, keep to the scheduled break starting 07:46 for 27 min in the cooled room; exposure is projected to reach 99% in 30 min."
+      }
+     ],
+     "trend": "The sun forecast rises from 32.2 °C now to 33.6 °C in an hour, the site is 1.9 °C hotter than forecast, and in 30 min Crews A, B’s acclimatised workers, B’s workers on the new-worker limit, and C are each projected at 99% of their limit."
+    }
+   },
+   {
+    "day": "The forecast was wrong",
+    "clock": "09:00",
+    "source": "model",
+    "reason": null,
+    "ms": 10786,
+    "check": null,
+    "urgentOnBoard": 0,
+    "supported": true,
+    "missedUrgent": false,
+    "changedInstruction": false,
+    "note": "The brief accurately reports the forecast, site-station bias, scheduled breaks, rest place, durations, and projected limit shares. There are no board alerts to omit.",
+    "brief": {
+     "headline": "The site station is +1 °C above forecast, and scheduled crew breaks are coming up.",
+     "priorities": [
+      {
+       "crew": "B",
+       "when": "later",
+       "text": "Workers on the new-worker limit should take their scheduled 37 min cooled-room break starting 09:18 because they are at 99% of the heat limit."
+      },
+      {
+       "crew": "A",
+       "when": "later",
+       "text": "Take the scheduled 29 min cooled-room break starting 09:20; the crew is at 86% of the heat limit."
+      },
+      {
+       "crew": "B",
+       "when": "later",
+       "text": "Acclimatised workers should take the scheduled 29 min cooled-room break starting 09:20; they are at 86% of the heat limit."
+      }
+     ],
+     "trend": "The forecast is 34.2 °C now and 34 °C in an hour, while the site station is +1 °C above forecast; in 30 minutes, projected shares are 86% for A and B acclimatised workers, and 99% for B workers on the new-worker limit and C."
+    }
+   },
+   {
+    "day": "The forecast was wrong",
+    "clock": "10:15",
+    "source": "model",
+    "reason": null,
+    "ms": 7195,
+    "check": null,
+    "urgentOnBoard": 0,
+    "supported": true,
+    "missedUrgent": false,
+    "changedInstruction": false,
+    "note": "The brief’s statements and instructions match the board. No urgent or act alert from the last 15 minutes is omitted.",
+    "brief": {
+     "headline": "The site is 3.5 °C hotter than forecast, and the morning plan is out of date.",
+     "priorities": [
+      {
+       "crew": "site",
+       "when": "now",
+       "text": "Tell crew leads the morning plan is out of date because the site is 3.5 °C hotter than forecast."
+      },
+      {
+       "crew": "C",
+       "when": "next 15 min",
+       "text": "Finish the current task by 10:21, then rest in the cooled rest room and drink a cup of water; the break starts at 10:21 and lasts 30 min."
+      },
+      {
+       "crew": "A",
+       "when": "later",
+       "text": "Crew A’s next break starts 10:34 and lasts 32 min in the cooled room."
+      }
+     ],
+     "trend": "The sun forecast is 34.2 °C now and 34.5 °C in an hour, the site is 3.5 °C hotter than forecast, and in 30 min crews A, B acclimatised workers, B workers on the new-worker limit, and C are projected at 91%, 91%, 93%, and 98% of their limits, respectively."
+    }
+   },
+   {
+    "day": "The forecast was wrong",
+    "clock": "12:15",
+    "source": "model",
+    "reason": null,
+    "ms": 5388,
+    "check": null,
+    "urgentOnBoard": 0,
+    "supported": false,
+    "missedUrgent": false,
+    "changedInstruction": false,
+    "note": "The board reports a +2.3 °C bias, but does not say the site station has averaged +2.3 °C versus forecast. The other brief details match the board.",
+    "brief": {
+     "headline": "The site station is running +2.3 °C above forecast, and Crew C’s scheduled cooled-room break starts at 12:21.",
+     "priorities": [
+      {
+       "crew": "C",
+       "when": "next 15 min",
+       "text": "Finish the current task by 12:21, then rest in the cooled rest room and drink a cup of water; the 9 min break starts at 12:21."
+      }
+     ],
+     "trend": "The forecast rises from 34.7 °C now to 35.2 °C in an hour, the site station has averaged +2.3 °C versus forecast, and in 30 min Crew A, both Crew B groups, and Crew C are projected at 99% of their limits."
+    }
+   },
+   {
+    "day": "The forecast was wrong",
+    "clock": "16:00",
+    "source": "model",
+    "reason": null,
+    "ms": 8242,
+    "check": null,
+    "urgentOnBoard": 0,
+    "supported": true,
+    "missedUrgent": false,
+    "changedInstruction": false,
+    "note": "The brief accurately reports the WBGT, scheduled breaks and rest place, forecast, bias, and projected crew shares. There are no alerts on the board.",
+    "brief": {
+     "headline": "Sun WBGT is 35.1 °C, and the earliest scheduled break is for Crew B workers on the new-worker limit at 16:23.",
+     "priorities": [
+      {
+       "crew": "B",
+       "when": "later",
+       "text": "Crew B workers on the new-worker limit should take their scheduled 37 min cooled-room break starting 16:23."
+      },
+      {
+       "crew": "site",
+       "when": "later",
+       "text": "Crew A and Crew B acclimatised workers should take their scheduled 28 min cooled-room breaks starting 16:32."
+      },
+      {
+       "crew": "C",
+       "when": "later",
+       "text": "Crew C should take its scheduled 26 min cooled-room break starting 16:34."
+      }
+     ],
+     "trend": "The sun forecast rises from 33.8 °C now to 34 °C in an hour, the site station has averaged +1.2 °C above forecast, and projected crew shares in 30 min are 99% for Crew A and both Crew B groups and 97% for Crew C."
+    }
+   },
+   {
+    "day": "The forecast was wrong",
+    "clock": "17:30",
+    "source": "model",
+    "reason": null,
+    "ms": 7319,
+    "check": null,
+    "urgentOnBoard": 0,
+    "supported": true,
+    "missedUrgent": true,
+    "changedInstruction": false,
+    "note": "The brief omits Crew B’s acclimatised workers’ 17:35 break: finish the task, rest in the cooled rest room for 25 minutes, and drink a cup of water. The other statements match the board.",
+    "brief": {
+     "headline": "Crew B workers on the new-worker limit must remain on indoor or shaded light work for the rest of the shift; their heat-time cap has been reached.",
+     "priorities": [
+      {
+       "crew": "B",
+       "when": "now",
+       "text": "Keep workers on the new-worker limit on indoor or shaded light work for the rest of the shift because their heat-time cap has been reached."
+      },
+      {
+       "crew": "A",
+       "when": "next 15 min",
+       "text": "Finish the current task by 17:35, then rest in the cooled rest room for 25 min and drink a cup of water."
+      },
+      {
+       "crew": "C",
+       "when": "next 15 min",
+       "text": "Finish the current task by 17:38, then rest in the cooled rest room for 22 min and drink a cup of water."
+      }
+     ],
+     "trend": "The sun forecast falls from 33.3 °C now to 32.1 °C in an hour, the site has averaged 0.5 °C below forecast, and crews A, B acclimatised workers, and C are each projected at 99% of their limit in 30 min."
+    }
+   },
+   {
+    "day": "Hottest day of summer 2026",
+    "clock": "07:30",
+    "source": "model",
+    "reason": null,
+    "ms": 4744,
+    "check": null,
+    "urgentOnBoard": 0,
+    "supported": true,
+    "missedUrgent": false,
+    "changedInstruction": false,
+    "note": "The brief accurately reflects the board, including the 07:16 watch alert and the break details.",
+    "brief": {
+     "headline": "Crew C must finish its current task by 07:31, then take its scheduled cooled-room break.",
+     "priorities": [
+      {
+       "crew": "C",
+       "when": "now",
+       "text": "Finish the current task by 07:31, then rest in the cooled rest room for 11 min and drink a cup of water, as the alert directs."
+      },
+      {
+       "crew": "A",
+       "when": "next 15 min",
+       "text": "Crew A’s next break starts 07:46 and lasts 15 min in the cooled room; its projected share is 99% in 30 min."
+      },
+      {
+       "crew": "B",
+       "when": "next 15 min",
+       "text": "Acclimatised workers’ next break starts 07:46 and lasts 15 min in the cooled room; their projected share is 99% in 30 min."
+      }
+     ],
+     "trend": "The forecast rises from 33 °C now to 33.8 °C in an hour, the site-versus-forecast difference is +0 °C, and each crew group is projected at 99% of its limit in 30 min."
+    }
+   },
+   {
+    "day": "Hottest day of summer 2026",
+    "clock": "09:00",
+    "source": "model",
+    "reason": null,
+    "ms": 5976,
+    "check": null,
+    "urgentOnBoard": 0,
+    "supported": true,
+    "missedUrgent": false,
+    "changedInstruction": false,
+    "note": "The brief accurately reflects the board’s break times, durations, rest place, alert action, projections, and forecast figures.",
+    "brief": {
+     "headline": "Crew C’s scheduled break is at 09:05; finish the current task by then and rest in the cooled rest room.",
+     "priorities": [
+      {
+       "crew": "C",
+       "when": "now",
+       "text": "Finish the current task by 09:05, then rest in the cooled rest room and drink a cup of water, as the alert directs."
+      },
+      {
+       "crew": "A",
+       "when": "later",
+       "text": "Crew A’s next break starts 09:18 and lasts 11 min in the cooled room; its projected share in 30 min is 99%."
+      },
+      {
+       "crew": "B",
+       "when": "later",
+       "text": "Crew B’s acclimatised workers break at 09:18 for 11 min, while workers on the new-worker limit break at 09:22 for 35 min; both groups are projected at 99% in 30 min."
+      }
+     ],
+     "trend": "The sun forecast rises from 33.8 °C now to 34.2 °C in an hour; the site-versus-forecast figure is -1.5 °C, and each crew is projected at 99% of its limit in 30 min."
+    }
+   },
+   {
+    "day": "Hottest day of summer 2026",
+    "clock": "10:15",
+    "source": "model",
+    "reason": null,
+    "ms": 5962,
+    "check": null,
+    "urgentOnBoard": 0,
+    "supported": true,
+    "missedUrgent": false,
+    "changedInstruction": false,
+    "note": "The stated readings, forecast, bias, projected shares, and break instructions match the board. The brief omits Crew C’s 10:32 break, but the board has no urgent or act alert for it in the last 15 minutes.",
+    "brief": {
+     "headline": "At 10:15, crews are working in 34.2 °C sun WBGT, with the forecast rising to 35 °C in an hour.",
+     "priorities": [
+      {
+       "crew": "A",
+       "when": "next 15 min",
+       "text": "Finish the current task by 10:16, then rest in the cooled rest room for 11 min and drink a cup of water."
+      },
+      {
+       "crew": "B",
+       "when": "next 15 min",
+       "text": "Acclimatised workers: finish the current task by 10:16, then rest in the cooled rest room for 11 min and drink a cup of water."
+      },
+      {
+       "crew": "B",
+       "when": "next 15 min",
+       "text": "Workers on the new-worker limit: finish the current task by 10:23, then rest in the cooled rest room for 37 min and drink a cup of water."
+      }
+     ],
+     "trend": "The sun forecast rises from 34.3 °C now to 35 °C in an hour, the site station has averaged 0.1 °C below forecast, and projected shares in 30 min are 87% for Crew A, 87% for acclimatised Crew B, 99% for Crew B workers on the new-worker limit, and 96% for Crew C."
+    }
+   },
+   {
+    "day": "Hottest day of summer 2026",
+    "clock": "12:15",
+    "source": "model",
+    "reason": null,
+    "ms": 6587,
+    "check": null,
+    "urgentOnBoard": 0,
+    "supported": false,
+    "missedUrgent": false,
+    "changedInstruction": false,
+    "note": "The board gives a −0.6 °C bias but does not say it is an average over the last 30 minutes. The break instruction and projected shares match the board.",
+    "brief": {
+     "headline": "Crew B workers on the new-worker limit are working at 98% of the heat limit, with their break starting at 12:21.",
+     "priorities": [
+      {
+       "crew": "B",
+       "when": "now",
+       "text": "Finish the current task by 12:21, then rest in the cooled rest room for the scheduled 9 min and drink a cup of water, as the alert directs."
+      }
+     ],
+     "trend": "The forecast falls from 37.1 °C now to 36.6 °C in an hour; the site station has averaged 0.6 °C below forecast over the last 30 min, and projected shares in 30 min are 99% for Crew A, 99% for Crew B acclimatised workers, 98% for Crew B workers on the new-worker limit, and 99% for Crew C."
+    }
+   },
+   {
+    "day": "Hottest day of summer 2026",
+    "clock": "16:00",
+    "source": "model",
+    "reason": null,
+    "ms": 3404,
+    "check": null,
+    "urgentOnBoard": 0,
+    "supported": true,
+    "missedUrgent": false,
+    "changedInstruction": false,
+    "note": "The brief matches the listed breaks, rest place, forecast, and projected shares. The board’s bias is 1.6 °C; its 15:32 watch alert separately says the site is 1.3 °C hotter than forecast and instructs leads that the morning plan is out of date.",
+    "brief": {
+     "headline": "The site is 1.6 °C hotter than forecast, and the morning plan is out of date.",
+     "priorities": [
+      {
+       "crew": "B",
+       "when": "next 15 min",
+       "text": "Workers on the new-worker limit have a cooled-room break starting 16:23 for 37 min, so tell their crew lead the morning plan is out of date."
+      },
+      {
+       "crew": "A",
+       "when": "later",
+       "text": "The rebar-tying crew’s cooled-room break starts 16:31 and lasts 29 min; the site is 1.6 °C hotter than forecast."
+      },
+      {
+       "crew": "B",
+       "when": "later",
+       "text": "Acclimatised workers have a cooled-room break starting 16:31 for 29 min; the site is 1.6 °C hotter than forecast."
+      }
+     ],
+     "trend": "Forecast WBGT in the sun is 33.8 °C now and in an hour; the site is 1.6 °C hotter than forecast, while projected 30-minute shares are 99% for crews A and B and 98% for crew C."
+    }
+   },
+   {
+    "day": "Hottest day of summer 2026",
+    "clock": "17:30",
+    "source": "model",
+    "reason": null,
+    "ms": 5135,
+    "check": null,
+    "urgentOnBoard": 0,
+    "supported": true,
+    "missedUrgent": false,
+    "changedInstruction": false,
+    "note": "The brief accurately reports the forecast, site bias, break times, durations, rest place, and actions. The board has no urgent or act alerts in the last 15 minutes.",
+    "brief": {
+     "headline": "The site is +0.6 °C above forecast, and scheduled cooled-room breaks are due shortly for crews A, B’s acclimatised workers, and C.",
+     "priorities": [
+      {
+       "crew": "A",
+       "when": "next 15 min",
+       "text": "Finish the current task by 17:33, then rest in the cooled rest room for 27 min and drink a cup of water."
+      },
+      {
+       "crew": "B",
+       "when": "next 15 min",
+       "text": "For the acclimatised workers, finish the current task by 17:33, then rest in the cooled rest room for 27 min and drink a cup of water."
+      },
+      {
+       "crew": "C",
+       "when": "next 15 min",
+       "text": "Finish the current task by 17:36, then rest in the cooled rest room for 24 min and drink a cup of water."
+      }
+     ],
+     "trend": "Forecast sun WBGT falls from 33.3 °C now to 32.4 °C in an hour, while the site is +0.6 °C above forecast; crews A, B’s acclimatised workers, and C are each projected at 99% of their limit in 30 min."
+    }
+   },
+   {
+    "day": "Dust storm",
+    "clock": "07:30",
+    "source": "model",
+    "reason": null,
+    "ms": 6012,
+    "check": null,
+    "urgentOnBoard": 0,
+    "supported": false,
+    "missedUrgent": false,
+    "changedInstruction": true,
+    "note": "The board says the crews are resting, but does not identify this as a break; the brief calls it a break. The stated rest places, end times, exposure shares, forecast, and alert status match the board.",
+    "brief": {
+     "headline": "The site station is +1.2 °C above forecast, while crews are resting and no alerts have been raised.",
+     "priorities": [
+      {
+       "crew": "A",
+       "when": "next 15 min",
+       "text": "Keep Crew A in the cooled room on its break until about 07:33; its rolling exposure is at 93% of the limit."
+      },
+      {
+       "crew": "B",
+       "when": "next 15 min",
+       "text": "Keep the acclimatised workers in the cooled room on their break until about 07:33; their rolling exposure is at 93% of the limit."
+      },
+      {
+       "crew": "B",
+       "when": "later",
+       "text": "Keep workers on the new-worker limit in the cooled room on their break until about 08:00; their rolling exposure is at 97% of the limit."
+      }
+     ],
+     "trend": "Over the next hour, forecast sun WBGT rises from 31.3 °C now to 32.4 °C, the site is +1.2 °C above forecast, and projected 30-minute shares are 98% for Crew A, 98% for Crew B acclimatised workers, 99% for Crew B workers on the new-worker limit, and 97% for Crew C."
+    }
+   },
+   {
+    "day": "Dust storm",
+    "clock": "09:00",
+    "source": "model",
+    "reason": null,
+    "ms": 3069,
+    "check": null,
+    "urgentOnBoard": 0,
+    "supported": true,
+    "missedUrgent": false,
+    "changedInstruction": false,
+    "note": "The brief accurately reflects the board’s alerts, break times and durations, rest location, forecast, and projected shares.",
+    "brief": {
+     "headline": "The site station is 1.4 °C hotter than forecast, and Crew B’s new-worker-limit group and Crew C have scheduled breaks approaching.",
+     "priorities": [
+      {
+       "crew": "B",
+       "when": "next 15 min",
+       "text": "Finish the current task by 09:05, then rest in the cooled rest room for 36 min and drink a cup of water, as directed by the alert."
+      },
+      {
+       "crew": "C",
+       "when": "next 15 min",
+       "text": "Finish the current task by 09:08, then rest in the cooled rest room for 24 min and drink a cup of water, as directed by the alert."
+      }
+     ],
+     "trend": "The sun forecast stays at 32.6 °C now and in an hour, while the site station is 1.4 °C hotter than forecast; in 30 min, projected shares are 99% for Crew A, 99% for Crew B’s acclimatised workers, 85% for Crew B’s new-worker-limit group, and 94% for Crew C."
+    }
+   },
+   {
+    "day": "Dust storm",
+    "clock": "10:15",
+    "source": "model",
+    "reason": null,
+    "ms": 5691,
+    "check": null,
+    "urgentOnBoard": 0,
+    "supported": true,
+    "missedUrgent": false,
+    "changedInstruction": false,
+    "note": "The brief matches the board’s 10:14 alert and the listed break instructions. The 30-minute projected shares and forecast values also match.",
+    "brief": {
+     "headline": "The site is 2.2 °C hotter than forecast, and the morning plan is out of date.",
+     "priorities": [
+      {
+       "crew": "site",
+       "when": "now",
+       "text": "Tell crew leads the morning plan is out of date because the site is 2.2 °C hotter than forecast."
+      },
+      {
+       "crew": "A",
+       "when": "next 15 min",
+       "text": "Finish the current task by 10:21, then take the 12 min break in the cooled rest room and drink a cup of water."
+      },
+      {
+       "crew": "B",
+       "when": "next 15 min",
+       "text": "For acclimatised workers, finish the current task by 10:21, then take the 12 min break in the cooled rest room and drink a cup of water."
+      }
+     ],
+     "trend": "The forecast rises from 32.9 °C now to 33.7 °C in an hour, while the site is 2.2 °C hotter than forecast; in 30 min, projected crew shares are 99% for A, 99% for B acclimatised workers, 98% for B workers on the new-worker limit, and 99% for C."
+    }
+   },
+   {
+    "day": "Dust storm",
+    "clock": "12:15",
+    "source": "model",
+    "reason": null,
+    "ms": 6093,
+    "check": null,
+    "urgentOnBoard": 1,
+    "supported": true,
+    "missedUrgent": false,
+    "changedInstruction": false,
+    "note": "The brief accurately includes the 12:11 dust action alert, the 12:21 breaks and their duration, rest place and water instruction, and the listed forecast, bias and 30-minute limit-share values.",
+    "brief": {
+     "headline": "Act on the unhealthy dust alert now while keeping crews to their scheduled breaks.",
+     "priorities": [
+      {
+       "crew": "site",
+       "when": "now",
+       "text": "Use FFP2/N95 masks for all outdoor work and postpone cutting, grinding and sweeping; dust is unhealthy, and masks make heavy work harder."
+      },
+      {
+       "crew": "A",
+       "when": "next 15 min",
+       "text": "Finish the current task by 12:21, then take the 9 min break in the cooled rest room and drink a cup of water."
+      },
+      {
+       "crew": "B",
+       "when": "next 15 min",
+       "text": "For acclimatised workers, finish the current task by 12:21, then take the 9 min break in the cooled rest room and drink a cup of water."
+      }
+     ],
+     "trend": "The sun forecast is 34 °C now and 33.7 °C in an hour, while the site has been +1.6 °C above forecast; in 30 min, crews A, B acclimatised, B on the new-worker limit, and C are each projected at 99% of their limit."
+    }
+   },
+   {
+    "day": "Dust storm",
+    "clock": "16:00",
+    "source": "model",
+    "reason": null,
+    "ms": 7220,
+    "check": null,
+    "urgentOnBoard": 0,
+    "supported": true,
+    "missedUrgent": false,
+    "changedInstruction": false,
+    "note": "The brief accurately reflects the forecast, bias, break times, durations, rest place, and projected limit shares. The board has no alerts.",
+    "brief": {
+     "headline": "The site is 0.9 °C hotter than forecast, and Crew B’s new-worker group has the next scheduled break at 16:25.",
+     "priorities": [
+      {
+       "crew": "B",
+       "when": "later",
+       "text": "Crew B workers on the new-worker limit: take the scheduled 35 min cooled-room break starting 16:25."
+      },
+      {
+       "crew": "A",
+       "when": "later",
+       "text": "Crew A: take the scheduled 25 min cooled-room break starting 16:35."
+      },
+      {
+       "crew": "B",
+       "when": "later",
+       "text": "Crew B acclimatised workers: take the scheduled 25 min cooled-room break starting 16:35."
+      }
+     ],
+     "trend": "The sun forecast is 32.5 °C now and 31.9 °C in an hour, the site is +0.9 °C versus forecast, and in 30 min Crew A and Crew B acclimatised workers are projected at 97% of their limits, Crew B workers on the new-worker limit at 99%, and Crew C at 98%."
+    }
+   },
+   {
+    "day": "Dust storm",
+    "clock": "17:30",
+    "source": "model",
+    "reason": null,
+    "ms": 6042,
+    "check": null,
+    "urgentOnBoard": 0,
+    "supported": false,
+    "missedUrgent": false,
+    "changedInstruction": false,
+    "note": "The board gives a site-station WBGT of 32.2 °C in sun and 31.2 °C in shade, but does not say the station is above forecast; the brief also calls the station’s +0.7 °C bias an average over the last 30 minutes, which the board does not specify. The remaining listed break actions, times, durations, and projected limit shares match the board.",
+    "brief": {
+     "headline": "Heat at the site station is above forecast, and the scheduled cooled-room breaks for crews A and B’s acclimatised workers begin at 17:37.",
+     "priorities": [
+      {
+       "crew": "A",
+       "when": "next 15 min",
+       "text": "Finish the current task by 17:37, then rest in the cooled rest room for 23 min and drink a cup of water, as the alert directs."
+      },
+      {
+       "crew": "B",
+       "when": "next 15 min",
+       "text": "For acclimatised workers, finish the current task by 17:37, then rest in the cooled rest room for 23 min and drink a cup of water, as the alert directs."
+      },
+      {
+       "crew": "C",
+       "when": "next 15 min",
+       "text": "Finish the current task by 17:40, then rest in the cooled rest room for 20 min and drink a cup of water, as the alert directs."
+      }
+     ],
+     "trend": "The sun forecast falls from 31.5 °C now to 30.4 °C in an hour, while the station averaged +0.7 °C above forecast over the last 30 min; crews A, B’s acclimatised workers, and C are each projected at 99% of their heat limit in 30 min following the schedule."
+    }
+   },
+   {
+    "day": "Hottest day of summer 2025",
+    "clock": "07:30",
+    "source": "model",
+    "reason": null,
+    "ms": 5074,
+    "check": null,
+    "urgentOnBoard": 0,
+    "supported": true,
+    "missedUrgent": false,
+    "changedInstruction": false,
+    "note": "The brief matches the 07:25 watch alert and accurately reports the forecast and 30-minute projected shares. No urgent or act alert is present.",
+    "brief": {
+     "headline": "Crew C must finish the current task by 07:40, then rest in the cooled rest room and drink a cup of water.",
+     "priorities": [
+      {
+       "crew": "C",
+       "when": "now",
+       "text": "Finish the current task by 07:40, then rest in the cooled rest room and drink a cup of water, as directed by the 07:25 alert."
+      }
+     ],
+     "trend": "Forecast sun WBGT rises from 33.6 °C now to 34.6 °C in an hour; the site station is 1.3 °C below forecast, while projected shares in 30 minutes are 99% for Crew A, 99% for Crew B's acclimatised workers, 97% for Crew B's workers on the new-worker limit, and 99% for Crew C."
+    }
+   },
+   {
+    "day": "Hottest day of summer 2025",
+    "clock": "09:00",
+    "source": "model",
+    "reason": null,
+    "ms": 4598,
+    "check": null,
+    "urgentOnBoard": 0,
+    "supported": true,
+    "missedUrgent": false,
+    "changedInstruction": false,
+    "note": "The temperatures, break details, rest location and water action match the board. The board lists 99% for each crew group’s 30-minute limit share and a bias of −0.1 °C.",
+    "brief": {
+     "headline": "Heat is forecast to rise from 34.8 °C now to 36.2 °C in an hour; Crew A and Crew B’s acclimatised workers break at 09:03.",
+     "priorities": [
+      {
+       "crew": "A",
+       "when": "now",
+       "text": "Finish the current task by 09:03, then rest in the cooled rest room for 12 min and drink a cup of water; the break is due then."
+      },
+      {
+       "crew": "B",
+       "when": "now",
+       "text": "Acclimatised workers: finish the current task by 09:03, then rest in the cooled rest room for 12 min and drink a cup of water; the break is due then."
+      },
+      {
+       "crew": "C",
+       "when": "next 15 min",
+       "text": "Finish the current task by 09:09, then rest in the cooled rest room for 14 min and drink a cup of water; the break is due then."
+      }
+     ],
+     "trend": "The forecast rises from 34.8 °C now to 36.2 °C in an hour, while the site-versus-forecast difference is -0.1 °C; all crews are projected at 99% of their limit in 30 min following the schedule."
+    }
+   },
+   {
+    "day": "Hottest day of summer 2025",
+    "clock": "10:15",
+    "source": "model",
+    "reason": null,
+    "ms": 6756,
+    "check": null,
+    "urgentOnBoard": 0,
+    "supported": true,
+    "missedUrgent": false,
+    "changedInstruction": false,
+    "note": "The brief matches the listed break times, durations, rest location, and actions. The forecast and +0.3 °C bias are supported by the board; all crew entries show 99% projected in 30 minutes. No urgent or act alert appears in the last 15 minutes.",
+    "brief": {
+     "headline": "Crew B workers on the new-worker limit must finish their current task by 10:26, then take their scheduled 38 min break in the cooled rest room and drink a cup of water.",
+     "priorities": [
+      {
+       "crew": "B",
+       "when": "next 15 min",
+       "text": "Workers on the new-worker limit: finish the current task by 10:26, then rest in the cooled rest room for 38 min and drink a cup of water."
+      },
+      {
+       "crew": "A",
+       "when": "next 15 min",
+       "text": "Finish the current task by 10:30, then rest in the cooled rest room for 30 min and drink a cup of water."
+      },
+      {
+       "crew": "B",
+       "when": "next 15 min",
+       "text": "Acclimatised workers: finish the current task by 10:30, then rest in the cooled rest room for 30 min and drink a cup of water."
+      }
+     ],
+     "trend": "The sun forecast is 36.1 °C now and 36 °C in an hour; the site station has averaged +0.3 °C versus forecast, and each crew is projected at 99% of its heat limit in 30 min following the schedule."
+    }
+   },
+   {
+    "day": "Hottest day of summer 2025",
+    "clock": "12:15",
+    "source": "model",
+    "reason": null,
+    "ms": 5796,
+    "check": null,
+    "urgentOnBoard": 0,
+    "supported": true,
+    "missedUrgent": false,
+    "changedInstruction": false,
+    "note": "The brief accurately reports the forecast, +1 °C bias, scheduled breaks and their actions, and projected limit shares. No urgent or act alert is present; all listed alerts are watch alerts.",
+    "brief": {
+     "headline": "The site station is +1 °C above forecast, with Crew A and both Crew B groups due for cooled-room breaks shortly.",
+     "priorities": [
+      {
+       "crew": "A",
+       "when": "next 15 min",
+       "text": "Finish the current task by 12:22, then rest in the cooled rest room for 8 min and drink a cup of water; the scheduled break is due at 12:22."
+      },
+      {
+       "crew": "B",
+       "when": "next 15 min",
+       "text": "For acclimatised workers, finish the current task by 12:22, then rest in the cooled rest room for 8 min and drink a cup of water; the scheduled break is due at 12:22."
+      },
+      {
+       "crew": "B",
+       "when": "next 15 min",
+       "text": "For workers on the new-worker limit, finish the current task by 12:26, then rest in the cooled rest room for 4 min and drink a cup of water; the scheduled break is due at 12:26."
+      }
+     ],
+     "trend": "Forecast WBGT in the sun falls from 36.2 °C now to 35.8 °C in an hour, while the site station has averaged +1 °C above forecast; in 30 minutes, projected shares are 98% for Crew A and acclimatised Crew B, and 99% for new-worker-limit Crew B and Crew C."
+    }
+   },
+   {
+    "day": "Hottest day of summer 2025",
+    "clock": "16:00",
+    "source": "model",
+    "reason": null,
+    "ms": 5996,
+    "check": null,
+    "urgentOnBoard": 0,
+    "supported": true,
+    "missedUrgent": false,
+    "changedInstruction": false,
+    "note": "The brief accurately reports the listed heat-limit shares, forecast, station bias, and break instructions. Crew C’s scheduled break is omitted, but the board has no urgent or act alert.",
+    "brief": {
+     "headline": "The site station is averaging 1.2 °C above forecast, and all crews are at 99% of their heat limit.",
+     "priorities": [
+      {
+       "crew": "B",
+       "when": "later",
+       "text": "Workers on the new-worker limit: take the scheduled 16:23 break for 37 min in the cooled room."
+      },
+      {
+       "crew": "A",
+       "when": "later",
+       "text": "Take the scheduled 16:32 break for 28 min in the cooled room."
+      },
+      {
+       "crew": "B",
+       "when": "later",
+       "text": "Acclimatised workers: take the scheduled 16:32 break for 28 min in the cooled room."
+      }
+     ],
+     "trend": "Forecast WBGT in the sun is 33.8 °C now and 33 °C in an hour, while the site station is averaging 1.2 °C above forecast; each crew is projected to be at 99% of its limit in 30 minutes following the schedule."
+    }
+   },
+   {
+    "day": "Hottest day of summer 2025",
+    "clock": "17:30",
+    "source": "model",
+    "reason": null,
+    "ms": 5258,
+    "check": null,
+    "urgentOnBoard": 0,
+    "supported": false,
+    "missedUrgent": false,
+    "changedInstruction": false,
+    "note": "The brief incorrectly says the site station has averaged +1.1 °C versus forecast. The board gives a bias of +1.1 °C but does not say it is an average.",
+    "brief": {
+     "headline": "Crews A, B’s acclimatised workers, and C have scheduled cooled-room breaks starting within the next 6 minutes.",
+     "priorities": [
+      {
+       "crew": "A",
+       "when": "next 15 min",
+       "text": "Finish the current task by 17:34, then rest in the cooled rest room for 26 min and drink a cup of water; the crew is at 98% of its heat limit."
+      },
+      {
+       "crew": "B",
+       "when": "next 15 min",
+       "text": "For acclimatised workers, finish the current task by 17:34, then rest in the cooled rest room for 26 min and drink a cup of water; this group is at 98% of its heat limit."
+      },
+      {
+       "crew": "C",
+       "when": "next 15 min",
+       "text": "Finish the current task by 17:36, then rest in the cooled rest room for 24 min and drink a cup of water; the crew is at 97% of its heat limit."
+      }
+     ],
+     "trend": "Forecast sun WBGT is 32.6 °C now and 31.9 °C in an hour, while the site station has averaged +1.1 °C versus forecast; following the schedule, A and B’s acclimatised workers project to 99% of their limits in 30 min, as does C."
+    }
    }
   ]
  }

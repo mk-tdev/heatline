@@ -8,6 +8,9 @@ Every third-party asset, dataset and library used in the build is listed here wi
 | --- | --- | --- | --- |
 | ECMWF thermofeel 2.3.0, Liljegren module | Ported to `packages/climate/src/liljegren.ts`; also generates the golden file | Apache-2.0 | In use; attribution in `NOTICE` |
 | Open-Meteo Historical Weather API (ERA5) | `data/weather/abu-dhabi-2025-08.json` | CC BY 4.0 (attribution) | In use; attribution in `NOTICE` |
+| Open-Meteo Historical Weather API (ERA5), 15 Jun–15 Sep 2025 and 2026 | `data/weather/abu-dhabi-season-*.json` | CC BY 4.0 (attribution) | In use; attribution in `NOTICE` |
+| Open-Meteo Previous Runs API (day-ahead forecasts) | `data/weather/abu-dhabi-dayahead-*.json` | CC BY 4.0 (attribution) | In use; attribution in `NOTICE` |
+| Open-Meteo Air Quality API (Copernicus CAMS) | `data/weather/abu-dhabi-airquality-*.json` | CC BY 4.0 and Copernicus attribution | In use; attribution in `NOTICE` |
 
 ## 3D asset candidates (M3; confirm licence before download)
 

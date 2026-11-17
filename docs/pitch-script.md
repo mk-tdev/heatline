@@ -16,6 +16,7 @@ The UAE’s midday break covers two and a half hours. Across the last two summer
 - **“Why NIOSH and not the Thermal Work Limit?”** TWL needs on-site measurements we do not have. NIOSH limits can be worked out from weather, so they are a fair screen for planning. A pilot would compare both on site.
 - **“Why do your warnings alone do worse than flag breaks?”** A flag stops everyone at once; a phone warning relies on each person stopping. Heatline is meant to be used with a plan.
 - **“Your simulation shows a lot of heat illness.”** Yes, far more than real sites report. We use it to compare approaches on the same day, not to predict cases. The headline evidence is the weather analysis, which has no simulation in it.
+- **“Where does live data come in?”** Site watch takes readings from a WBGT meter on the work area (or a meter's CSV export), checks them, and corrects the forecast every minute. Over two summers of real weather, breaks timed from live readings kept crews over the limit 1.9% of the time, against 36% from the forecast alone ([site-watch.md](site-watch.md)).
 - **“What does the AI actually decide?”** Nothing. Rules set every warning level and action and check every plan. In 30 recorded runs under pressure the rules refused 30 of the AI’s proposals and no rule-breaking plan reached the supervisor ([record](eval/README.md)).
 
 ## Opening cue — before the 25-second first-person demo

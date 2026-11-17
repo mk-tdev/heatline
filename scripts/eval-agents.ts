@@ -17,7 +17,10 @@ import weather from '../data/weather/abu-dhabi-2025-08.json' with { type: 'json'
 import type { Language, WarningAction } from '@heatline/contracts';
 import { BRIEFING_LANGUAGES, SCENARIOS, briefing, buildCatalogScenario, buildDayPlan, createEnvironment, runShift, screenExposure, weatherRows, type OpenMeteoHourly, type ScenarioTemplate } from '@heatline/sim';
 import { LANGUAGE_NAMES, checkGuardianMessage, fallbackGuardianMessage, guardianContext, type GuardianContext, type PlanCheck } from '@heatline/agents';
-import { MODEL, guardian, planner } from '../server/http';
+import { MODEL, guardian, planner, watchBrief } from '../server/http';
+import { readFileSync, existsSync } from 'node:fs';
+import { broadcastLines, conditionsFrom, defaultCrews, runWatch, shiftsFor, siteTruth, stationFrom, watchContext, type WatchAlert } from '@heatline/sim';
+import { checkWatchBrief, type WatchContext } from '@heatline/agents';
 
 if (!process.env.OPENAI_API_KEY) {
   console.error('OPENAI_API_KEY is not set. Add it to .env and run: npm run eval:agents');
@@ -253,6 +256,7 @@ async function evalTranslations() {
   const mild = sample.map((h) => ({ ...h, airC: h.airC - 12, rhPct: 40 }));
   const plans = [buildDayPlan({ ...site, rest: 'cool-room' }), buildDayPlan({ ...site, rest: 'shade' }), buildDayPlan({ ...site, date: '2025-11-12', weather: mild.map((h) => ({ ...h, time: h.time.replace('2025-08-19', '2025-11-12') })) })];
   const english = [
+    ...broadcastLines('en').map((l) => ({ kind: `broadcast:${l.key}`, text: (language: Language) => broadcastLines(language).find((x) => x.key === l.key)!.text })),
     ...actions.map((action) => ({ kind: `guardian:${action}`, text: (language: Language) => fallbackGuardianMessage({ name: 'Anwar', language, action }).message })),
     ...[...new Map(plans.flatMap((plan, pi) => briefing(plan, 'en').map((line, i) => [line, { kind: `briefing:${pi}:${i}`, text: (language: Language) => briefing(plan, language)[i]! }] as const))).values()],
   ];
@@ -275,20 +279,71 @@ async function evalTranslations() {
   return { lines: english.length, results };
 }
 
+// ---- Noor's site-watch briefs: 24 moments on the four replay days -------------------------------
+
+const Faithfulness = z.object({
+  supported: z.boolean().describe('True if every statement in the brief is supported by the board.'),
+  missedUrgent: z.boolean().describe('True if the board has an urgent or act alert from the last 15 minutes that the brief leaves out.'),
+  changedInstruction: z.boolean().describe('True if the brief changes a break time, a duration, a rest place or an action from the board.'),
+  note: z.string(),
+});
+
+async function evalWatch() {
+  const replay = JSON.parse(readFileSync('data/watch/replay-days.json', 'utf8')) as { days: { date: string; title: string; reanalysis: never[]; dayAhead: never[]; pm10: (number | null)[] }[] };
+  const moments = [450, 540, 615, 735, 960, 1050];
+  const cases = replay.days.flatMap((d) => {
+    const truth = siteTruth(conditionsFrom(d.reanalysis, d.date), d.date);
+    const pm10 = (m: number) => d.pm10[Math.floor(m / 60)] ?? null;
+    const crews = defaultCrews(d.date, template.workers);
+    const run = runWatch({ date: d.date, shifts: shiftsFor(d.date), crews, forecast: conditionsFrom(d.dayAhead, d.date), truth, readings: stationFrom(truth, d.date, 300, 1200, [{ from: 540, to: 600 }], pm10), pm10, policy: 'follow' });
+    return moments.map((m) => ({ day: d.title, date: d.date, ctx: watchContext(run, m, crews) as WatchContext, recent: run.alerts.filter((a: WatchAlert) => a.minute <= m && m - a.minute <= 15 && (a.level === 'act' || a.level === 'urgent')) }));
+  });
+  const rows = await pool(cases, 4, async (c) => {
+    const out = (await watchBrief(c.ctx)) as Awaited<ReturnType<typeof watchBrief>> & { reason?: string };
+    const brief = { headline: out.headline, priorities: out.priorities, trend: out.trend };
+    const judged = await openai.responses.parse({
+      model: MODEL, reasoning: { effort: 'low' },
+      input: [
+        { role: 'system', content: 'You audit a short safety brief against the site board it was written from. Be strict and literal.' },
+        { role: 'user', content: `BOARD\n${JSON.stringify(c.ctx)}\n\nBRIEF\n${JSON.stringify(brief)}` },
+      ],
+      text: { format: zodTextFormat(Faithfulness, 'faithfulness') },
+    });
+    const v = judged.output_parsed!;
+    process.stdout.write(out.source === 'model' && v.supported && !v.changedInstruction ? '.' : 'x');
+    return { day: c.day, clock: c.ctx.clock, source: out.source, reason: out.reason ?? null, ms: out.ms, check: checkWatchBrief(c.ctx, brief), urgentOnBoard: c.recent.length, ...v, brief };
+  });
+  console.log();
+  return {
+    total: rows.length,
+    fromModel: rows.filter((r) => r.source === 'model').length,
+    rejectedByChecks: rows.filter((r) => r.reason).length,
+    rejectionReasons: rows.filter((r) => r.reason).map((r) => r.reason),
+    supported: rows.filter((r) => r.supported).length,
+    changedInstruction: rows.filter((r) => r.changedInstruction).length,
+    missedUrgent: rows.filter((r) => r.missedUrgent).length,
+    momentsWithUrgent: rows.filter((r) => r.urgentOnBoard > 0).length,
+    latencyMs: { median: median(rows.filter((r) => r.source === 'model').map((r) => r.ms)), p90: p90(rows.filter((r) => r.source === 'model').map((r) => r.ms)) },
+    rows,
+  };
+}
+
 // ---- Report ----------------------------------------------------------------------------------
 
 const only = process.argv[2];
 const t0 = Date.now();
 console.log(`Evaluating with ${MODEL}`);
-const g = !only || only === 'guardian' ? await evalGuardian() : null;
-const p = !only || only === 'planner' ? await evalPlanner() : null;
-const t = !only || only === 'translations' ? await evalTranslations() : null;
+const previous = existsSync('docs/eval/results.json') ? JSON.parse(readFileSync('docs/eval/results.json', 'utf8')) : {};
+const g = !only || only === 'guardian' ? await evalGuardian() : previous.guardian ?? null;
+const p = !only || only === 'planner' ? await evalPlanner() : previous.planner ?? null;
+const t = !only || only === 'translations' ? await evalTranslations() : previous.translations ?? null;
+const w = !only || only === 'watch' ? await evalWatch() : previous.watch ?? null;
 mkdirSync('docs/eval', { recursive: true });
 const stamp = new Date().toISOString();
-if (!only) writeFileSync('docs/eval/results.json', JSON.stringify({ generated: stamp, model: MODEL, guardian: g, planner: p, translations: t }, null, 1));
-else writeFileSync(`docs/eval/results-${only}.json`, JSON.stringify({ generated: stamp, model: MODEL, guardian: g, planner: p, translations: t }, null, 1));
+writeFileSync('docs/eval/results.json', JSON.stringify({ generated: stamp, model: MODEL, ...(only ? { updated: only } : {}), guardian: g, planner: p, translations: t, watch: w }, null, 1));
 
 if (g) console.log(`Guardian: ${g.actionKept}/${g.total} kept the action; ${g.fromModel} from the model, ${g.fellBackToTemplate} templates; weakened ${g.weakened}; medical advice ${g.medicalAdvice}; readings ${g.quotesReadings}; fluency ${JSON.stringify(g.fluency)}; latency ${g.latencyMs.median}/${g.latencyMs.p90} ms`);
 if (p) console.log(`Planner: ${p.plansAcceptedByRules}/${p.total} accepted by the rules; ${p.fromModel} from the model, ${p.fellBackToRules} rules-only; proposals refused ${p.refusedProposals} in ${p.runsWhereRulesRefusedAProposal} runs; no-pour-day poured ${p.noPourDayPoured}; past the break ${p.breakDayPourPastBreak}; claimed safe ${p.claimedSafe}; latency ${p.latencyMs.median}/${p.latencyMs.p90} ms`);
 if (t) for (const r of t.results) console.log(`Translations ${r.language}: ${r.sameMeaning}/${r.checked} same meaning, ${r.natural} natural, ${r.flagged.length} flagged`);
+if (w) console.log(`Watch briefs: ${w.fromModel}/${w.total} from the model, ${w.rejectedByChecks} rejected by checks (${w.rejectionReasons.join('; ')}); supported ${w.supported}; changed an instruction ${w.changedInstruction}; missed an urgent alert ${w.missedUrgent} (of ${w.momentsWithUrgent} moments with one); latency ${w.latencyMs.median}/${w.latencyMs.p90} ms`);
 console.log(`Done in ${Math.round((Date.now() - t0) / 1000)} s`);

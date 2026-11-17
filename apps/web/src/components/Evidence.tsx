@@ -5,6 +5,7 @@ import report from '../../../../data/backtest/august-2025.json';
 import type { BacktestReport, PolicyTotals } from '@heatline/sim';
 import { formatClock } from '@heatline/contracts';
 import { season } from '../season';
+import watchEval from '../../../../data/watch/evaluation.json';
 
 const r = report as unknown as BacktestReport;
 const median = (xs: number[]) => (xs.length ? [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)]! : null);
@@ -83,7 +84,15 @@ export function Evidence({ onClose }: { onClose: () => void }) {
           <p><b>Limits of this finding.</b> The weather is a reanalysis for a grid square of several kilometres, not an instrument on a site, and real sites can be hotter. Being over the limit means work needs controls, not that it is banned. Abu Dhabi’s own code asks for a Thermal Work Limit assessment, which this is not. Regenerate with <code>npm run season</code>.</p>
         </div>
 
-        <h3 className="ev-part">2 · A month of simulated shifts</h3>
+        <h3 className="ev-part">2 · Live site watch, on two summers of real forecasts</h3>
+        <p className="ev-lead">The same three crews on all {watchEval.days} days, with breaks timed five ways. The scheduler sees only the forecast issued the day before and, when present, a station on the work area; time over the limit is measured on the site's actual conditions.</p>
+        <table className="compact-table">
+          <thead><tr><th>How breaks are timed</th><th>Time over the NIOSH limit</th><th>Work per worker a day</th></tr></thead>
+          <tbody>{watchEval.strategies.map((x) => <tr key={x.id}><td>{x.label}</td><td className={x.id === 'live' ? 'win' : ''}>{x.overLimitSharePct}%</td><td>{x.workMinPerWorkerDay} min</td></tr>)}</tbody>
+        </table>
+        <p className="science-note">Forecasts and reanalysis are real archives; the site's extra heat over the area forecast and the station's noise are stated assumptions. <a href="#watch" onClick={onClose}>Open site watch</a> to replay any day and read the reasons behind each alert.</p>
+
+        <h3 className="ev-part">3 · A month of simulated shifts</h3>
         <p className="ev-lead">
           Every day of August 2025, three shifts a day ({r.windows.map((x) => x.label).join(', ')}): {shifts} shifts of 20 synthetic workers, each played four ways on the real weather.
         </p>

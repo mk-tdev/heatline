@@ -428,3 +428,7 @@
 .pilot-steps p { font-size: 13px; line-height: 1.65; color: #587078; margin: 0; }
 @media (max-width: 1100px) { .season-finding { grid-template-columns: 1fr 1fr 1fr; } .season-copy { grid-column: 1 / -1; } .pilot-steps { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 700px) { .season-finding { grid-template-columns: 1fr; padding: 44px 0 38px; } .pilot-steps { grid-template-columns: 1fr; } .pilot-path { margin: 60px 0 40px; } }
+
+.experience-intro { grid-template-columns: 1.1fr repeat(4, 1fr); gap: 28px; }
+@media (max-width: 1100px) { .experience-intro { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 700px) { .experience-intro { grid-template-columns: 1fr; } }

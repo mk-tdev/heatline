@@ -7,6 +7,7 @@
 import { type IncomingMessage, type ServerResponse } from 'node:http';
 import OpenAI from 'openai';
 import { recordShade, shadeCount } from './shade';
+import { TelemetryPost, readTelemetry, recordTelemetry } from './telemetry';
 import { allow, signSpeech, verifySpeech, visitor } from './guard';
 import { zodTextFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
@@ -33,6 +34,12 @@ import {
   type GuardianContext,
   type LeverArgs,
   type PlannerWorld,
+  WATCH_SYSTEM,
+  WatchBrief,
+  checkWatchBrief,
+  fallbackWatchBrief,
+  watchPrompt,
+  type WatchContext,
 } from '@heatline/agents';
 
 export const MODEL = process.env.OPENAI_MODEL || 'gpt-6-luna';
@@ -89,6 +96,34 @@ const PlannerInput = z.strictObject({
   effectiveAt: z.number().int().min(0).max(1440),
   unavailable: z.array(z.string().max(20)).max(30),
   ask: z.string().max(300),
+});
+
+const WatchInput = z.strictObject({
+  clock: z.string().regex(/^\d{2}:\d{2}$/),
+  site: z.strictObject({
+    wbgtSun: z.number().min(0).max(50),
+    wbgtShade: z.number().min(0).max(50),
+    source: z.string().max(60),
+    forecastSun: z.number().min(0).max(50),
+    forecastSunInHour: z.number().min(0).max(50),
+    biasC: z.number().min(-15).max(15),
+    marginC: z.number().min(0).max(5),
+    dust: z.enum(['clear', 'elevated', 'unhealthy', 'severe']),
+    pm10: z.number().min(0).max(5000).nullable(),
+  }),
+  crews: z.array(z.strictObject({
+    crew: z.string().max(4),
+    workers: z.enum(['whole crew', 'acclimatised workers', 'workers on the new-worker limit']),
+    task: z.string().max(80),
+    status: z.enum(['working', 'resting', 'off shift', 'indoor work']),
+    limitSharePct: z.number().min(0).max(500),
+    limitShareIn30MinPct: z.number().min(0).max(500).nullable(),
+    nextBreak: z.string().regex(/^\d{2}:\d{2}$/).nullable(),
+    breakLengthMin: z.number().int().min(0).max(240).nullable(),
+    restingUntil: z.string().regex(/^\d{2}:\d{2}$/).nullable(),
+    restPlace: z.string().max(40),
+  })).max(12),
+  alerts: z.array(z.strictObject({ time: z.string().regex(/^\d{2}:\d{2}$/), level: z.enum(['info', 'watch', 'act', 'urgent']), title: z.string().max(160), action: z.string().max(300) })).max(12),
 });
 
 // ---- Helpers ------------------------------------------------------------------------------
@@ -252,6 +287,28 @@ export async function planner(input: z.infer<typeof PlannerInput>, res: Pick<Ser
   }
 }
 
+/** Noor's site-watch brief: orders and explains the scheduler's alerts; never changes them. */
+export async function watchBrief(ctx: WatchContext) {
+  const t0 = performance.now();
+  if (!openai) return { ...fallbackWatchBrief(ctx), source: 'rules', ms: 0 };
+  try {
+    const response = await withTimeout(15_000, (signal) =>
+      openai.responses.parse(
+        { model: MODEL, reasoning: { effort: 'low' }, input: [{ role: 'system', content: WATCH_SYSTEM }, { role: 'user', content: watchPrompt(ctx) }], text: { format: zodTextFormat(WatchBrief, 'watch_brief') } },
+        { signal },
+      ),
+    );
+    const out = response.output_parsed;
+    const problem = out ? checkWatchBrief(ctx, out) : 'no output';
+    if (out && !problem) return { ...out, source: 'model', model: MODEL, ms: Math.round(performance.now() - t0) };
+    console.warn(`watch: rejected model output (${problem})`);
+    return { ...fallbackWatchBrief(ctx), source: 'rules', reason: `model output rejected: ${problem}`, ms: Math.round(performance.now() - t0) };
+  } catch (error) {
+    console.warn(`watch: ${(error as Error).name}: ${(error as Error).message}`);
+  }
+  return { ...fallbackWatchBrief(ctx), source: 'rules', ms: Math.round(performance.now() - t0) };
+}
+
 // ---- Voice: read the guardian's message aloud (for workers who can't read the screen) ----------
 
 const SpeakInput = z.strictObject({ text: z.string().min(1).max(300), language: Language, token: z.string().max(100) });
@@ -288,6 +345,26 @@ export async function handler(req: IncomingMessage, res: ServerResponse) {
       if (!input.success) return send(res, 400, { error: 'invalid receipt' });
       await recordShade(room.data, input.data.receipt);
       return send(res, 200, { received: true });
+    }
+    if (url.pathname === '/api/telemetry') {
+      const site = z.uuidv4().safeParse(req.headers['x-heatline-site']);
+      if (!site.success) return send(res, 400, { error: 'invalid site' });
+      if (req.method === 'GET') {
+        const date = url.searchParams.get('date') ?? '';
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return send(res, 400, { error: 'invalid date' });
+        return send(res, 200, { site: site.data, date, readings: await readTelemetry(site.data, date) });
+      }
+      if (req.method !== 'POST') return send(res, 405, { error: 'unsupported method' });
+      if (!allow('telemetry', visitor(req))) return send(res, 429, { error: 'too many readings, slow down' });
+      const input = TelemetryPost.safeParse(await readJson(req, 64 * 1024));
+      if (!input.success) return send(res, 400, { error: 'invalid readings', detail: input.error.issues.slice(0, 3).map((i) => `${i.path.join('.')}: ${i.message}`) });
+      return send(res, 200, { stored: await recordTelemetry(site.data, input.data.readings) });
+    }
+    if (req.method === 'POST' && url.pathname === '/api/watch-brief') {
+      const parsed = WatchInput.safeParse(await readJson(req));
+      if (!parsed.success) return send(res, 400, { error: 'invalid watch context' });
+      if (!allow('watch', visitor(req))) return send(res, 200, { ...fallbackWatchBrief(parsed.data as WatchContext), source: 'rules', ms: 0 });
+      return send(res, 200, await watchBrief(parsed.data as WatchContext));
     }
     if (req.method === 'GET' && url.pathname === '/api/health') return send(res, 200, { ai: !!openai, model: openai ? MODEL : null });
     if (req.method === 'POST' && url.pathname === '/api/guardian') {

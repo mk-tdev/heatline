@@ -23,7 +23,9 @@
     "backtest": "node --import tsx scripts/backtest.ts",
     "season": "node --import tsx scripts/season.ts",
     "eval:agents": "node --env-file=.env --import tsx scripts/eval-agents.ts",
-    "build:api": "node scripts/build-api.mjs"
+    "build:api": "node scripts/build-api.mjs",
+    "eval:watch": "node --import tsx scripts/watch-eval.ts && node --import tsx scripts/replay-days.ts",
+    "station:sim": "node --import tsx scripts/station-sim.ts"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

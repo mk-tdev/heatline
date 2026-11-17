@@ -13,7 +13,7 @@ const dateLabel = (iso: string) => new Date(`${iso}T12:00:00`).toLocaleDateStrin
 const MOODS = ['afternoon', 'morning', 'humid', 'storm'];
 const ICONS = ['☀', '◷', '◌', '≋'];
 
-export function Intro({ onStart, onEvidence, onExploreFoot, onPlan }: { onPlan: () => void; onExploreFoot: () => void; onStart: (scenario: string, mode: Mode) => void; onEvidence: () => void }) {
+export function Intro({ onStart, onEvidence, onExploreFoot, onPlan, onWatch }: { onWatch: () => void; onPlan: () => void; onExploreFoot: () => void; onStart: (scenario: string, mode: Mode) => void; onEvidence: () => void }) {
   const [ai, setAi] = useState(false);
   const [motion, setMotion] = useState(() => !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   useEffect(() => void health().then((h) => setAi(h.ai)), []);
@@ -28,14 +28,14 @@ export function Intro({ onStart, onEvidence, onExploreFoot, onPlan }: { onPlan: 
       <section className="welcome-hero" aria-label="Welcome to Heatline">
         <nav className="welcome-nav" aria-label="Main navigation">
           <a className="welcome-brand" href="#"><BrandMark /> Heatline</a>
-          <div className="welcome-nav-links"><button onClick={onPlan}>Shift planner</button><button onClick={choose}>The 3D site</button><button onClick={onEvidence}>The evidence</button></div>
+          <div className="welcome-nav-links"><button onClick={onPlan}>Shift planner</button><button onClick={onWatch}>Site watch</button><button onClick={choose}>The 3D site</button><button onClick={onEvidence}>The evidence</button></div>
           <span className="challenge-pill">Future Health Challenge</span>
         </nav>
         <div className="hero-copy">
           <p className="location-line"><span className="live-dot" /> Saadiyat Island, Abu Dhabi</p>
           <h1>The heat doesn’t<br />stop at three.</h1>
-          <p className="hero-description">The midday break covers two and a half hours. Across the last two summers, Abu Dhabi’s heat was over the safe limit for steady outdoor work for {Math.round(season.overLimitHoursPerDay)} hours a day. Heatline plans the shift around the heat that is left, warns each worker in their own language, and lets a supervisor rehearse the call first.</p>
-          <div className="hero-actions"><button className="hero-start" onClick={() => onStart('afternoon-pour', 'story')}><span className="play-glyph" aria-hidden="true">▶</span> Step into the site</button><button className="hero-secondary" onClick={onPlan}>Plan tomorrow’s shift <span aria-hidden="true">→</span></button></div>
+          <p className="hero-description">The midday break covers two and a half hours. Across the last two summers, Abu Dhabi’s heat was over the safe limit for steady outdoor work for {Math.round(season.overLimitHoursPerDay)} hours a day. Heatline plans the shift around the heat that is left, watches the site live and calls each break before the limit, warns every worker in their own language, and lets a supervisor rehearse the call first.</p>
+          <div className="hero-actions"><button className="hero-start" onClick={() => onStart('afternoon-pour', 'story')}><span className="play-glyph" aria-hidden="true">▶</span> Step into the site</button><button className="hero-secondary" onClick={onPlan}>Plan tomorrow’s shift <span aria-hidden="true">→</span></button><button className="hero-secondary" onClick={onWatch}>Watch a site live <span aria-hidden="true">→</span></button></div>
           <div className="hero-more">
             <span>Or</span>
             <button onClick={choose} title="Four shifts on real August days">Explore the scenarios</button>
@@ -63,8 +63,9 @@ export function Intro({ onStart, onEvidence, onExploreFoot, onPlan }: { onPlan: 
         </section>
 
         <section className="experience-intro" aria-label="How Heatline works">
-          <h2>Three parts.<br />One site.</h2>
+          <h2>Four parts.<br />One site.</h2>
           <div className="experience-step"><span aria-hidden="true">◷</span><h3>Plan the day</h3><p>Tomorrow’s forecast becomes work and rest limits for every hour, the coolest pour window and a crew briefing in seven languages. No hardware.</p><button className="step-link" onClick={onPlan}>Open the shift planner</button></div>
+          <div className="experience-step"><span aria-hidden="true">◎</span><h3>Watch the site live</h3><p>A WBGT station on the work area corrects the forecast every minute. Each crew’s last hour of heat is tracked against the NIOSH limit, and every break is called before the limit, with the reasons.</p><button className="step-link" onClick={onWatch}>Open site watch</button></div>
           <div className="experience-step"><span aria-hidden="true">◉</span><h3>Warn each worker</h3><p>A phone guardian speaks each worker’s language, works offline and without a wearable. Supervisors see crew totals, never anyone’s readings.</p><a className="step-link" href="/worker/index.html">Try Anwar’s phone</a></div>
           <div className="experience-step"><span aria-hidden="true">↶</span><h3>Rehearse the call</h3><p>A 3D site with twenty synthetic workers. Ask for a plan, see the rules check it, then rewind the same afternoon and compare.</p><button className="step-link" onClick={choose}>Choose a shift</button></div>
         </section>

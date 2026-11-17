@@ -1,6 +1,16 @@
 # Heatline status
 
-Updated 11 November 2026. The sections below supersede older milestone claims.
+Updated 17 November 2026. The sections below supersede older milestone claims.
+
+## Site watch, after early reviewer feedback (17 Nov)
+
+- **Site watch** at `/#watch`: station telemetry (`POST /api/telemetry`, CSV import, `npm run station:sim`), quality checks, fusion with the forecast, rolling NIOSH exposure per crew group, breaks announced 15 minutes ahead, rest moved from shade to the cooled room when needed, heat-time caps, dust alerts with hysteresis, safe fallback when the station fails. Replay mode on four curated days or any day since 2024; live mode for any preset site.
+- **Profiles**: acclimatisation from days worked in the heat (new, returning, restart); task metabolic-rate catalogue.
+- **Explainability**: numbered reasons and a with/without projection on every alert; crew broadcasts in seven languages.
+- **Noor's watch brief** (`/api/watch-brief`): reads the crew-level board only; rejected if it invents a time, crew or name.
+- **Evaluation** over 186 days of 2025–2026 with archived day-ahead forecasts: time over the limit 84.2% (fixed routine), 36.3% (forecast only), 10.0% (+1 °C margin), 1.9% (live), 5.5% (live with a daily three-hour outage). 24 recorded briefs: all from the model and passing the checks; 19 judged fully supported.
+- Tests: 128.
+
 
 ## Product framing, shift planner and recorded evidence (11 Nov)
 

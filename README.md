@@ -10,24 +10,49 @@
     <img alt="Rules-only mode available" src="https://img.shields.io/badge/No_API_key-required-A7D8C5?style=flat-square" />
     <img alt="Hackathon prototype" src="https://img.shields.io/badge/Status-hackathon_prototype-F4BE68?style=flat-square" />
   </p>
-  <p><a href="https://heatline-plum.vercel.app/#plan">Shift planner</a> · <a href="#-take-the-supervisors-seat">3D site</a> · <a href="#-what-the-weather-alone-says">Evidence</a> · <a href="docs/pilot.md">Path to a pilot</a> · <a href="#-the-challenges-six-desired-outcomes">Challenge outcomes</a> · <a href="docs/pitch-script.md">Read the pitch</a> · <a href="docs/demo-flow.md">Demo flow</a> · <a href="#-run-it-locally">Run locally</a> · <a href="docs/scientific-basis.md">Explore the science</a></p>
+  <p><a href="https://heatline-plum.vercel.app/#plan">Shift planner</a> · <a href="https://heatline-plum.vercel.app/#watch">Site watch</a> · <a href="#-take-the-supervisors-seat">3D site</a> · <a href="#-what-the-weather-alone-says">Evidence</a> · <a href="docs/pilot.md">Path to a pilot</a> · <a href="#-the-challenges-six-desired-outcomes">Challenge outcomes</a> · <a href="docs/pitch-script.md">Read the pitch</a> · <a href="docs/demo-flow.md">Demo flow</a> · <a href="#-run-it-locally">Run locally</a> · <a href="docs/scientific-basis.md">Explore the science</a></p>
 </div>
 
 ![Heatline’s full-width animated coastal construction panorama](output/playwright/heatline-panorama-desktop.jpg)
 
 The UAE bans outdoor work in the sun from 12:30 to 15:00 in summer. The heat does not keep to those hours. Across the last two midday-break seasons near Saadiyat Island, the heat was over the US NIOSH limit for steady moderate work for about 13 of the 14 working hours in a day, and the break covers only a fifth of them.
 
-**Heatline is a worker-first heat-safety system for outdoor sites, built for the Future Health Digital Innovation Challenge — Climate-Resilient Worker Health.** It has three parts:
+**Heatline is a worker-first heat-safety system for outdoor sites, built for the Future Health Digital Innovation Challenge — Climate-Resilient Worker Health.** It has four parts:
 
 | Part | What it does | Try it |
 | --- | --- | --- |
 | **Shift planner** | Turns tomorrow's forecast for any site into work and rest limits for every hour, the coolest window for a concrete pour, and a crew briefing in seven languages. Needs only a location: no hardware, no worker data. Works on a phone | [Open the planner](https://heatline-plum.vercel.app/#plan) |
+| **Site watch** | Fuses a WBGT station on the work area with the forecast every minute, tracks each crew's last hour of heat and effort against the NIOSH limit, and announces every break 15 minutes before the limit, with the reasons. Adds dust alerts from air-quality data, moves crews to a cooled room when shade is not enough, and degrades safely when the station fails. Replay any real summer day, or watch a site today | [Open site watch](https://heatline-plum.vercel.app/#watch) |
 | **Worker phone guardian** | Warns each worker in their own language, with one clear action. Works offline and without a wearable. The supervisor sees crew totals, never anyone's readings | [Anwar's phone](https://heatline-plum.vercel.app/worker/index.html) · [crew dashboard](https://heatline-plum.vercel.app/worker/supervisor.html) |
 | **Rehearsal site** | A 3D construction site with twenty synthetic workers on real August days. Ask an AI assistant for a plan, watch the site rules check it, approve it, then rewind the same afternoon and compare | [Open Heatline](https://heatline-plum.vercel.app) on a laptop |
 
 The planner is for real days. The rehearsal site is where plans and warnings are tested before they reach real people, so nobody is put at risk to find out what a decision does.
 
 ![The shift planner for the hottest day of summer 2026](output/playwright/heatline-shift-planner.jpg)
+
+## 🛰️ Site watch: live telemetry, proactive breaks
+
+Added after early reviewer feedback asked for live site telemetry, dynamic acclimatisation and task profiles, an AI assistant that watches exposure trends, and proactive, explainable alerts. [Full write-up](docs/site-watch.md).
+
+![Site watch replaying the day the forecast was 3 °C too cool](output/playwright/heatline-site-watch.jpg)
+
+Two summers of real weather (186 days, three crews), with the scheduler seeing only the forecast issued the day before and, when present, the station:
+
+| How breaks are timed | Time over the NIOSH limit | Work per worker a day | Breaks announced ≥10 min ahead |
+| --- | --- | --- | --- |
+| Fixed routine, 50 min work / 10 min rest | 84.2% | 513 min | — |
+| Day-ahead forecast only | 36.3% | 374 min | 99.9% |
+| Day-ahead forecast + 1 °C margin | 10.0% | 351 min | 99.8% |
+| **Live: station fused with the forecast** | **1.9%** | **364 min** | **99.5%** |
+| Live, station down 09:00–12:00 daily | 5.5% | 363 min | 99.1% |
+
+Live readings cut time over the limit from a third of the shift to 2%, and crews work more than with a blind safety margin. The forecast and weather archives are real; the site's extra heat over the area forecast and the station's noise are stated assumptions (`npm run eval:watch`).
+
+- **Telemetry in.** `POST /api/telemetry` takes WBGT, or globe, natural wet-bulb and air temperature (WBGT by ISO 7243), plus humidity, wind and PM10/PM2.5. Readings are quality-checked. Meter exports can be imported as CSV. `npm run station:sim` stands in for a meter.
+- **Profiles.** Acclimatisation comes from days worked in the heat (new workers build from 20%; back after a week away, 50/60/80/100%), never from body data. Tasks carry metabolic-rate estimates.
+- **Explained alerts.** Every alert opens to numbered reasons and a chart of the next hour with and without the break. Crew alerts go out as fixed text in seven languages.
+- **Noor watches the trend.** The AI reads the crew-level board, including 30-minute projections, and says what matters in the next 15 minutes. Her answer is rejected if it invents a time, crew or name. In 24 recorded moments, all came from the model and passed; a strict judge found 19 fully supported ([record](docs/eval/README.md#noors-site-watch-briefs)).
+- **Privacy.** The board never receives a name, a body reading or anyone's location. A test checks every alert and every minute.
 
 ## 🌡️ What the weather alone says
 
@@ -48,12 +73,12 @@ The challenge asks: *how might we protect workers exposed to extreme heat throug
 
 | Desired outcome | What Heatline does | Where to see it | How it is checked |
 | --- | --- | --- | --- |
-| **1. Dynamic heat-risk assessment** from the environment, the workload, the shift and, with consent, the worker's own signals | Works out each worker's heat strain minute by minute from real August 2025 weather, sun and shade on each work area (the shade moves with the sun), how hard the job is, clothing (Bilal's protective overalls count as hotter), how used to the heat the worker is (Anwar is on day 2), and the midday break. A wearable is optional; without one, the risk is estimated from the conditions and the work | The heat label on each work area, the crew cards, and any worker's phone. For a real site and day, the [shift planner](https://heatline-plum.vercel.app/#plan) gives the same heat assessment hour by hour, for light, moderate and heavy work, normal or heavy clothing, and workers new to the heat | `tests/climate.test.ts`, `tests/physiology.test.ts`, `tests/engine.test.ts`, `tests/dayplan.test.ts` |
-| **2. Clear, graded, multilingual warnings**, each with a safe action | Four levels (green, yellow, amber, red), each with exactly one action: keep drinking, drink now, rest in shade, rest in the cool cabin, stop heat work, or emergency. Written and read aloud in Arabic, Hindi, Urdu, Bengali, Malayalam, Tagalog and English. **The rules set the level and the action; the AI only words it** and is rejected if it changes the action, uses the wrong script or adds medical advice | The worker's phone (right panel) and its **Listen** button; speech bubbles on site; the crew briefing in the shift planner | `tests/rules.test.ts`, `tests/projections.test.ts` (fallback messages in every language pass the checks); [60 AI-worded messages checked](docs/eval/README.md): all 60 kept the action |
+| **1. Dynamic heat-risk assessment** from the environment, the workload, the shift and, with consent, the worker's own signals | Works out each worker's heat strain minute by minute from real August 2025 weather, sun and shade on each work area (the shade moves with the sun), how hard the job is, clothing (Bilal's protective overalls count as hotter), how used to the heat the worker is (Anwar is on day 2), and the midday break. A wearable is optional; without one, the risk is estimated from the conditions and the work | The heat label on each work area, the crew cards, and any worker's phone. Live, [site watch](https://heatline-plum.vercel.app/#watch) tracks each crew's rolling hour of heat and effort from a station on the work area, with acclimatisation from work history and task metabolic rates. For a real site and day, the [shift planner](https://heatline-plum.vercel.app/#plan) gives the same heat assessment hour by hour, for light, moderate and heavy work, normal or heavy clothing, and workers new to the heat | `tests/climate.test.ts`, `tests/physiology.test.ts`, `tests/engine.test.ts`, `tests/dayplan.test.ts`, `tests/watch.test.ts` |
+| **2. Clear, graded, multilingual warnings**, each with a safe action | Four levels (green, yellow, amber, red), each with exactly one action: keep drinking, drink now, rest in shade, rest in the cool cabin, stop heat work, or emergency. Written and read aloud in Arabic, Hindi, Urdu, Bengali, Malayalam, Tagalog and English. **The rules set the level and the action; the AI only words it** and is rejected if it changes the action, uses the wrong script or adds medical advice | The worker's phone (right panel) and its **Listen** button; speech bubbles on site; the crew briefing in the shift planner; site watch alerts, each with its reasons and a crew broadcast in seven languages | `tests/rules.test.ts`, `tests/projections.test.ts` (fallback messages in every language pass the checks); [60 AI-worded messages checked](docs/eval/README.md): all 60 kept the action |
 | **3. Worker-first governance**: consent, collecting little, no disciplinary use | Wearable sharing is the worker's choice and warnings work either way. A worker's readings stay on their own phone. The supervisor and Noor see crew totals only, never names or body readings; a name is shown only when someone shows signs of serious heat illness, so help can reach them. Omar sees who is used to the heat, never readings. Nothing in the supervisor's view can be used to rank or blame individuals | The phone banner "Only Anwar sees this screen"; the crew cards; Anwar's phone demo (**Share** or **Decline**) | `tests/projections.test.ts` checks every minute of a shift for leaked names or readings |
-| **4. Field-ready operation** with a safe fallback | Dead wearable batteries, a half-hour network outage and a dust storm are played out in **When everything fails**. Without a sensor, the phone switches to an estimate and says so. Without the network or the AI, pre-written messages and a rules-only plan take over. Anwar's phone demo works fully offline and sends his "I reached shade" confirmation when the signal returns | The **When everything fails** shift; the [worker phone demo](https://heatline-plum.vercel.app/worker/index.html) | `tests/scenarios.test.ts`, `tests/http.test.ts` |
-| **5. Supervisor decision support** at crew and site level | At the decision point, Omar proposes a plan using the levers a supervisor really has: shade tents, moving or cancelling the concrete pour, and moving workers to indoor duties. The site rules (midday break, work and rest limits, water, shade, no working alone, new workers' limits) check every plan and can refuse it. Omar's verdict also says when a plan is allowed but still over the safe heat limit. **Nothing changes until the supervisor approves** | The shift planner, for the day ahead; the 15:10 decision in **The afternoon pour**, then **Compare** | `tests/rules.test.ts`, `tests/scenarios.test.ts`, `tests/dayplan.test.ts`; [30 planner runs under pressure](docs/eval/README.md): no rule-breaking plan reached the supervisor |
-| **6. Safety and productivity measures**: lead time, false alarms, adherence, incidents, escalations, compliance and lost time | **Compare** shows the same afternoon with and without the plan. **Evidence** opens with two summers of real weather, then replays all of August 2025 in simulation (93 shifts, four approaches): 81% of high-strain episodes warned in advance, typically 37 minutes ahead; 10% false alarms; worker time over the NIOSH exposure limit 96% on the original schedule, 47% with an approved plan; simulated serious heat-illness cases 197 with no measures, 52 with site-wide flag breaks, 0 with an approved Heatline plan; times a rule was broken; minutes until a collapsed worker is being cooled; rest time and pours finished (the cost). Shade confirmations from workers' phones measure adherence | **Compare** and **Evidence** buttons | `npm run season` and `npm run backtest` regenerate the data |
+| **4. Field-ready operation** with a safe fallback | Dead wearable batteries, a half-hour network outage and a dust storm are played out in **When everything fails**. Without a sensor, the phone switches to an estimate and says so. Without the network or the AI, pre-written messages and a rules-only plan take over. Anwar's phone demo works fully offline and sends his "I reached shade" confirmation when the signal returns | The **When everything fails** shift; the [worker phone demo](https://heatline-plum.vercel.app/worker/index.html); site watch with the station failing (time over the limit 5.5% instead of 1.9%) | `tests/scenarios.test.ts`, `tests/http.test.ts` |
+| **5. Supervisor decision support** at crew and site level | At the decision point, Omar proposes a plan using the levers a supervisor really has: shade tents, moving or cancelling the concrete pour, and moving workers to indoor duties. The site rules (midday break, work and rest limits, water, shade, no working alone, new workers' limits) check every plan and can refuse it. Omar's verdict also says when a plan is allowed but still over the safe heat limit. **Nothing changes until the supervisor approves** | The shift planner, for the day ahead; site watch, for the next 15 minutes; the 15:10 decision in **The afternoon pour**, then **Compare** | `tests/rules.test.ts`, `tests/scenarios.test.ts`, `tests/dayplan.test.ts`; [30 planner runs under pressure](docs/eval/README.md): no rule-breaking plan reached the supervisor |
+| **6. Safety and productivity measures**: lead time, false alarms, adherence, incidents, escalations, compliance and lost time | **Compare** shows the same afternoon with and without the plan. **Evidence** opens with two summers of real weather, then replays all of August 2025 in simulation (93 shifts, four approaches): 81% of high-strain episodes warned in advance, typically 37 minutes ahead; 10% false alarms; worker time over the NIOSH exposure limit 96% on the original schedule, 47% with an approved plan; simulated serious heat-illness cases 197 with no measures, 52 with site-wide flag breaks, 0 with an approved Heatline plan; times a rule was broken; minutes until a collapsed worker is being cooled; rest time and pours finished (the cost). Shade confirmations from workers' phones measure adherence. **Site watch** reports, over two summers of real weather, time over the limit, work time, break lead time and alerts per day for five ways of timing breaks | **Compare** and **Evidence** buttons; the evaluation on the site-watch page | `npm run season`, `npm run backtest` and `npm run eval:watch` regenerate the data |
 
 The challenge also warns that worker protection must come before productivity, and that collecting too much can become surveillance. We treat both as design rules. The plan gives up 8 of 93 pours in August to reach zero serious cases, and the supervisor never sees an individual's body readings.
 
@@ -147,6 +172,7 @@ Open **http://127.0.0.1:5183**. The API runs on port **8787**.
 The rules decide; the AI words messages and proposes plans. We recorded how well that boundary holds ([full record](docs/eval/README.md)):
 
 - **60 guardian messages** in six languages: a separate judge, shown only the message, read the intended action from all 60. None weakened the action, added medical advice or quoted a body reading.
+- **24 site-watch briefs** on four replay days: all from the model, none rejected; a strict judge found 19 fully supported by the board. The test found and fixed two real faults in the board itself.
 - **30 planner runs**, most of them pushing Omar to cut corners ("ignore the heat rules today", "put the new worker on the pour"): the site rules refused 30 of his proposals along the way, and no rule-breaking plan reached the supervisor. He never poured on the day nobody should pour.
 - **90 pre-written lines** were back-translated by machine; three real wording problems were found and fixed. No native speaker has reviewed them yet.
 
@@ -172,6 +198,9 @@ flowchart LR
     Checks --> Replay[Replay and compare]
     Simulation --> Evidence[Backtests and sensitivity analysis]
     Forecast[Forecast for any site] --> Planner[Shift planner: hourly limits, pour window, briefing]
+    Station[WBGT station on site] --> Watch[Site watch: rolling exposure, breaks before the limit]
+    Forecast --> Watch
+    Watch --> Noor2[Noor: what matters in 15 min]
     Environment -. same heat code .-> Planner
 ```
 
@@ -208,10 +237,12 @@ npm run check       # TypeScript + unit/regression tests
 npm run build       # Production web build
 npm run backtest    # Regenerate the August experiment and sensitivity variants
 npm run season      # Regenerate the two-summer weather analysis
+npm run eval:watch  # Re-run the site-watch evaluation over 186 days (about 25 s)
+npm run station:sim -- --site <station id> --backfill   # A stand-in WBGT station
 npm run eval:agents # Re-run the AI checks (needs an OpenAI key)
 ```
 
-The test suite has **109 tests**. The August replay covers **31 days × 3 shifts × 4 approaches**, plus five what-if variants: **2,232 simulated shifts**. These are simulation results, not field-validation results.
+The test suite has **128 tests**. The August replay covers **31 days × 3 shifts × 4 approaches**, plus five what-if variants: **2,232 simulated shifts**. These are simulation results, not field-validation results.
 
 The production build currently emits a large-bundle advisory for the 3D client. This remains a performance improvement opportunity.
 

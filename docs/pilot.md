@@ -1,12 +1,13 @@
 # Path to a pilot
 
-Written 11 November 2026. Everything here is a plan to be tested with a partner, not a result.
+Written 11 November 2026; site watch added 17 November 2026. Everything here is a plan to be tested with a partner, not a result.
 
 ## What would be deployed
 
 | Part | What it needs on site | State today |
 | --- | --- | --- |
 | **Shift planner** | A site location. Nothing else: no hardware, no worker data | Working. Forecast and past days for any coordinates, at `/#plan` |
+| **Site watch** | One WBGT meter per work area that can post readings (directly, through a gateway, or as a CSV export), and a supervisor's screen. Works without a meter on the forecast plus a 1 °C margin | Working. Live today at `/#watch`; telemetry API; replay of any day since 2024; evaluated over 186 real days |
 | **Worker phone guardian** | Workers' own phones, or one shared phone per crew. Works offline once opened | Working demo for one worker and one stored warning; not yet driven by the day's plan |
 | **Crew dashboard** | The supervisor's phone or laptop | Working demo of one crew count; no sign-in yet |
 | **Rehearsal site** | A laptop, for the safety team before the season | Working. Four scenarios on one fictional site |
@@ -30,7 +31,7 @@ Written 11 November 2026. Everything here is a plan to be tested with a partner,
 | Stage | When | What happens | What we measure |
 | --- | --- | --- | --- |
 | **1. Rehearse** | March – May 2027 | One contractor's safety team runs heat drills on its own site layout and crew mix | Do supervisors change their decisions? Do they find the plans workable? |
-| **2. Shadow** | June – September 2027 | Forecast plans each evening for one to three sites. Supervisors see them; nobody is required to follow them | Forecast against the site's own heat readings. Plan against what the site actually did |
+| **2. Shadow** | June – September 2027 | Forecast plans each evening and a WBGT meter on each main work area feeding site watch, on one to three sites. Supervisors see the breaks; nobody is required to follow them yet | Forecast against the site's own readings (the real site effect); announced breaks against breaks taken; alerts a day; station uptime |
 | **3. Guardian** | From July 2027, volunteers only | Phone warnings for crews who opt in, with no wearable. A small wearable group later, under ethics review | Warning lead time, false alarms, whether rest was taken, symptoms reported, escalations, work time lost |
 
 The measures in stage 3 are the ones the challenge names: alert lead time, false-alarm rate, adherence to controls, heat-related symptoms or incidents, emergency escalations, compliance and lost work time.

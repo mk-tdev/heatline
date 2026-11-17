@@ -5,6 +5,7 @@ import { Intro } from './components/Intro';
 import { LandingExplore } from './scene/LandingExplore';
 import { Evidence } from './components/Evidence';
 import { Planner } from './planner/Planner';
+import { Watch } from './watch/Watch';
 import './styles.css';
 import './experience.css';
 
@@ -27,19 +28,23 @@ function Root() {
   const [playground, setPlayground] = useState(false);
   // The shift planner has its own address (#plan) so it can be linked and opened on a phone.
   const [planner, setPlanner] = useState(() => window.location.hash.startsWith('#plan'));
+  const [watch, setWatch] = useState(() => window.location.hash.startsWith('#watch'));
   useEffect(() => {
-    const sync = () => setPlanner(window.location.hash.startsWith('#plan'));
+    const sync = () => { setPlanner(window.location.hash.startsWith('#plan')); setWatch(window.location.hash.startsWith('#watch')); };
     window.addEventListener('hashchange', sync);
     return () => window.removeEventListener('hashchange', sync);
   }, []);
   const openPlanner = () => { window.location.hash = '#plan'; };
+  const openWatch = () => { window.location.hash = '#watch'; };
+  const closeWatch = () => { history.replaceState(null, '', window.location.pathname); setWatch(false); };
   const closePlanner = () => { history.replaceState(null, '', window.location.pathname); setPlanner(false); };
   const needsDesktop = () => window.innerWidth < 1024 || /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   return (
     <>
       {run && <App key={run.key} scenarioId={run.scenario} startMode={run.mode} onBrief={() => setRun(null)} onEvidence={() => setEvidence(true)} />}
       {planner && !run && <Planner onClose={closePlanner} onRehearse={() => { closePlanner(); if (needsDesktop()) setDesktopNotice(true); else setRun({ scenario: 'afternoon-pour', mode: 'story', key: Date.now() }); }} />}
-      {!run && !planner && <Intro onPlan={openPlanner} onExploreFoot={() => { if (needsDesktop()) setDesktopNotice(true); else setPlayground(true); }} onStart={(scenario, mode) => { if (needsDesktop()) setDesktopNotice(true); else setRun({ scenario, mode, key: Date.now() }); }} onEvidence={() => setEvidence(true)} />}
+      {watch && !run && !planner && <Watch onClose={closeWatch} />}
+      {!run && !planner && !watch && <Intro onWatch={openWatch} onPlan={openPlanner} onExploreFoot={() => { if (needsDesktop()) setDesktopNotice(true); else setPlayground(true); }} onStart={(scenario, mode) => { if (needsDesktop()) setDesktopNotice(true); else setRun({ scenario, mode, key: Date.now() }); }} onEvidence={() => setEvidence(true)} />}
       {playground && <LandingExplore onClose={() => setPlayground(false)} />}
       {desktopNotice && <DesktopNotice onClose={() => setDesktopNotice(false)} />}
       {evidence && <Evidence onClose={() => setEvidence(false)} />}

@@ -28,6 +28,17 @@ Limits. Forecast and reanalysis weather describe a grid square of several kilome
 
 What this does and does not show. It shows that, on this weather record and against this limit, the midday break leaves most over-limit hours to be managed by work and rest cycles and cooling. It does not show how many workers were harmed, and it is not a measurement on any site. "Above the limit" means controls are needed, not that work is prohibited. Two seasons at one grid point are not a climatology.
 
+## Site watch: live scheduling
+
+`packages/sim/src/watch.ts`, `station.ts`, `profiles.ts`, `airquality.ts`. Full description and results in [site-watch.md](site-watch.md).
+
+- **Exposure** is NIOSH 2016-106's time-weighted approach: for each crew group, the mean WBGT (work area, rest area, plus clothing) and the mean metabolic rate over the last 60 minutes, against the REL (acclimatised) or RAL (unacclimatised) for that mean rate. Before the shift, the hour is filled with rest at the rest-area WBGT.
+- **Scheduling** keeps the rolling hour 0.1 °C under the limit: work stops when the next minute would breach it; rest lasts at least 10 minutes and ends when 15 more minutes of work would stay under. Projections use the forecast plus the station correction, which fades with a three-hour time constant.
+- **Station fusion and fallback margins** (0.5 °C stale, 1.0 °C forecast-only) are Heatline's choices, not published values. WBGT from components uses ISO 7243's outdoor weighting (0.7 natural wet-bulb, 0.2 globe, 0.1 air).
+- **Acclimatisation** from work history: new workers 20% of a usual 480-minute heat day, +20% a day, unacclimatised limit until day 14; after 7 or more days away, 50/60/80/100% on the unacclimatised limit; after more than 28 days away, start again. NIOSH states the build-up and the one-week loss; the four-week restart follows secondary sources and studies, which put full loss at four to six weeks.
+- **Dust** bands use US EPA AQI PM10 breakpoints (155, 255, 355 µg/m³), defined on 24-hour averages and applied here to 15-minute averages as a stricter screen. CAMS data are modelled on a grid of about 45 km.
+- **Evaluation** uses Open-Meteo's archive of day-ahead forecasts (`*_previous_day1`) and ERA5-based reanalysis for 186 days. Site effects (+0.3 °C, up to +0.9 °C more in sun, day offset SD 0.4 °C, wander SD 0.25 °C) and station noise (SD 0.2 °C) are synthetic assumptions, not measurements. Results describe the scheduler against those assumptions; a pilot must measure the real site effect.
+
 ## Demonstration policy is not TWL
 
 `packages/rules/src/tables.ts` retains the original configurable scenario bands (28, 30.5, 32.5 °C WBGT) and work/rest defaults solely to reproduce training scenarios. These bands are not a conversion from WBGT to TWL and are not validated ACGIH or NIOSH limits. Passing this policy cannot establish that work is safe or lawful. Pour continuity is a scenario assumption, not a legal exemption.
