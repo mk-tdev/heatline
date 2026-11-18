@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-18T16:01:22.564Z",
+ "generated": "2026-11-18T16:13:53.893Z",
  "days": 186,
  "seasons": "15 June – 15 September, 2025 and 2026",
  "site": "Saadiyat Island grid point (24.50 N, 54.42 E); three crews of the demonstration site (20 workers, one on a new-worker build-up)",
@@ -159,7 +159,7 @@
   },
   {
    "id": "live+rotation",
-   "label": "Live, rotating to a shaded lighter task before resting",
+   "label": "Live, rotating to indoor tasks before resting",
    "overLimitSharePct": 2.6,
    "workMinPerWorkerDay": 338,
    "rotateMinPerWorkerDay": 163,

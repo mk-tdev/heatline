@@ -36,7 +36,7 @@ const STRATEGIES: { id: Strategy; label: string }[] = [
   { id: 'forecast+1', label: 'Day-ahead forecast with Heatline’s +1 °C margin' },
   { id: 'live', label: 'Live: site station fused with the forecast' },
   { id: 'live-outage', label: 'Live, with the station down 09:00–12:00' },
-  { id: 'live+rotation', label: 'Live, rotating to a shaded lighter task before resting' },
+  { id: 'live+rotation', label: 'Live, rotating to indoor tasks before resting' },
 ];
 
 interface Totals { workerRotateMin: number; workerDays: number; byLevel: Record<string, number>; workerShiftMin: number; workerOverMin: number; workerWorkMin: number; groupDays: number; groupDaysOver15: number; breaks: number; breaksAnnounced10: number; leads: number[]; alerts: number; alertDays: number }
