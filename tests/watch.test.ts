@@ -176,3 +176,65 @@ describe('crew broadcasts', () => {
     expect(broadcast(run.alerts.find((a) => a.kind === 'sensor')!, 'bn')).toBeNull();
   });
 });
+
+describe('task rotation', () => {
+  const readings = stationFrom(truth, date, 300, 1200);
+  const rotCrews = defaultCrews(date, template.workers, { rotation: true });
+  const restOnly = runWatch({ date, shifts, crews, forecast: grid, truth, readings, policy: 'follow' });
+  const rotating = runWatch({ date, shifts, crews: rotCrews, forecast: grid, truth, readings, policy: 'follow' });
+  const sum = (r: typeof rotating, f: (g: (typeof r.groups)[number]) => number) => r.groups.reduce((s, g) => s + f(g) * g.headcount, 0);
+
+  it('keeps crews productive by rotating to indoor tasks, still inside the limit', () => {
+    const productive = (r: typeof rotating) => sum(r, (g) => g.workMin + g.rotateMin);
+    expect(sum(rotating, (g) => g.rotateMin)).toBeGreaterThan(0);
+    expect(productive(rotating)).toBeGreaterThan(productive(restOnly) * 1.15);
+    expect(sum(rotating, (g) => g.overLimitMin) / sum(rotating, (g) => g.shiftMin)).toBeLessThan(0.05);
+  });
+  it('announces rotations as rotations, and broadcasts them in every language', () => {
+    const notice = rotating.alerts.find((a) => a.kind === 'break-soon' && a.mode === 'rotate')!;
+    expect(notice.title).toMatch(/rotate at/);
+    expect(notice.action).toMatch(/cooled workshop|cooled store/);
+    for (const language of BROADCAST_LANGUAGES) expect(broadcast(notice, language)).toContain(String(notice.forMin));
+    expect(broadcast(notice, 'en')).toMatch(/indoor task/);
+  });
+  it('never rotates to a task that is itself over its limit (shade in August)', () => {
+    const shadeCrew: WatchCrew = { id: 'S', label: 'Test', taskId: 'rebar', inSun: true, clothingAdjustC: 0, rest: 'cool-room', rotation: { label: 'shaded task', watts: 300 }, groups: [{ tier: 'standard', headcount: 5, capMin: Infinity }] };
+    const run = runWatch({ date, shifts, crews: [shadeCrew], forecast: grid, truth, readings, policy: 'follow' });
+    // Shade WBGT on an August afternoon is above the NIOSH limit for steady moderate work, so no rotation after 15:00.
+    const afternoon = run.minutes.filter((m) => m.minute >= 900);
+    expect(afternoon.every((m) => m.groups.every((g) => g.status !== 'rotate'))).toBe(true);
+  });
+});
+
+import { noorTriggers, shiftSummary } from '@heatline/sim';
+import { checkShiftRecord, fallbackShiftRecord, type ShiftRecordInput } from '@heatline/agents';
+describe('Noor on watch and the shift recorder', () => {
+  const rotCrews = defaultCrews(date, template.workers, { rotation: true });
+  const run = runWatch({ date, shifts, crews: rotCrews, forecast: grid, truth, readings: stationFrom(truth, date, 300, 1200, [{ from: 540, to: 600 }]), policy: 'follow' });
+  it('briefs on significant changes, spaced out, starting with the shift', () => {
+    const t = noorTriggers(run);
+    expect(t[0]!.reason).toBe('Start of shift');
+    for (let i = 1; i < t.length; i++) expect(t[i]!.minute - t[i - 1]!.minute).toBeGreaterThanOrEqual(20);
+    expect(t.some((x) => /station/i.test(x.reason))).toBe(true);
+    expect(t.length).toBeLessThan(20);
+  });
+  it('summarises the shift at crew level, with the figures adding up', () => {
+    const s = shiftSummary(run, rotCrews);
+    for (const g of s.groups) expect(g.mainTaskMin + g.indoorRotationMin + g.restMin + g.indoorCapMin).toBeLessThanOrEqual(s.shiftMinutes);
+    expect(s.stationMinutes + s.stationMissingMinutes).toBe(s.shiftMinutes);
+    expect(s.alerts.capsReached).toBe(1);
+    expect(JSON.stringify(s)).not.toMatch(PRIVATE);
+  });
+  it('accepts the rules record and rejects drafts that invent numbers, names or safety', () => {
+    const s = shiftSummary(run, rotCrews) as ShiftRecordInput;
+    const rules = fallbackShiftRecord(s);
+    expect(checkShiftRecord(s, rules)).toBeNull();
+    const base = { summary: `Peak WBGT ${s.peakWbgtSun} °C at ${s.peakAt}.`, wentWell: [], concerns: [], forTomorrow: [] };
+    expect(checkShiftRecord(s, base)).toBeNull();
+    expect(checkShiftRecord(s, { ...base, summary: 'Crews worked 731 minutes.' })).toMatch(/unknown number/);
+    expect(checkShiftRecord(s, { ...base, summary: 'Anwar rested well.' })).toBe('name');
+    expect(checkShiftRecord(s, { ...base, summary: 'The shift was safe.' })).toBe('safety claim');
+    expect(checkShiftRecord(s, { ...base, summary: 'Break at 23:59.' })).toMatch(/unknown time/);
+    expect(checkShiftRecord(s, { ...base, summary: 'Crew Z rested.' })).toMatch(/unknown crew/);
+  });
+});

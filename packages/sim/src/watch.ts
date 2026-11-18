@@ -34,6 +34,8 @@ export interface WatchCrew {
   inSun: boolean;
   clothingAdjustC: number;
   rest: 'shade' | 'cool-room';
+  /** a lighter task in the shade the crew can rotate to instead of resting (e.g. rebar cutting under a canopy) */
+  rotation?: { label: string; watts: number; indoor?: boolean };
   groups: WatchGroup[];
 }
 
@@ -79,12 +81,14 @@ export interface WatchAlert {
   /** for break alerts: when the break is due and how long */
   due?: Minute;
   forMin?: number;
+  /** for break alerts: rest, or rotation to the crew's shaded lighter task */
+  mode?: 'rest' | 'rotate';
 }
 
 export interface GroupMinute {
   crew: string;
   tier: WatchGroup['tier'];
-  status: 'work' | 'rest' | 'off' | 'capped';
+  status: 'work' | 'rotate' | 'rest' | 'off' | 'capped';
   /** rolling one-hour average WBGT as the scheduler estimates it */
   twa: number;
   limit: number;
@@ -93,7 +97,7 @@ export interface GroupMinute {
   heatMin: number;
   /** where the group rests now (the scheduler can move it from shade to the cooled room) */
   restPlace: WatchCrew['rest'];
-  nextBreak: { at: Minute; forMin: number } | null;
+  nextBreak: { at: Minute; forMin: number; mode: 'rest' | 'rotate' } | null;
   /** while on a break: when the scheduler expects work to resume */
   resumeAt: Minute | null;
   /** projected share of the limit 30 minutes from now, following the scheduler (record mode only) */
@@ -121,6 +125,8 @@ export interface GroupSummary {
   tier: WatchGroup['tier'];
   headcount: number;
   workMin: number;
+  /** minutes on the shaded rotation task (productive, lighter) */
+  rotateMin: number;
   shiftMin: number;
   /** minutes over the limit on true conditions while on shift */
   overLimitMin: number;
@@ -184,26 +190,57 @@ interface GroupState {
   watts: number;
   est: Rolling;
   truth: Rolling;
-  status: 'work' | 'rest' | 'off' | 'capped';
+  status: 'work' | 'rotate' | 'rest' | 'off' | 'capped';
+  /** rotation task watts when the crew can rotate under this policy, else null */
+  rotWatts: number | null;
   /** where the group rests; the scheduler can move it from shade to the cooled room */
   restPlace: WatchCrew['rest'];
   restStart: Minute;
   heatMin: number;
   /** announced break waiting to start */
-  pending: { alert: string; announcedAt: Minute; due: Minute; forMin: number } | null;
+  pending: { alert: string; announcedAt: Minute; due: Minute; forMin: number; mode: 'rest' | 'rotate' } | null;
   overAlert: boolean;
   capWarned: boolean;
   summary: GroupSummary;
   truthOver: boolean;
 }
 
-interface Exposure { workW: number; restW: number }
+interface Exposure { workW: number; restW: number; rotW: number }
 
-/** Exposure values for a crew from conditions: work area, and where it rests. */
+/** Exposure values for a crew from conditions: work area, where it rests, and its shaded rotation task. */
 function exposure(crew: WatchCrew, c: Conditions, rest: WatchCrew['rest'] = crew.rest): Exposure {
   const work = (crew.inSun ? c.sun : c.shade) + crew.clothingAdjustC;
   const restW = rest === 'cool-room' ? CABIN_WBGT : c.shade + crew.clothingAdjustC;
-  return { workW: work, restW };
+  const rotW = crew.rotation?.indoor ? CABIN_WBGT : c.shade + crew.clothingAdjustC;
+  return { workW: work, restW, rotW };
+}
+
+/** Margin by which the rotation task must sit under its own limit to count as recovery [°C]. */
+export const ROTATION_GUARD_C = Number(globalThis.process?.env?.HEATLINE_ROT_GUARD ?? 0.5);
+/**
+ * Rotate only to a task that is sustainable in current conditions: done continuously, its heat and
+ * effort sit at least ROTATION_GUARD_C under its own NIOSH limit, so the rolling hour falls while the
+ * crew keeps working. And this minute must not breach the limit.
+ */
+function canRotate(r: Rolling, e: Exposure, rotWatts: number, tier: WatchGroup['tier']): boolean {
+  if (e.rotW > limitFor(rotWatts, tier) - ROTATION_GUARD_C) return false;
+  const twa = r.twa + (e.rotW - r.w[r.i]!) / WINDOW;
+  const m = r.watts + (rotWatts - r.m[r.i]!) / WINDOW;
+  return twa <= limitFor(m, tier) - GUARD_C;
+}
+
+/**
+ * During relief from the main task: rotate to the shaded lighter task if that keeps a clear margin,
+ * otherwise rest. Once resting, stay resting until the main task resumes (no flip-flopping).
+ * Pushes the minute and returns what was done.
+ */
+function relief(r: Rolling, e: Exposure, rotWatts: number | null, tier: WatchGroup['tier'], previous: 'rotate' | 'rest' | 'work' = 'work'): 'rotate' | 'rest' {
+  if (rotWatts !== null && previous !== 'rest' && canRotate(r, e, rotWatts, tier)) {
+    r.push(e.rotW, rotWatts);
+    return 'rotate';
+  }
+  r.push(e.restW, REST_W);
+  return 'rest';
 }
 
 /** Can the group work this minute and stay under its limit? */
@@ -225,6 +262,7 @@ function canResume(r: Rolling, at: (k: number) => Exposure, watts: number, tier:
 }
 
 /** The scheduler's decision for one minute, given the state before it. */
+/** 'rest' here means relief from the main task; whether that is rest or rotation is chosen by relief(). */
 function decide(status: GroupState['status'], restStart: Minute, minute: Minute, r: Rolling, at: (k: number) => Exposure, watts: number, tier: WatchGroup['tier']): 'work' | 'rest' {
   if (status === 'work' || status === 'off') return canWork(r, at(0), watts, tier) ? 'work' : 'rest';
   if (minute - restStart < MIN_REST) return 'rest';
@@ -232,44 +270,52 @@ function decide(status: GroupState['status'], restStart: Minute, minute: Minute,
 }
 
 /** Project the scheduler forward on estimated conditions: when the next break starts and how long it lasts. */
-function projectBreak(s: GroupState, minute: Minute, inShift: (m: Minute) => boolean, at: (k: number) => Exposure, horizon: number): { at: Minute; forMin: number } | null {
+function projectBreak(s: GroupState, minute: Minute, inShift: (m: Minute) => boolean, at: (k: number) => Exposure, horizon: number): { at: Minute; forMin: number; mode: 'rest' | 'rotate' } | null {
   if (s.status !== 'work') return null;
   const r = s.est.copy();
   let status: 'work' | 'rest' = 'work';
   let restStart = -Infinity;
   let breakAt: Minute | null = null;
+  let mode: 'rest' | 'rotate' = 'rest';
+  let prev: 'rotate' | 'rest' | 'work' = 'work';
   for (let k = 0; k < horizon; k++) {
     const m = minute + k;
-    if (!inShift(m)) return breakAt === null ? null : { at: breakAt, forMin: m - breakAt };
+    if (!inShift(m)) return breakAt === null ? null : { at: breakAt, forMin: m - breakAt, mode };
     const atK = (j: number) => at(k + j);
     const next = decide(status, restStart, m, r, atK, s.watts, s.group.tier);
     const e = at(k);
     if (next === 'rest' && status === 'work') {
-      if (breakAt !== null) return { at: breakAt, forMin: m - breakAt };
+      if (breakAt !== null) return { at: breakAt, forMin: m - breakAt, mode };
       restStart = m;
       breakAt = m;
     }
-    if (next === 'work' && status === 'rest' && breakAt !== null) return { at: breakAt, forMin: m - breakAt };
+    if (next === 'work' && status === 'rest' && breakAt !== null) return { at: breakAt, forMin: m - breakAt, mode };
     status = next;
-    r.push(next === 'work' ? e.workW : e.restW, next === 'work' ? s.watts : REST_W);
+    if (next === 'work') { r.push(e.workW, s.watts); prev = 'work'; }
+    else {
+      prev = relief(r, e, s.rotWatts, s.group.tier, prev);
+      if (m === breakAt) mode = prev;
+    }
   }
-  return breakAt === null ? null : { at: breakAt, forMin: minute + horizon - breakAt };
+  return breakAt === null ? null : { at: breakAt, forMin: minute + horizon - breakAt, mode };
 }
 
 /** Projected share of the limit over the next hour: following the scheduler, and working straight through. */
 function projectRatios(s: GroupState, minute: Minute, at: (k: number) => Exposure, horizon = 60): { minute: Minute; withAction: number; without: number }[] {
   const a = s.est.copy();
   const b = s.est.copy();
-  let status: 'work' | 'rest' = s.status === 'rest' ? 'rest' : 'work';
+  let status: 'work' | 'rest' = s.status === 'rest' || s.status === 'rotate' ? 'rest' : 'work';
   let restStart = s.restStart;
   const out: { minute: Minute; withAction: number; without: number }[] = [];
+  let prevA: 'rotate' | 'rest' | 'work' = s.status === 'rotate' ? 'rotate' : s.status === 'rest' ? 'rest' : 'work';
   for (let k = 0; k <= horizon; k++) {
     const m = minute + k;
     const e = at(k);
     const next = decide(status, restStart, m, a, (j) => at(k + j), s.watts, s.group.tier);
     if (next === 'rest' && status === 'work') restStart = m;
     status = next;
-    a.push(next === 'work' ? e.workW : e.restW, next === 'work' ? s.watts : REST_W);
+    if (next === 'work') { a.push(e.workW, s.watts); prevA = 'work'; }
+    else prevA = relief(a, e, s.rotWatts, s.group.tier, prevA);
     b.push(e.workW, s.watts);
     if (k % 5 === 0) out.push({ minute: m, withAction: a.twa / limitFor(a.watts, s.group.tier), without: b.twa / limitFor(b.watts, s.group.tier) });
   }
@@ -309,6 +355,7 @@ export function runWatch(input: WatchInput): WatchRun {
         est: new Rolling(pad, REST_W),
         truth: new Rolling(pad, REST_W),
         status: 'off' as const,
+        rotWatts: input.policy === 'follow' && crew.rotation ? crew.rotation.watts : null,
         restPlace: crew.rest,
         restStart: -Infinity,
         heatMin: 0,
@@ -316,7 +363,7 @@ export function runWatch(input: WatchInput): WatchRun {
         overAlert: false,
         capWarned: false,
         truthOver: false,
-        summary: { crew: crew.id, tier: group.tier, headcount: group.headcount, workMin: 0, shiftMin: 0, overLimitMin: 0, breaks: [], crossings: [] },
+        summary: { crew: crew.id, tier: group.tier, headcount: group.headcount, workMin: 0, rotateMin: 0, shiftMin: 0, overLimitMin: 0, breaks: [], crossings: [] },
       };
     });
   });
@@ -396,9 +443,11 @@ export function runWatch(input: WatchInput): WatchRun {
         next = decide(s.status, s.restStart, minute, s.est, exAt, s.watts, s.group.tier);
         // An announced break starts when announced, even if conditions eased since: crews were told.
         if (next === 'work' && s.status === 'work' && s.pending && minute >= s.pending.due) next = 'rest';
+        // Relief: the shaded lighter task if it keeps the rolling hour under the limit, otherwise rest.
+        if (next === 'rest' && s.rotWatts !== null && s.status !== 'rest' && canRotate(s.est, e, s.rotWatts, s.group.tier)) next = 'rotate';
       }
 
-      if (next === 'rest' && s.status === 'work') {
+      if ((next === 'rest' || next === 'rotate') && s.status === 'work') {
         s.restStart = minute;
         const lead = s.pending ? minute - s.pending.announcedAt : null;
         s.summary.breaks.push({ announcedAt: s.pending?.announcedAt ?? null, startedAt: minute, lead });
@@ -407,20 +456,22 @@ export function runWatch(input: WatchInput): WatchRun {
         }
         s.pending = null;
       }
-      if (next === 'capped' && s.status !== 'capped') {
+      if (next === 'capped' && !s.capWarned) {
+        s.capWarned = true;
         raise({ minute, kind: 'cap', level: 'act', crew: s.crew.id, tier: s.group.tier, title: `${label}: today's heat-time cap reached`, action: 'Move them to indoor or shaded light work for the rest of the shift.', why: [`${s.heatMin} minutes of heat work so far today; today's cap from their build-up schedule is ${s.group.capMin}.`, 'Caps come from each worker’s days in the heat (work history), not from body measurements.'] });
       }
 
       // Exposure this minute.
       const working = next === 'work';
+      const rotating = next === 'rotate';
       const capped = next === 'capped';
-      const wE = working ? e.workW : capped ? CABIN_WBGT : e.restW;
-      const wT = working ? et.workW : capped ? CABIN_WBGT : et.restW;
-      const watts = working ? s.watts : capped ? LIGHT_W : REST_W;
+      const wE = working ? e.workW : rotating ? e.rotW : capped ? CABIN_WBGT : e.restW;
+      const wT = working ? et.workW : rotating ? et.rotW : capped ? CABIN_WBGT : et.restW;
+      const watts = working ? s.watts : rotating ? s.rotWatts! : capped ? LIGHT_W : REST_W;
       s.est.push(wE, watts);
       s.truth.push(wT, watts);
       s.status = next;
-      if (working) s.heatMin++;
+      if (working || rotating) s.heatMin++;
 
       const limitE = limitFor(s.est.watts, s.group.tier);
       const ratio = s.est.twa / limitE;
@@ -428,6 +479,7 @@ export function runWatch(input: WatchInput): WatchRun {
       if (onShift) {
         s.summary.shiftMin++;
         if (working) s.summary.workMin++;
+        if (rotating) s.summary.rotateMin++;
         const over = truthRatio > 1;
         if (over) s.summary.overLimitMin++;
         if (over && !s.truthOver) s.summary.crossings.push(minute);
@@ -449,25 +501,30 @@ export function runWatch(input: WatchInput): WatchRun {
           }
         }
         // While a break is announced, the board shows exactly what was announced, unless it is formally moved.
-        if (nextBreak && s.pending && nextBreak.at > s.pending.due - 3) nextBreak = { at: s.pending.due, forMin: s.pending.forMin };
+        if (nextBreak && s.pending && nextBreak.at > s.pending.due - 3) nextBreak = { at: s.pending.due, forMin: s.pending.forMin, mode: s.pending.mode };
         if (nextBreak) {
           const inMin = nextBreak.at - minute;
           if (!s.pending && inMin <= notice) {
+            const rot = nextBreak.mode === 'rotate' && s.crew.rotation ? s.crew.rotation : null;
             const a = raise({
-              minute, kind: 'break-soon', level: 'watch', crew: s.crew.id, tier: s.group.tier, due: nextBreak.at, forMin: nextBreak.forMin,
-              title: `${label}: break at ${formatClock(nextBreak.at)} for ${nextBreak.forMin} min`,
-              action: `Finish the current task by ${formatClock(nextBreak.at)}, then rest in ${restWords(s.restPlace)} and drink a cup of water.`,
+              minute, kind: 'break-soon', level: 'watch', crew: s.crew.id, tier: s.group.tier, due: nextBreak.at, forMin: nextBreak.forMin, mode: nextBreak.mode,
+              title: rot ? `${label}: rotate at ${formatClock(nextBreak.at)} for ${nextBreak.forMin} min` : `${label}: break at ${formatClock(nextBreak.at)} for ${nextBreak.forMin} min`,
+              action: rot
+                ? `At ${formatClock(nextBreak.at)}, move the crew to ${rot.label} for ${nextBreak.forMin} min, then back to ${taskProfile(s.crew.taskId).label.toLowerCase()}. Drink a cup of water on the way.`
+                : `Finish the current task by ${formatClock(nextBreak.at)}, then rest in ${restWords(s.restPlace)} and drink a cup of water.`,
               why: [
                 `Heat now: WBGT ${f1(est.sun)} °C in the sun (${SOURCE_WORDS[fused.source]}${fused.margin ? `, +${fused.margin} °C safety margin` : ''}).`,
                 `Last hour for ${tierWords(s.group.tier)}: average WBGT ${f1(s.est.twa)} °C at ${Math.round(s.est.watts)} W (${taskProfile(s.crew.taskId).label.toLowerCase()}${s.crew.clothingAdjustC ? `, +${s.crew.clothingAdjustC} °C for clothing` : ''}).`,
                 `NIOSH ${s.group.tier === 'standard' ? 'recommended exposure limit' : 'limit for unacclimatised workers'} at that workload: ${f1(limitE)} °C.`,
-                `Working straight on, the hour's average passes the limit at about ${formatClock(nextBreak.at)}. A ${nextBreak.forMin}-minute break in ${restWords(s.restPlace)} brings it back under.`,
+                rot
+                  ? `Working straight on, the hour's average passes the limit at about ${formatClock(nextBreak.at)}. Rotating to the lighter task in shade (${rot.watts} W) keeps the crew working and brings the average back under; resting is the fallback if it does not.`
+                  : `Working straight on, the hour's average passes the limit at about ${formatClock(nextBreak.at)}. A ${nextBreak.forMin}-minute break in ${restWords(s.restPlace)} brings it back under.`,
               ],
               projection: projectRatios(s, minute + 1, (k) => exAt(k + 1)),
             });
-            s.pending = { alert: a.id, announcedAt: minute, due: nextBreak.at, forMin: nextBreak.forMin };
+            s.pending = { alert: a.id, announcedAt: minute, due: nextBreak.at, forMin: nextBreak.forMin, mode: nextBreak.mode };
           } else if (s.pending && nextBreak.at <= s.pending.due - 3) {
-            raise({ minute, kind: 'break-moved', level: 'act', crew: s.crew.id, tier: s.group.tier, due: nextBreak.at, forMin: nextBreak.forMin, title: `${label}: break moved earlier, to ${formatClock(nextBreak.at)}`, action: `Conditions are hotter than projected. Rest in ${restWords(s.restPlace)} from ${formatClock(nextBreak.at)}.`, why: [`Earlier projection: ${formatClock(s.pending.due)}. Heat now: WBGT ${f1(est.sun)} °C (${SOURCE_WORDS[fused.source]}).`] });
+            raise({ minute, kind: 'break-moved', level: 'act', crew: s.crew.id, tier: s.group.tier, due: nextBreak.at, forMin: nextBreak.forMin, mode: nextBreak.mode, title: `${label}: ${nextBreak.mode === 'rotate' ? 'rotation' : 'break'} moved earlier, to ${formatClock(nextBreak.at)}`, action: nextBreak.mode === 'rotate' && s.crew.rotation ? `Conditions are hotter than projected. Move the crew to ${s.crew.rotation.label} from ${formatClock(nextBreak.at)}.` : `Conditions are hotter than projected. Rest in ${restWords(s.restPlace)} from ${formatClock(nextBreak.at)}.`, why: [`Earlier projection: ${formatClock(s.pending.due)}. Heat now: WBGT ${f1(est.sun)} °C (${SOURCE_WORDS[fused.source]}).`] });
             s.pending.due = nextBreak.at;
             s.pending.forMin = nextBreak.forMin;
           }
@@ -485,17 +542,17 @@ export function runWatch(input: WatchInput): WatchRun {
 
       let resumeAt: Minute | null = null;
       let in30: number | null = null;
-      if (onShift && input.record !== false && (next === 'work' || next === 'rest')) {
+      if (onShift && input.record !== false && (next === 'work' || next === 'rest' || next === 'rotate')) {
         const proj = projectRatios(s, minute + 1, (k) => exAt(k + 1), 30);
         in30 = proj[proj.length - 1]!.withAction;
-        if (next === 'rest') {
+        if (next !== 'work') {
           const r = s.est.copy();
           let st: 'work' | 'rest' = 'rest';
+          let how: 'rotate' | 'rest' | 'work' = next === 'rotate' ? 'rotate' : 'rest';
           for (let k = 1; k <= horizon && inShift(minute + k); k++) {
             st = decide(st, s.restStart, minute + k, r, (j) => exAt(k + j), s.watts, s.group.tier);
             if (st === 'work') { resumeAt = minute + k; break; }
-            const e2 = exAt(k);
-            r.push(e2.restW, REST_W);
+            how = relief(r, exAt(k), s.rotWatts, s.group.tier, how);
           }
         }
       }

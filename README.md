@@ -45,13 +45,16 @@ Two summers of real weather (186 days, three crews), with the scheduler seeing o
 | Day-ahead forecast + 1 °C margin | 10.0% | 351 min | 99.8% |
 | **Live: station fused with the forecast** | **1.9%** | **364 min** | **99.5%** |
 | Live, station down 09:00–12:00 daily | 5.5% | 363 min | 99.1% |
+| **Live, rotating to indoor tasks before resting** | **2.6%** | **500 min** (163 on indoor rotation) | **99.1%** |
 
-Live readings cut time over the limit from a third of the shift to 2%, and crews work more than with a blind safety margin. The forecast and weather archives are real; the site's extra heat over the area forecast and the station's noise are stated assumptions (`npm run eval:watch`).
+Live readings cut time over the limit from a third of the shift to 2%. Rotating crews to indoor tasks in a cooled workshop before resting keeps them productive for 500 minutes a day, close to the fixed routine's 513, with time over the limit at 2.6% instead of 84%. The forecast and weather archives are real; the site's extra heat over the area forecast and the station's noise are stated assumptions (`npm run eval:watch`).
 
 - **Telemetry in.** `POST /api/telemetry` takes WBGT, or globe, natural wet-bulb and air temperature (WBGT by ISO 7243), plus humidity, wind and PM10/PM2.5. Readings are quality-checked. Meter exports can be imported as CSV. `npm run station:sim` stands in for a meter.
 - **Profiles.** Acclimatisation comes from days worked in the heat (new workers build from 20%; back after a week away, 50/60/80/100%), never from body data. Tasks carry metabolic-rate estimates.
 - **Explained alerts.** Every alert opens to numbered reasons and a chart of the next hour with and without the break. Crew alerts go out as fixed text in seven languages.
-- **Noor watches the trend.** The AI reads the crew-level board, including 30-minute projections, and says what matters in the next 15 minutes. Her answer is rejected if it invents a time, crew or name. In 24 recorded moments, all came from the model and passed; a strict judge found 19 fully supported ([record](docs/eval/README.md#noors-site-watch-briefs)).
+- **Task rotation.** Before resting, a crew rotates to its indoor task in a cooled workshop, but only if that task is itself within its limit. Rotation in shade rarely qualifies in this heat, and the scheduler says so.
+- **Noor on watch.** The AI briefs the supervisor on her own whenever the board changes significantly (about 4 times a day), using the board's projections. Her answer is rejected if it invents a time, crew or name ([record](docs/eval/README.md#noors-site-watch-briefs)).
+- **Shift recorder.** The AI drafts the end-of-shift heat-safety record for the site file; every number must come from the crew-level figures. 8 of 8 recorded drafts passed and were judged supported ([record](docs/eval/README.md#the-shift-recorder)).
 - **Privacy.** The board never receives a name, a body reading or anyone's location. A test checks every alert and every minute.
 
 ## 🌡️ What the weather alone says
@@ -172,7 +175,8 @@ Open **http://127.0.0.1:5183**. The API runs on port **8787**.
 The rules decide; the AI words messages and proposes plans. We recorded how well that boundary holds ([full record](docs/eval/README.md)):
 
 - **60 guardian messages** in six languages: a separate judge, shown only the message, read the intended action from all 60. None weakened the action, added medical advice or quoted a body reading.
-- **24 site-watch briefs** on four replay days: all from the model, none rejected; a strict judge found 19 fully supported by the board. The test found and fixed two real faults in the board itself.
+- **8 shift records** drafted by the recorder: all passed the number check and were judged supported by the figures.
+- **24 site-watch briefs** on four replay days: 23 passed the checks (one was replaced by the rules summary) and a judge reading the same board found 21 fully supported. The test found and fixed two real faults in the board itself.
 - **30 planner runs**, most of them pushing Omar to cut corners ("ignore the heat rules today", "put the new worker on the pour"): the site rules refused 30 of his proposals along the way, and no rule-breaking plan reached the supervisor. He never poured on the day nobody should pour.
 - **90 pre-written lines** were back-translated by machine; three real wording problems were found and fixed. No native speaker has reviewed them yet.
 
@@ -242,7 +246,7 @@ npm run station:sim -- --site <station id> --backfill   # A stand-in WBGT statio
 npm run eval:agents # Re-run the AI checks (needs an OpenAI key)
 ```
 
-The test suite has **128 tests**. The August replay covers **31 days × 3 shifts × 4 approaches**, plus five what-if variants: **2,232 simulated shifts**. These are simulation results, not field-validation results.
+The test suite has **134 tests**. The August replay covers **31 days × 3 shifts × 4 approaches**, plus five what-if variants: **2,232 simulated shifts**. These are simulation results, not field-validation results.
 
 The production build currently emits a large-bundle advisory for the 3D client. This remains a performance improvement opportunity.
 

@@ -6,7 +6,7 @@ import type { Language } from '@heatline/contracts';
 import { formatClock } from '@heatline/contracts';
 import type { WatchAlert } from './watch';
 
-type Line = 'breakSoon' | 'breakNow' | 'restPlace' | 'over' | 'cap' | 'dust' | 'dustSevere';
+type Line = 'breakSoon' | 'rotateSoon' | 'breakNow' | 'restPlace' | 'over' | 'cap' | 'dust' | 'dustSevere';
 
 const PLACE: Record<Language, { shade: string; cool: string }> = {
   en: { shade: 'in the shade', cool: 'in the cool room' },
@@ -21,6 +21,7 @@ const PLACE: Record<Language, { shade: string; cool: string }> = {
 const TEXT: Record<Language, Record<Line, string>> = {
   en: {
     breakSoon: 'Crew {crew}: break at {time} for {min} minutes, {place}. Drink a cup of water.',
+    rotateSoon: 'Crew {crew}: at {time}, move to your indoor task for {min} minutes. Drink a cup of water.',
     breakNow: 'Crew {crew}: stop now and rest {place}. Drink a cup of water.',
     restPlace: 'Crew {crew}: take your breaks in the cool room, not in the shade.',
     over: 'Crew {crew}: stop heat work now and go to the cool room. Tell someone if you feel dizzy or nauseous.',
@@ -30,6 +31,7 @@ const TEXT: Record<Language, Record<Line, string>> = {
   },
   ar: {
     breakSoon: 'الفريق {crew}: استراحة الساعة {time} لمدة {min} دقيقة {place}. اشربوا كوب ماء.',
+    rotateSoon: 'الفريق {crew}: في الساعة {time}، انتقلوا إلى مهمتكم الداخلية لمدة {min} دقيقة. اشربوا كوب ماء.',
     breakNow: 'الفريق {crew}: توقفوا الآن واستريحوا {place}. اشربوا كوب ماء.',
     restPlace: 'الفريق {crew}: خذوا استراحاتكم في الغرفة المكيفة، وليس في الظل.',
     over: 'الفريق {crew}: أوقفوا العمل في الحر الآن واذهبوا إلى الغرفة المكيفة. أخبروا أحدًا إذا شعرتم بدوخة أو غثيان.',
@@ -39,6 +41,7 @@ const TEXT: Record<Language, Record<Line, string>> = {
   },
   hi: {
     breakSoon: 'टीम {crew}: {time} बजे {min} मिनट का आराम, {place}। एक कप पानी पिएँ।',
+    rotateSoon: 'टीम {crew}: {time} बजे {min} मिनट के लिए अंदर वाले काम पर जाएँ। एक कप पानी पिएँ।',
     breakNow: 'टीम {crew}: अभी रुकें और {place} आराम करें। एक कप पानी पिएँ।',
     restPlace: 'टीम {crew}: आराम ठंडे कमरे में करें, छाँव में नहीं।',
     over: 'टीम {crew}: गर्मी में काम अभी रोकें और ठंडे कमरे में जाएँ। चक्कर या मतली हो तो किसी को बताएँ।',
@@ -48,6 +51,7 @@ const TEXT: Record<Language, Record<Line, string>> = {
   },
   ur: {
     breakSoon: 'ٹیم {crew}: {time} بجے {min} منٹ کا آرام، {place}۔ ایک کپ پانی پئیں۔',
+    rotateSoon: 'ٹیم {crew}: {time} بجے {min} منٹ کے لیے اندر والے کام پر جائیں۔ ایک کپ پانی پئیں۔',
     breakNow: 'ٹیم {crew}: ابھی رکیں اور {place} آرام کریں۔ ایک کپ پانی پئیں۔',
     restPlace: 'ٹیم {crew}: آرام ٹھنڈے کمرے میں کریں، سائے میں نہیں۔',
     over: 'ٹیم {crew}: گرمی میں کام ابھی روکیں اور ٹھنڈے کمرے میں جائیں۔ چکر یا متلی ہو تو کسی کو بتائیں۔',
@@ -57,6 +61,7 @@ const TEXT: Record<Language, Record<Line, string>> = {
   },
   bn: {
     breakSoon: 'দল {crew}: {time}-এ {min} মিনিটের বিরতি, {place}। এক কাপ পানি পান করুন।',
+    rotateSoon: 'দল {crew}: {time}-এ {min} মিনিটের জন্য ভেতরের কাজে যান। এক কাপ পানি পান করুন।',
     breakNow: 'দল {crew}: এখনই থামুন এবং {place} বিশ্রাম নিন। এক কাপ পানি পান করুন।',
     restPlace: 'দল {crew}: বিরতি ঠান্ডা ঘরে নিন, ছায়ায় নয়।',
     over: 'দল {crew}: গরমের কাজ এখনই থামান এবং ঠান্ডা ঘরে যান। মাথা ঘুরলে বা বমি ভাব হলে কাউকে জানান।',
@@ -66,6 +71,7 @@ const TEXT: Record<Language, Record<Line, string>> = {
   },
   ml: {
     breakSoon: 'ടീം {crew}: {time}-ന് {min} മിനിറ്റ് വിശ്രമം, {place}. ഒരു കപ്പ് വെള്ളം കുടിക്കുക.',
+    rotateSoon: 'ടീം {crew}: {time}-ന് {min} മിനിറ്റ് അകത്തെ ജോലിയിലേക്ക് മാറുക. ഒരു കപ്പ് വെള്ളം കുടിക്കുക.',
     breakNow: 'ടീം {crew}: ഇപ്പോൾ നിർത്തി {place} വിശ്രമിക്കുക. ഒരു കപ്പ് വെള്ളം കുടിക്കുക.',
     restPlace: 'ടീം {crew}: വിശ്രമസമയത്ത് തണുത്ത മുറിയിൽ വിശ്രമിക്കുക, തണലിൽ അല്ല.',
     over: 'ടീം {crew}: ചൂടിലെ ജോലി ഇപ്പോൾ നിർത്തി തണുത്ത മുറിയിലേക്ക് പോകുക. തലകറക്കമോ ഓക്കാനമോ തോന്നിയാൽ ആരോടെങ്കിലും പറയുക.',
@@ -75,6 +81,7 @@ const TEXT: Record<Language, Record<Line, string>> = {
   },
   tl: {
     breakSoon: 'Crew {crew}: magpahinga {place} nang {min} minuto simula {time}. Uminom ng isang tasa ng tubig.',
+    rotateSoon: 'Crew {crew}: sa {time}, lumipat sa trabaho sa loob nang {min} minuto. Uminom ng isang tasa ng tubig.',
     breakNow: 'Crew {crew}: huminto ngayon at magpahinga {place}. Uminom ng isang tasa ng tubig.',
     restPlace: 'Crew {crew}: magpahinga sa malamig na silid, hindi sa lilim.',
     over: 'Crew {crew}: itigil ngayon ang trabaho sa init at pumunta sa malamig na silid. Sabihin sa isang tao kung nahihilo o nasusuka ka.',
@@ -93,7 +100,7 @@ export function broadcastFact(alert: WatchAlert, rest: 'shade' | 'cool-room' = '
   switch (alert.kind) {
     case 'break-soon':
     case 'break-moved':
-      return alert.due !== undefined ? { line: 'breakSoon', values: { crew, time: formatClock(alert.due), min: String(alert.forMin ?? 10) }, place } : null;
+      return alert.due !== undefined ? { line: alert.mode === 'rotate' ? 'rotateSoon' : 'breakSoon', values: { crew, time: formatClock(alert.due), min: String(alert.forMin ?? 10) }, place } : null;
     case 'break-now': return { line: 'breakNow', values: { crew }, place };
     case 'rest-place': return { line: 'restPlace', values: { crew }, place: 'cool' };
     case 'over-limit': return { line: 'over', values: { crew }, place: 'cool' };

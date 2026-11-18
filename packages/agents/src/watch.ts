@@ -27,7 +27,7 @@ export interface WatchContext {
     /** which workers in the crew this entry covers */
     workers: 'whole crew' | 'acclimatised workers' | 'workers on the new-worker limit';
     task: string;
-    status: 'working' | 'resting' | 'off shift' | 'indoor work';
+    status: 'working' | 'indoor rotation' | 'resting' | 'off shift' | 'indoor work';
     /** rolling-hour exposure as a share of the NIOSH limit [%] */
     limitSharePct: number;
     /** projected share in 30 minutes if the crew follows the scheduler [%] */
@@ -35,6 +35,10 @@ export interface WatchContext {
     nextBreak: string | null;
     /** how long the next break lasts [min] */
     breakLengthMin: number | null;
+    /** whether the next break is rest or rotation to the crew's indoor task */
+    nextBreakKind: 'rest' | 'indoor rotation' | null;
+    /** the crew's indoor rotation task, if it has one */
+    rotationTask: string | null;
     /** while on a break: when work is expected to resume */
     restingUntil: string | null;
     restPlace: string;
@@ -69,7 +73,7 @@ export function watchPrompt(c: WatchContext): string {
   const s = c.site;
   return [
     `Time ${c.clock}. Heat now: WBGT ${s.wbgtSun} °C in the sun, ${s.wbgtShade} °C in shade (${s.source}${s.marginC ? `, +${s.marginC} °C safety margin` : ''}). Forecast WBGT in the sun: ${s.forecastSun} °C now, ${s.forecastSunInHour} °C in an hour. Site vs forecast (station minus forecast, averaged over the last 30 min): ${s.biasC >= 0 ? '+' : ''}${s.biasC} °C. Dust: ${s.dust}${s.pm10 !== null ? ` (PM10 ${s.pm10} µg/m³)` : ''}.`,
-    ...c.crews.map((x) => `Crew ${x.crew}${x.workers === 'whole crew' ? '' : `, ${x.workers}`} (${x.task}): ${x.status}, at ${x.limitSharePct}% of the heat limit${x.limitShareIn30MinPct !== null ? `, projected ${x.limitShareIn30MinPct}% in 30 min following the schedule` : ''}. ${x.status === 'resting' ? (x.restingUntil ? `On a break until about ${x.restingUntil}, in ${x.restPlace}.` : `On a break in ${x.restPlace}.`) : x.nextBreak ? `Next break starts ${x.nextBreak} and lasts ${x.breakLengthMin} min, in ${x.restPlace}.` : x.status === 'working' ? 'No break due in the next 90 minutes.' : ''}`),
+    ...c.crews.map((x) => `Crew ${x.crew}${x.workers === 'whole crew' ? '' : `, ${x.workers}`} (${x.task}): ${x.status}, at ${x.limitSharePct}% of the heat limit${x.limitShareIn30MinPct !== null ? `, projected ${x.limitShareIn30MinPct}% in 30 min following the schedule` : ''}. ${x.status === 'resting' || x.status === 'indoor rotation' ? (x.restingUntil ? `${x.status === 'indoor rotation' ? `On indoor rotation (${x.rotationTask})` : `On a break in ${x.restPlace}`} until about ${x.restingUntil}, then back to the main task.` : x.status === 'indoor rotation' ? `On indoor rotation (${x.rotationTask}).` : `On a break in ${x.restPlace}.`) : x.nextBreak ? (x.nextBreakKind === 'indoor rotation' ? `Next relief starts ${x.nextBreak}: ${x.breakLengthMin} min of indoor rotation (${x.rotationTask}).` : `Next break starts ${x.nextBreak} and lasts ${x.breakLengthMin} min, in ${x.restPlace}.`) : x.status === 'working' ? 'No break due in the next 90 minutes.' : ''}`),
     c.alerts.length ? 'Recent alerts (newest last):' : 'No recent alerts.',
     ...c.alerts.map((a) => `${a.time} [${a.level}] ${a.title}. ${a.action}`),
   ].join('\n');

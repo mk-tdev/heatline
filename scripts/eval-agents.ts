@@ -17,10 +17,10 @@ import weather from '../data/weather/abu-dhabi-2025-08.json' with { type: 'json'
 import type { Language, WarningAction } from '@heatline/contracts';
 import { BRIEFING_LANGUAGES, SCENARIOS, briefing, buildCatalogScenario, buildDayPlan, createEnvironment, runShift, screenExposure, weatherRows, type OpenMeteoHourly, type ScenarioTemplate } from '@heatline/sim';
 import { LANGUAGE_NAMES, checkGuardianMessage, fallbackGuardianMessage, guardianContext, type GuardianContext, type PlanCheck } from '@heatline/agents';
-import { MODEL, guardian, planner, watchBrief } from '../server/http';
+import { MODEL, guardian, planner, shiftReport, watchBrief } from '../server/http';
 import { readFileSync, existsSync } from 'node:fs';
-import { broadcastLines, conditionsFrom, defaultCrews, runWatch, shiftsFor, siteTruth, stationFrom, watchContext, type WatchAlert } from '@heatline/sim';
-import { checkWatchBrief, type WatchContext } from '@heatline/agents';
+import { broadcastLines, conditionsFrom, defaultCrews, runWatch, shiftSummary, shiftsFor, siteTruth, stationFrom, watchContext, type WatchAlert } from '@heatline/sim';
+import { checkShiftRecord, checkWatchBrief, reportPrompt, watchPrompt, type ShiftRecordInput, type WatchContext } from '@heatline/agents';
 
 if (!process.env.OPENAI_API_KEY) {
   console.error('OPENAI_API_KEY is not set. Add it to .env and run: npm run eval:agents');
@@ -305,7 +305,7 @@ async function evalWatch() {
       model: MODEL, reasoning: { effort: 'low' },
       input: [
         { role: 'system', content: 'You audit a short safety brief against the site board it was written from. Be strict and literal.' },
-        { role: 'user', content: `BOARD\n${JSON.stringify(c.ctx)}\n\nBRIEF\n${JSON.stringify(brief)}` },
+        { role: 'user', content: `BOARD (exactly as given to Noor)\n${watchPrompt(c.ctx)}\n\nBRIEF\n${JSON.stringify(brief)}` },
       ],
       text: { format: zodTextFormat(Faithfulness, 'faithfulness') },
     });
@@ -328,6 +328,53 @@ async function evalWatch() {
   };
 }
 
+// ---- The shift recorder: 8 end-of-shift records ---------------------------------------------------
+
+const RecordAudit = z.object({
+  supported: z.boolean().describe('True if every statement in the record is supported by the figures.'),
+  missedConcern: z.boolean().describe('True if the figures show a station gap, minutes over the limit, unannounced breaks, unhealthy dust or a heat-time cap that the record leaves out of its concerns.'),
+  inventedAction: z.boolean().describe('True if an action for tomorrow relies on equipment, people or facts not in the figures.'),
+  note: z.string(),
+});
+
+async function evalReports() {
+  const replay = JSON.parse(readFileSync('data/watch/replay-days.json', 'utf8')) as { days: { date: string; title: string; reanalysis: never[]; dayAhead: never[]; pm10: (number | null)[] }[] };
+  const cases = replay.days.flatMap((d) => (['on', 'outage'] as const).map((station) => {
+    const truth = siteTruth(conditionsFrom(d.reanalysis, d.date), d.date);
+    const pm10 = (m: number) => d.pm10[Math.floor(m / 60)] ?? null;
+    const crews = defaultCrews(d.date, template.workers, { rotation: true });
+    const run = runWatch({ date: d.date, shifts: shiftsFor(d.date), crews, forecast: conditionsFrom(d.dayAhead, d.date), truth, readings: stationFrom(truth, d.date, 300, 1200, station === 'outage' ? [{ from: 540, to: 720 }] : [], pm10), pm10, policy: 'follow' });
+    return { day: d.title, station, summary: shiftSummary(run, crews) as ShiftRecordInput };
+  }));
+  const rows = await pool(cases, 4, async (c) => {
+    const out = (await shiftReport(c.summary)) as Awaited<ReturnType<typeof shiftReport>> & { reason?: string };
+    const record = { summary: out.summary, wentWell: out.wentWell, concerns: out.concerns, forTomorrow: out.forTomorrow };
+    const judged = await openai.responses.parse({
+      model: MODEL, reasoning: { effort: 'low' },
+      input: [
+        { role: 'system', content: 'You audit an end-of-shift heat-safety record against the figures it was written from. Be strict and literal.' },
+        { role: 'user', content: `FIGURES (exactly as given to the recorder)\n${reportPrompt(c.summary)}\n\nRECORD\n${JSON.stringify(record)}` },
+      ],
+      text: { format: zodTextFormat(RecordAudit, 'record_audit') },
+    });
+    const v = judged.output_parsed!;
+    process.stdout.write(out.source === 'model' && v.supported && !v.missedConcern ? '.' : 'x');
+    return { day: c.day, station: c.station, source: out.source, reason: out.reason ?? null, ms: out.ms, check: checkShiftRecord(c.summary, record), ...v, record };
+  });
+  console.log();
+  return {
+    total: rows.length,
+    fromModel: rows.filter((r) => r.source === 'model').length,
+    rejectedByChecks: rows.filter((r) => r.reason).length,
+    rejectionReasons: rows.filter((r) => r.reason).map((r) => r.reason),
+    supported: rows.filter((r) => r.supported).length,
+    missedConcern: rows.filter((r) => r.missedConcern).length,
+    inventedAction: rows.filter((r) => r.inventedAction).length,
+    latencyMs: { median: median(rows.filter((r) => r.source === 'model').map((r) => r.ms)), p90: p90(rows.filter((r) => r.source === 'model').map((r) => r.ms)) },
+    rows,
+  };
+}
+
 // ---- Report ----------------------------------------------------------------------------------
 
 const only = process.argv[2];
@@ -338,12 +385,14 @@ const g = !only || only === 'guardian' ? await evalGuardian() : previous.guardia
 const p = !only || only === 'planner' ? await evalPlanner() : previous.planner ?? null;
 const t = !only || only === 'translations' ? await evalTranslations() : previous.translations ?? null;
 const w = !only || only === 'watch' ? await evalWatch() : previous.watch ?? null;
+const rep = !only || only === 'report' ? await evalReports() : previous.report ?? null;
 mkdirSync('docs/eval', { recursive: true });
 const stamp = new Date().toISOString();
-writeFileSync('docs/eval/results.json', JSON.stringify({ generated: stamp, model: MODEL, ...(only ? { updated: only } : {}), guardian: g, planner: p, translations: t, watch: w }, null, 1));
+writeFileSync('docs/eval/results.json', JSON.stringify({ generated: stamp, model: MODEL, ...(only ? { updated: only } : {}), guardian: g, planner: p, translations: t, watch: w, report: rep }, null, 1));
 
 if (g) console.log(`Guardian: ${g.actionKept}/${g.total} kept the action; ${g.fromModel} from the model, ${g.fellBackToTemplate} templates; weakened ${g.weakened}; medical advice ${g.medicalAdvice}; readings ${g.quotesReadings}; fluency ${JSON.stringify(g.fluency)}; latency ${g.latencyMs.median}/${g.latencyMs.p90} ms`);
 if (p) console.log(`Planner: ${p.plansAcceptedByRules}/${p.total} accepted by the rules; ${p.fromModel} from the model, ${p.fellBackToRules} rules-only; proposals refused ${p.refusedProposals} in ${p.runsWhereRulesRefusedAProposal} runs; no-pour-day poured ${p.noPourDayPoured}; past the break ${p.breakDayPourPastBreak}; claimed safe ${p.claimedSafe}; latency ${p.latencyMs.median}/${p.latencyMs.p90} ms`);
 if (t) for (const r of t.results) console.log(`Translations ${r.language}: ${r.sameMeaning}/${r.checked} same meaning, ${r.natural} natural, ${r.flagged.length} flagged`);
 if (w) console.log(`Watch briefs: ${w.fromModel}/${w.total} from the model, ${w.rejectedByChecks} rejected by checks (${w.rejectionReasons.join('; ')}); supported ${w.supported}; changed an instruction ${w.changedInstruction}; missed an urgent alert ${w.missedUrgent} (of ${w.momentsWithUrgent} moments with one); latency ${w.latencyMs.median}/${w.latencyMs.p90} ms`);
+if (rep) console.log(`Shift records: ${rep.fromModel}/${rep.total} from the model, ${rep.rejectedByChecks} rejected (${rep.rejectionReasons.join('; ')}); supported ${rep.supported}; missed a concern ${rep.missedConcern}; invented an action ${rep.inventedAction}; latency ${rep.latencyMs.median}/${rep.latencyMs.p90} ms`);
 console.log(`Done in ${Math.round((Date.now() - t0) / 1000)} s`);

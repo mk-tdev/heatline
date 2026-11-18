@@ -40,6 +40,12 @@ import {
   fallbackWatchBrief,
   watchPrompt,
   type WatchContext,
+  REPORT_SYSTEM,
+  ShiftRecord,
+  checkShiftRecord,
+  fallbackShiftRecord,
+  reportPrompt,
+  type ShiftRecordInput,
 } from '@heatline/agents';
 
 export const MODEL = process.env.OPENAI_MODEL || 'gpt-6-luna';
@@ -115,15 +121,47 @@ const WatchInput = z.strictObject({
     crew: z.string().max(4),
     workers: z.enum(['whole crew', 'acclimatised workers', 'workers on the new-worker limit']),
     task: z.string().max(80),
-    status: z.enum(['working', 'resting', 'off shift', 'indoor work']),
+    status: z.enum(['working', 'indoor rotation', 'resting', 'off shift', 'indoor work']),
     limitSharePct: z.number().min(0).max(500),
     limitShareIn30MinPct: z.number().min(0).max(500).nullable(),
     nextBreak: z.string().regex(/^\d{2}:\d{2}$/).nullable(),
     breakLengthMin: z.number().int().min(0).max(240).nullable(),
+    nextBreakKind: z.enum(['rest', 'indoor rotation']).nullable(),
+    rotationTask: z.string().max(80).nullable(),
     restingUntil: z.string().regex(/^\d{2}:\d{2}$/).nullable(),
     restPlace: z.string().max(40),
   })).max(12),
   alerts: z.array(z.strictObject({ time: z.string().regex(/^\d{2}:\d{2}$/), level: z.enum(['info', 'watch', 'act', 'urgent']), title: z.string().max(160), action: z.string().max(300) })).max(12),
+});
+
+const n = (max = 100000) => z.number().min(0).max(max);
+const ShiftReportInput = z.strictObject({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  from: z.string().regex(/^\d{2}:\d{2}$/),
+  to: z.string().regex(/^\d{2}:\d{2}$/),
+  shiftMinutes: n(1440),
+  peakWbgtSun: n(50),
+  peakAt: z.string().regex(/^\d{2}:\d{2}$/),
+  maxSiteAboveForecastC: n(20),
+  stationMinutes: n(1440),
+  stationMissingMinutes: n(1440),
+  dustMinutes: z.strictObject({ elevated: n(1440), unhealthy: n(1440), severe: n(1440) }),
+  peakPm10: n(5000),
+  alerts: z.strictObject({ total: n(5000), toActOn: n(5000), urgent: n(5000), breaksAnnounced: n(5000), breaksMovedEarlier: n(5000), breaksUnannounced: n(5000), stationEvents: n(5000), dustEvents: n(5000), capsReached: n(5000) }),
+  groups: z.array(z.strictObject({
+    crew: z.string().max(4),
+    workers: z.enum(['whole crew', 'acclimatised workers', 'workers on the new-worker limit']),
+    task: z.string().max(80),
+    headcount: n(500),
+    mainTaskMin: n(1440),
+    indoorRotationMin: n(1440),
+    restMin: n(1440),
+    indoorCapMin: n(1440),
+    minutesOverLimitEstimated: n(1440),
+    peakLimitSharePct: n(500),
+    breaksAnnounced: n(500),
+    restMovedToCooledRoom: z.boolean(),
+  })).max(20),
 });
 
 // ---- Helpers ------------------------------------------------------------------------------
@@ -309,6 +347,28 @@ export async function watchBrief(ctx: WatchContext) {
   return { ...fallbackWatchBrief(ctx), source: 'rules', ms: Math.round(performance.now() - t0) };
 }
 
+/** The shift recorder: drafts the end-of-shift record; every number must come from the summary. */
+export async function shiftReport(input: ShiftRecordInput) {
+  const t0 = performance.now();
+  if (!openai) return { ...fallbackShiftRecord(input), source: 'rules', ms: 0 };
+  try {
+    const response = await withTimeout(25_000, (signal) =>
+      openai.responses.parse(
+        { model: MODEL, reasoning: { effort: 'low' }, input: [{ role: 'system', content: REPORT_SYSTEM }, { role: 'user', content: reportPrompt(input) }], text: { format: zodTextFormat(ShiftRecord, 'shift_record') } },
+        { signal },
+      ),
+    );
+    const out = response.output_parsed;
+    const problem = out ? checkShiftRecord(input, out) : 'no output';
+    if (out && !problem) return { ...out, source: 'model', model: MODEL, ms: Math.round(performance.now() - t0) };
+    console.warn(`report: rejected model output (${problem})`);
+    return { ...fallbackShiftRecord(input), source: 'rules', reason: `model draft rejected: ${problem}`, ms: Math.round(performance.now() - t0) };
+  } catch (error) {
+    console.warn(`report: ${(error as Error).name}: ${(error as Error).message}`);
+  }
+  return { ...fallbackShiftRecord(input), source: 'rules', ms: Math.round(performance.now() - t0) };
+}
+
 // ---- Voice: read the guardian's message aloud (for workers who can't read the screen) ----------
 
 const SpeakInput = z.strictObject({ text: z.string().min(1).max(300), language: Language, token: z.string().max(100) });
@@ -365,6 +425,12 @@ export async function handler(req: IncomingMessage, res: ServerResponse) {
       if (!parsed.success) return send(res, 400, { error: 'invalid watch context' });
       if (!allow('watch', visitor(req))) return send(res, 200, { ...fallbackWatchBrief(parsed.data as WatchContext), source: 'rules', ms: 0 });
       return send(res, 200, await watchBrief(parsed.data as WatchContext));
+    }
+    if (req.method === 'POST' && url.pathname === '/api/shift-report') {
+      const parsed = ShiftReportInput.safeParse(await readJson(req));
+      if (!parsed.success) return send(res, 400, { error: 'invalid shift summary' });
+      if (!allow('report', visitor(req))) return send(res, 200, { ...fallbackShiftRecord(parsed.data as ShiftRecordInput), source: 'rules', ms: 0 });
+      return send(res, 200, await shiftReport(parsed.data as ShiftRecordInput));
     }
     if (req.method === 'GET' && url.pathname === '/api/health') return send(res, 200, { ai: !!openai, model: openai ? MODEL : null });
     if (req.method === 'POST' && url.pathname === '/api/guardian') {

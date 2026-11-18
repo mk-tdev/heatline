@@ -1,6 +1,6 @@
 # Agent evaluation record
 
-Updated 17 November 2026: added Noor's site-watch briefs and the crew broadcasts.
+Updated 19 November 2026: added the shift recorder and task rotation; earlier, Noor's site-watch briefs and the crew broadcasts.
 
 Run on 11 November 2026 with `gpt-6-luna`, using the same functions the server calls. Full rows are in [`results.json`](results.json). Re-run with `npm run eval:agents` (needs an OpenAI key; took about four minutes).
 
@@ -70,19 +70,19 @@ This is a screen for gross errors. **No native speaker has reviewed these lines 
 
 ## Noor's site-watch briefs
 
-Run on 17 November 2026 (`npm run eval:agents -- watch`). Twenty-four moments: six times of day (07:30, 09:00, 10:15, 12:15, 16:00, 17:30) on each of the four replay days, with the station down 09:00–10:00 so the fallback is covered. Noor received exactly what the board shows: one entry per crew group (status, share of the limit now and projected in 30 minutes, next break and its length, rest place), the forecast now and in an hour, the site-versus-forecast difference, and the last 30 minutes of alerts still in force.
+Run on 19 November 2026, with task rotation on the board (`npm run eval:agents -- watch`). Twenty-four moments: six times of day (07:30, 09:00, 10:15, 12:15, 16:00, 17:30) on each of the four replay days, with the station down 09:00–10:00 so the fallback is covered. Noor received exactly what the board shows: one entry per crew group (status, share of the limit now and projected in 30 minutes, next break or rotation and its length, rest place, rotation task), the forecast now and in an hour, the site-versus-forecast difference, and the last 30 minutes of alerts still in force.
 
-The code checks reject a brief that mentions a time, crew or name not on the board, or claims safety. A separate judge call, shown the board as data and the brief, was asked whether every statement is supported, whether any instruction was changed, and whether an urgent or act alert from the last 15 minutes was left out.
+The code checks reject a brief that mentions a time, crew or name not on the board, or claims safety. A separate judge call, shown exactly the text Noor received and her brief, was asked whether every statement is supported, whether any instruction was changed, and whether an urgent or act alert from the last 15 minutes was left out.
 
 | Measure | Result |
 | --- | --- |
-| Briefs written by the model and passing the code checks | **24 / 24** |
-| Judged fully supported by the board | 19 / 24 |
-| Judged to change an instruction | 1 (called a rest period a break) |
-| Left out an urgent or act alert from the last 15 minutes | 1 of the 1 moments that had one (four items competed for three slots) |
-| Time to a brief | median 6.0 s, 90th percentile 7.3 s |
+| Briefs written by the model and passing the code checks | **23 / 24** (one rejected for writing a crew group in the crew field; the rules summary was shown instead) |
+| Judged fully supported by the board | **21 / 24** |
+| Judged to change an instruction | 1 (repeated a station-offline instruction after the station had come back) |
+| Left out an urgent or act alert from the last 15 minutes | 0 of the 1 moments that had one |
+| Time to a brief | median 6.7 s, 90th percentile 9.1 s |
 
-The other four "unsupported" verdicts concerned the site-versus-forecast figure, which the board gives as a 30-minute average while the judge recomputed it from the instantaneous readings.
+The other two "unsupported" verdicts: a break 16 minutes away labelled "next 15 min", and a brief that left out one crew group on a break. Earlier runs showed the judge the board as raw data rather than the text Noor received; it then misread labelled figures such as the 30-minute site-versus-forecast average. Giving both the same text is the fair test.
 
 **What the test changed.** The first two rounds found faults in the board, not just the wording, and they were fixed before this run:
 
@@ -95,3 +95,21 @@ The other four "unsupported" verdicts concerned the site-versus-forecast figure,
 ## Crew broadcasts
 
 Site-watch alerts go to crews as fixed sentences in seven languages (`packages/sim/src/broadcast.ts`). The machine back-translation check above was extended to them: 9 broadcast lines per language, 24 lines in all per language with the guardian and briefing lines. Across the six languages, 136 of 144 lines were judged to keep their meaning. The main finding repeated an earlier one: English "feel sick" had been translated as "nauseous" throughout, so the English now says "nauseous". Arabic broadcasts now use the plural, since they address a crew; Tagalog and Malayalam wording was made clearer. As before, **no native speaker has reviewed these lines yet.**
+
+## The shift recorder
+
+Run on 19 November 2026 (`npm run eval:agents -- report`). Eight end-of-shift records: the four replay days, each with the station working and with it failing 09:00–12:00, crews rotating to indoor tasks. The recorder received the crew-level shift figures as plain sentences. The code check rejects a draft containing a number, time or crew not in the figures, a name, or a claim that the shift was safe or compliant. A separate judge, shown exactly the same figures, checked each record.
+
+| Measure | Result |
+| --- | --- |
+| Records written by the model and passing the code check | **8 / 8** |
+| Judged supported by the figures | **8 / 8** |
+| Left a concern out | 1 (2 minutes of unhealthy dust on one day) |
+| Action for tomorrow not grounded in the figures | 1 ("check the station mounting and power" when the figures only show the gap) |
+| Time to a record | median 8.1 s |
+
+A first run gave the judge the raw data fields (for example `indoorCapMin`) instead of the sentences the recorder saw; it then misread them in all eight. Giving both the same text is the fair test, and is what the table reports.
+
+## Noor's automatic briefs: how often
+
+Across the 186 days of the site-watch evaluation (live station, rotation on), the board changed significantly enough for Noor to brief on her own 3.8 times a day on average, at most 8, with at least 20 minutes between briefs.

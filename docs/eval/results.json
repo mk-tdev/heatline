@@ -1,7 +1,7 @@
 {
- "generated": "2026-11-17T15:18:59.477Z",
+ "generated": "2026-11-18T16:06:18.663Z",
  "model": "gpt-6-luna",
- "updated": "translations",
+ "updated": "watch",
  "guardian": {
   "total": 60,
   "fromModel": 60,
@@ -2337,16 +2337,18 @@
  },
  "watch": {
   "total": 24,
-  "fromModel": 24,
-  "rejectedByChecks": 0,
-  "rejectionReasons": [],
-  "supported": 19,
+  "fromModel": 23,
+  "rejectedByChecks": 1,
+  "rejectionReasons": [
+   "model output rejected: unknown crew B (workers on the new-worker limit)"
+  ],
+  "supported": 21,
   "changedInstruction": 1,
-  "missedUrgent": 1,
+  "missedUrgent": 0,
   "momentsWithUrgent": 1,
   "latencyMs": {
-   "median": 5996,
-   "p90": 7319
+   "median": 6674,
+   "p90": 9139
   },
   "rows": [
    {
@@ -2354,33 +2356,33 @@
     "clock": "07:30",
     "source": "model",
     "reason": null,
-    "ms": 7115,
+    "ms": 11578,
     "check": null,
     "urgentOnBoard": 0,
     "supported": true,
     "missedUrgent": false,
     "changedInstruction": false,
-    "note": "The brief’s figures and listed break details match the board. The 07:06 watch alert is more than 15 minutes old, and its action is included.",
+    "note": "The brief’s statements match the board. The 07:06 watch alert is 24 minutes before the board time, so it is not an alert from the last 15 minutes.",
     "brief": {
-     "headline": "The site is 1.9 °C hotter than forecast, and Crew A and Crew B’s acclimatised workers are at 92% of the heat limit.",
+     "headline": "The site is 1.9 °C hotter than forecast, and the forecast sun WBGT rises from 32.2 °C now to 33.6 °C in an hour.",
      "priorities": [
       {
        "crew": "site",
-       "when": "now",
-       "text": "Tell crew leads that the morning plan is out of date, as the latest alert directs."
+       "when": "next 15 min",
+       "text": "Tell crew leads the morning plan is out of date, as the 07:06 watch alert directs."
       },
       {
        "crew": "A",
-       "when": "next 15 min",
-       "text": "Keep to the scheduled break starting 07:46 for 27 min in the cooled room; exposure is projected to reach 99% in 30 min."
+       "when": "later",
+       "text": "Crew A’s cooled-room break starts at 07:46 and lasts 27 min."
       },
       {
        "crew": "B",
-       "when": "next 15 min",
-       "text": "For acclimatised workers, keep to the scheduled break starting 07:46 for 27 min in the cooled room; exposure is projected to reach 99% in 30 min."
+       "when": "later",
+       "text": "Crew B’s acclimatised workers take their cooled-room break at 07:46 for 27 min."
       }
      ],
-     "trend": "The sun forecast rises from 32.2 °C now to 33.6 °C in an hour, the site is 1.9 °C hotter than forecast, and in 30 min Crews A, B’s acclimatised workers, B’s workers on the new-worker limit, and C are each projected at 99% of their limit."
+     "trend": "The forecast sun WBGT rises from 32.2 °C now to 33.6 °C in an hour, the site is +1.9 °C versus forecast, and in 30 min Crew A, Crew B acclimatised workers, Crew B workers on the new-worker limit, and Crew C are each projected at 99% of their limit following the schedule."
     }
    },
    {
@@ -2388,33 +2390,23 @@
     "clock": "09:00",
     "source": "model",
     "reason": null,
-    "ms": 10786,
+    "ms": 4011,
     "check": null,
     "urgentOnBoard": 0,
     "supported": true,
     "missedUrgent": false,
     "changedInstruction": false,
-    "note": "The brief accurately reports the forecast, site-station bias, scheduled breaks, rest place, durations, and projected limit shares. There are no board alerts to omit.",
+    "note": "The brief accurately reflects the board’s current heat-limit percentages, forecast, station-to-forecast difference, and scheduled breaks. There are no recent alerts.",
     "brief": {
-     "headline": "The site station is +1 °C above forecast, and scheduled crew breaks are coming up.",
+     "headline": "Site WBGT is 1 °C above forecast, while all crews are currently below their heat limits.",
      "priorities": [
       {
-       "crew": "B",
+       "crew": "site",
        "when": "later",
-       "text": "Workers on the new-worker limit should take their scheduled 37 min cooled-room break starting 09:18 because they are at 99% of the heat limit."
-      },
-      {
-       "crew": "A",
-       "when": "later",
-       "text": "Take the scheduled 29 min cooled-room break starting 09:20; the crew is at 86% of the heat limit."
-      },
-      {
-       "crew": "B",
-       "when": "later",
-       "text": "Acclimatised workers should take the scheduled 29 min cooled-room break starting 09:20; they are at 86% of the heat limit."
+       "text": "Keep the scheduled breaks on the board; the site station averaged 1 °C hotter than forecast over the last 30 min."
       }
      ],
-     "trend": "The forecast is 34.2 °C now and 34 °C in an hour, while the site station is +1 °C above forecast; in 30 minutes, projected shares are 86% for A and B acclimatised workers, and 99% for B workers on the new-worker limit and C."
+     "trend": "Forecast sun WBGT eases from 34.2 °C now to 34 °C in an hour; the site has been 1 °C above forecast, and in 30 min A and B acclimatised workers are projected at 86%, B workers on the new-worker limit at 99%, and C at 99% of their limits."
     }
    },
    {
@@ -2422,15 +2414,15 @@
     "clock": "10:15",
     "source": "model",
     "reason": null,
-    "ms": 7195,
+    "ms": 9139,
     "check": null,
     "urgentOnBoard": 0,
     "supported": true,
     "missedUrgent": false,
     "changedInstruction": false,
-    "note": "The brief’s statements and instructions match the board. No urgent or act alert from the last 15 minutes is omitted.",
+    "note": "The brief accurately reflects the board and includes the latest watch alert’s instruction to tell crew leads the morning plan is out of date.",
     "brief": {
-     "headline": "The site is 3.5 °C hotter than forecast, and the morning plan is out of date.",
+     "headline": "The site station is online, but the site is 3.5 °C hotter than forecast and the morning plan is out of date.",
      "priorities": [
       {
        "crew": "site",
@@ -2439,16 +2431,16 @@
       },
       {
        "crew": "C",
-       "when": "next 15 min",
-       "text": "Finish the current task by 10:21, then rest in the cooled rest room and drink a cup of water; the break starts at 10:21 and lasts 30 min."
+       "when": "now",
+       "text": "Finish the current task by 10:21, then rest in the cooled rest room for 30 min and drink a cup of water, as the alert directs."
       },
       {
        "crew": "A",
        "when": "later",
-       "text": "Crew A’s next break starts 10:34 and lasts 32 min in the cooled room."
+       "text": "Take the scheduled 32 min break in the cooled room starting 10:34; the crew is at 87% of its limit and projected at 91% in 30 min."
       }
      ],
-     "trend": "The sun forecast is 34.2 °C now and 34.5 °C in an hour, the site is 3.5 °C hotter than forecast, and in 30 min crews A, B acclimatised workers, B workers on the new-worker limit, and C are projected at 91%, 91%, 93%, and 98% of their limits, respectively."
+     "trend": "The sun forecast rises from 34.2 °C now to 34.5 °C in an hour, while the site is 3.5 °C hotter than forecast; in 30 min, A and B acclimatised workers are projected at 91% of their limits, B workers on the new-worker limit at 93%, and C at 98%."
     }
    },
    {
@@ -2456,23 +2448,23 @@
     "clock": "12:15",
     "source": "model",
     "reason": null,
-    "ms": 5388,
+    "ms": 5993,
     "check": null,
     "urgentOnBoard": 0,
-    "supported": false,
+    "supported": true,
     "missedUrgent": false,
     "changedInstruction": false,
-    "note": "The board reports a +2.3 °C bias, but does not say the site station has averaged +2.3 °C versus forecast. The other brief details match the board.",
+    "note": "The brief accurately reflects the 12:06 alert, Crew C’s 12:21 cooled-room break and 9-minute duration, and the forecast and 30-minute projections.",
     "brief": {
-     "headline": "The site station is running +2.3 °C above forecast, and Crew C’s scheduled cooled-room break starts at 12:21.",
+     "headline": "The site station is 2.3 °C hotter than forecast, and Crew C has a scheduled cooled-room break at 12:21.",
      "priorities": [
       {
        "crew": "C",
        "when": "next 15 min",
-       "text": "Finish the current task by 12:21, then rest in the cooled rest room and drink a cup of water; the 9 min break starts at 12:21."
+       "text": "Finish the current task by 12:21, then rest in the cooled rest room for 9 min and drink a cup of water."
       }
      ],
-     "trend": "The forecast rises from 34.7 °C now to 35.2 °C in an hour, the site station has averaged +2.3 °C versus forecast, and in 30 min Crew A, both Crew B groups, and Crew C are projected at 99% of their limits."
+     "trend": "The sun forecast rises from 34.7 °C now to 35.2 °C in an hour, while the site station has averaged 2.3 °C above forecast; in 30 min, Crew A and both Crew B groups are projected at 99% of their limits and Crew C at 99%."
     }
    },
    {
@@ -2480,33 +2472,33 @@
     "clock": "16:00",
     "source": "model",
     "reason": null,
-    "ms": 8242,
+    "ms": 6474,
     "check": null,
     "urgentOnBoard": 0,
     "supported": true,
     "missedUrgent": false,
     "changedInstruction": false,
-    "note": "The brief accurately reports the WBGT, scheduled breaks and rest place, forecast, bias, and projected crew shares. There are no alerts on the board.",
+    "note": "The brief accurately reports the station reading, forecast, station-versus-forecast average, break times and durations, cooled-room location, and projected shares. The board reports no recent alerts.",
     "brief": {
-     "headline": "Sun WBGT is 35.1 °C, and the earliest scheduled break is for Crew B workers on the new-worker limit at 16:23.",
+     "headline": "The site station is 35.1 °C in the sun, and Crew B workers on the new-worker limit have the earliest scheduled break.",
      "priorities": [
       {
        "crew": "B",
        "when": "later",
-       "text": "Crew B workers on the new-worker limit should take their scheduled 37 min cooled-room break starting 16:23."
+       "text": "Workers on the new-worker limit should take their scheduled 37 min break in the cooled room starting 16:23."
       },
       {
-       "crew": "site",
+       "crew": "A",
        "when": "later",
-       "text": "Crew A and Crew B acclimatised workers should take their scheduled 28 min cooled-room breaks starting 16:32."
+       "text": "Take the scheduled 28 min break in the cooled room starting 16:32."
       },
       {
-       "crew": "C",
+       "crew": "B",
        "when": "later",
-       "text": "Crew C should take its scheduled 26 min cooled-room break starting 16:34."
+       "text": "Acclimatised workers should take their scheduled 28 min break in the cooled room starting 16:32."
       }
      ],
-     "trend": "The sun forecast rises from 33.8 °C now to 34 °C in an hour, the site station has averaged +1.2 °C above forecast, and projected crew shares in 30 min are 99% for Crew A and both Crew B groups and 97% for Crew C."
+     "trend": "Forecast sun WBGT rises from 33.8 °C now to 34 °C in an hour; the site station has averaged +1.2 °C versus forecast, while projected shares in 30 min are 99% for Crew A, 99% for Crew B acclimatised workers, 99% for Crew B workers on the new-worker limit, and 97% for Crew C."
     }
    },
    {
@@ -2514,20 +2506,20 @@
     "clock": "17:30",
     "source": "model",
     "reason": null,
-    "ms": 7319,
+    "ms": 7376,
     "check": null,
     "urgentOnBoard": 0,
     "supported": true,
-    "missedUrgent": true,
+    "missedUrgent": false,
     "changedInstruction": false,
-    "note": "The brief omits Crew B’s acclimatised workers’ 17:35 break: finish the task, rest in the cooled rest room for 25 minutes, and drink a cup of water. The other statements match the board.",
+    "note": "The brief accurately reflects the current work restriction, scheduled breaks and rest instructions, and the stated heat trend. The 17:01 act alert is outside the last 15 minutes; the more recent watch alerts are covered.",
     "brief": {
-     "headline": "Crew B workers on the new-worker limit must remain on indoor or shaded light work for the rest of the shift; their heat-time cap has been reached.",
+     "headline": "Crew B’s workers on the new-worker limit must remain on indoor or shaded light work for the rest of the shift; scheduled breaks are due shortly for the working crews.",
      "priorities": [
       {
        "crew": "B",
        "when": "now",
-       "text": "Keep workers on the new-worker limit on indoor or shaded light work for the rest of the shift because their heat-time cap has been reached."
+       "text": "Keep workers on the new-worker limit on indoor or shaded light work for the rest of the shift because their heat-time cap has been reached; acclimatised workers should finish the current task by 17:35, then rest in the cooled rest room for 25 min and drink a cup of water."
       },
       {
        "crew": "A",
@@ -2540,7 +2532,7 @@
        "text": "Finish the current task by 17:38, then rest in the cooled rest room for 22 min and drink a cup of water."
       }
      ],
-     "trend": "The sun forecast falls from 33.3 °C now to 32.1 °C in an hour, the site has averaged 0.5 °C below forecast, and crews A, B acclimatised workers, and C are each projected at 99% of their limit in 30 min."
+     "trend": "The sun forecast falls from 33.3 °C now to 32.1 °C in an hour, the site station has been 0.5 °C below forecast, and Crews A, B’s acclimatised workers, and C are each projected at 99% of the limit in 30 min following the schedule."
     }
    },
    {
@@ -2548,15 +2540,15 @@
     "clock": "07:30",
     "source": "model",
     "reason": null,
-    "ms": 4744,
+    "ms": 6560,
     "check": null,
     "urgentOnBoard": 0,
-    "supported": true,
+    "supported": false,
     "missedUrgent": false,
     "changedInstruction": false,
-    "note": "The brief accurately reflects the board, including the 07:16 watch alert and the break details.",
+    "note": "A and B are labeled “next 15 min,” but their breaks start at 07:46, which is 16 minutes after the board time of 07:30. The alert’s instructions are otherwise included accurately.",
     "brief": {
-     "headline": "Crew C must finish its current task by 07:31, then take its scheduled cooled-room break.",
+     "headline": "Crew C must finish its current task by 07:31, then take its scheduled 11-minute cooled-room break.",
      "priorities": [
       {
        "crew": "C",
@@ -2566,15 +2558,15 @@
       {
        "crew": "A",
        "when": "next 15 min",
-       "text": "Crew A’s next break starts 07:46 and lasts 15 min in the cooled room; its projected share is 99% in 30 min."
+       "text": "Take the scheduled 15 min break in the cooled room starting 07:46; the crew is at 90% of its limit."
       },
       {
        "crew": "B",
        "when": "next 15 min",
-       "text": "Acclimatised workers’ next break starts 07:46 and lasts 15 min in the cooled room; their projected share is 99% in 30 min."
+       "text": "Acclimatised workers should take the scheduled 15 min cooled-room break starting 07:46; they are at 90% of their limit."
       }
      ],
-     "trend": "The forecast rises from 33 °C now to 33.8 °C in an hour, the site-versus-forecast difference is +0 °C, and each crew group is projected at 99% of its limit in 30 min."
+     "trend": "The forecast rises from 33 °C now to 33.8 °C in an hour, the site-versus-forecast difference is +0 °C, and each crew is projected at 99% of its limit in 30 min following the schedule."
     }
    },
    {
@@ -2582,33 +2574,33 @@
     "clock": "09:00",
     "source": "model",
     "reason": null,
-    "ms": 5976,
+    "ms": 6434,
     "check": null,
     "urgentOnBoard": 0,
     "supported": true,
     "missedUrgent": false,
     "changedInstruction": false,
-    "note": "The brief accurately reflects the board’s break times, durations, rest place, alert action, projections, and forecast figures.",
+    "note": "The brief accurately reflects the 08:50 alert, the listed break times and durations, and the forecast, station offset, and projected heat-limit figures.",
     "brief": {
-     "headline": "Crew C’s scheduled break is at 09:05; finish the current task by then and rest in the cooled rest room.",
+     "headline": "Crew C’s 09:05 break is the first action: finish the current task by 09:05, then rest in the cooled rest room and drink a cup of water.",
      "priorities": [
       {
        "crew": "C",
        "when": "now",
-       "text": "Finish the current task by 09:05, then rest in the cooled rest room and drink a cup of water, as the alert directs."
+       "text": "Follow the 08:50 alert: finish the current task by 09:05, then rest in the cooled rest room and drink a cup of water."
       },
       {
        "crew": "A",
        "when": "later",
-       "text": "Crew A’s next break starts 09:18 and lasts 11 min in the cooled room; its projected share in 30 min is 99%."
+       "text": "Crew A’s next break starts 09:18 and lasts 11 min in the cooled room."
       },
       {
        "crew": "B",
        "when": "later",
-       "text": "Crew B’s acclimatised workers break at 09:18 for 11 min, while workers on the new-worker limit break at 09:22 for 35 min; both groups are projected at 99% in 30 min."
+       "text": "Workers on the new-worker limit have their next break at 09:22 for 35 min in the cooled room."
       }
      ],
-     "trend": "The sun forecast rises from 33.8 °C now to 34.2 °C in an hour; the site-versus-forecast figure is -1.5 °C, and each crew is projected at 99% of its limit in 30 min."
+     "trend": "The forecast rises from 33.8 °C now to 34.2 °C in an hour, while the site station averaged 1.5 °C below forecast over the last 30 min; every crew group is projected at 99% of its limit in 30 min following the schedule."
     }
    },
    {
@@ -2616,33 +2608,33 @@
     "clock": "10:15",
     "source": "model",
     "reason": null,
-    "ms": 5962,
+    "ms": 7859,
     "check": null,
     "urgentOnBoard": 0,
     "supported": true,
     "missedUrgent": false,
     "changedInstruction": false,
-    "note": "The stated readings, forecast, bias, projected shares, and break instructions match the board. The brief omits Crew C’s 10:32 break, but the board has no urgent or act alert for it in the last 15 minutes.",
+    "note": "The brief accurately reports the break times, durations, rest instructions, forecast trend, station-versus-forecast difference, and projected heat-limit shares. The 09:45 act alert is older than 15 minutes; the recent watch alerts are represented.",
     "brief": {
-     "headline": "At 10:15, crews are working in 34.2 °C sun WBGT, with the forecast rising to 35 °C in an hour.",
+     "headline": "Crew A and Crew B’s acclimatised workers break at 10:16, while Crew B’s workers on the new-worker limit break at 10:23.",
      "priorities": [
       {
        "crew": "A",
        "when": "next 15 min",
-       "text": "Finish the current task by 10:16, then rest in the cooled rest room for 11 min and drink a cup of water."
+       "text": "Finish the current task by 10:16, then rest in the cooled rest room and drink a cup of water; the break is scheduled for 11 min."
       },
       {
        "crew": "B",
        "when": "next 15 min",
-       "text": "Acclimatised workers: finish the current task by 10:16, then rest in the cooled rest room for 11 min and drink a cup of water."
+       "text": "For acclimatised workers, finish the current task by 10:16, then rest in the cooled rest room and drink a cup of water; the break is scheduled for 11 min."
       },
       {
        "crew": "B",
        "when": "next 15 min",
-       "text": "Workers on the new-worker limit: finish the current task by 10:23, then rest in the cooled rest room for 37 min and drink a cup of water."
+       "text": "For workers on the new-worker limit, finish the current task by 10:23, then rest in the cooled rest room and drink a cup of water; the break is scheduled for 37 min."
       }
      ],
-     "trend": "The sun forecast rises from 34.3 °C now to 35 °C in an hour, the site station has averaged 0.1 °C below forecast, and projected shares in 30 min are 87% for Crew A, 87% for acclimatised Crew B, 99% for Crew B workers on the new-worker limit, and 96% for Crew C."
+     "trend": "The forecast rises from 34.3 °C now to 35 °C in an hour, while the site has averaged 0.1 °C below forecast; in 30 minutes, projected shares are 87% for Crew A and Crew B’s acclimatised workers, 99% for Crew B’s workers on the new-worker limit, and 96% for Crew C."
     }
    },
    {
@@ -2650,23 +2642,23 @@
     "clock": "12:15",
     "source": "model",
     "reason": null,
-    "ms": 6587,
+    "ms": 6237,
     "check": null,
     "urgentOnBoard": 0,
-    "supported": false,
+    "supported": true,
     "missedUrgent": false,
     "changedInstruction": false,
-    "note": "The board gives a −0.6 °C bias but does not say it is an average over the last 30 minutes. The break instruction and projected shares match the board.",
+    "note": "The brief accurately reflects the new-worker-limit crew’s status, break timing and duration, rest location, and water instruction. The trend figures and 30-minute projections also match the board.",
     "brief": {
-     "headline": "Crew B workers on the new-worker limit are working at 98% of the heat limit, with their break starting at 12:21.",
+     "headline": "Crew B workers on the new-worker limit are working at 98% of the heat limit; their scheduled break starts at 12:21.",
      "priorities": [
       {
        "crew": "B",
        "when": "now",
-       "text": "Finish the current task by 12:21, then rest in the cooled rest room for the scheduled 9 min and drink a cup of water, as the alert directs."
+       "text": "Workers on the new-worker limit: finish the current task by 12:21, then rest in the cooled rest room for 9 min and drink a cup of water, as directed by the alert."
       }
      ],
-     "trend": "The forecast falls from 37.1 °C now to 36.6 °C in an hour; the site station has averaged 0.6 °C below forecast over the last 30 min, and projected shares in 30 min are 99% for Crew A, 99% for Crew B acclimatised workers, 98% for Crew B workers on the new-worker limit, and 99% for Crew C."
+     "trend": "The sun forecast is 37.1 °C now and 36.6 °C in an hour, while the site station has averaged 0.6 °C below forecast over the last 30 min; in 30 min, projected shares are 99% for Crew A, 99% for Crew B acclimatised workers, 98% for Crew B workers on the new-worker limit, and 99% for Crew C."
     }
    },
    {
@@ -2674,33 +2666,33 @@
     "clock": "16:00",
     "source": "model",
     "reason": null,
-    "ms": 3404,
+    "ms": 4345,
     "check": null,
     "urgentOnBoard": 0,
     "supported": true,
     "missedUrgent": false,
     "changedInstruction": false,
-    "note": "The brief matches the listed breaks, rest place, forecast, and projected shares. The board’s bias is 1.6 °C; its 15:32 watch alert separately says the site is 1.3 °C hotter than forecast and instructs leads that the morning plan is out of date.",
+    "note": "The brief’s heat-limit figures, projections, break times and durations, cooled-room location, and morning-plan message match the board. The 1.6 °C site-versus-forecast figure is the board’s station-minus-forecast average over the last 30 minutes.",
     "brief": {
-     "headline": "The site is 1.6 °C hotter than forecast, and the morning plan is out of date.",
+     "headline": "At 16:00, the site is 1.6 °C hotter than forecast, while all crews are at 99% of their heat limits.",
      "priorities": [
       {
        "crew": "B",
        "when": "next 15 min",
-       "text": "Workers on the new-worker limit have a cooled-room break starting 16:23 for 37 min, so tell their crew lead the morning plan is out of date."
+       "text": "Workers on the new-worker limit should take their scheduled 37 min cooled-room break starting 16:23."
+      },
+      {
+       "crew": "site",
+       "when": "now",
+       "text": "Tell crew leads the morning plan is out of date; the site is 1.6 °C hotter than forecast."
       },
       {
        "crew": "A",
        "when": "later",
-       "text": "The rebar-tying crew’s cooled-room break starts 16:31 and lasts 29 min; the site is 1.6 °C hotter than forecast."
-      },
-      {
-       "crew": "B",
-       "when": "later",
-       "text": "Acclimatised workers have a cooled-room break starting 16:31 for 29 min; the site is 1.6 °C hotter than forecast."
+       "text": "Take the scheduled 29 min cooled-room break starting 16:31; the crew is at 99% of its heat limit."
       }
      ],
-     "trend": "Forecast WBGT in the sun is 33.8 °C now and in an hour; the site is 1.6 °C hotter than forecast, while projected 30-minute shares are 99% for crews A and B and 98% for crew C."
+     "trend": "Forecast WBGT is 33.8 °C now and in an hour, the site is 1.6 °C hotter than forecast, and in 30 min A and both B groups are projected at 99% of their limits while C is projected at 98%. "
     }
    },
    {
@@ -2708,15 +2700,15 @@
     "clock": "17:30",
     "source": "model",
     "reason": null,
-    "ms": 5135,
+    "ms": 5759,
     "check": null,
     "urgentOnBoard": 0,
     "supported": true,
     "missedUrgent": false,
     "changedInstruction": false,
-    "note": "The brief accurately reports the forecast, site bias, break times, durations, rest place, and actions. The board has no urgent or act alerts in the last 15 minutes.",
+    "note": "The brief accurately reports the break times, durations, rest location and actions, and the forecast, site-versus-forecast difference, and projected heat-limit percentages. The board has no urgent or act alert in the last 15 minutes.",
     "brief": {
-     "headline": "The site is +0.6 °C above forecast, and scheduled cooled-room breaks are due shortly for crews A, B’s acclimatised workers, and C.",
+     "headline": "Crew A and acclimatised Crew B have breaks at 17:33; Crew C’s break starts at 17:36.",
      "priorities": [
       {
        "crew": "A",
@@ -2726,7 +2718,7 @@
       {
        "crew": "B",
        "when": "next 15 min",
-       "text": "For the acclimatised workers, finish the current task by 17:33, then rest in the cooled rest room for 27 min and drink a cup of water."
+       "text": "Acclimatised workers: finish the current task by 17:33, then rest in the cooled rest room for 27 min and drink a cup of water."
       },
       {
        "crew": "C",
@@ -2734,7 +2726,7 @@
        "text": "Finish the current task by 17:36, then rest in the cooled rest room for 24 min and drink a cup of water."
       }
      ],
-     "trend": "Forecast sun WBGT falls from 33.3 °C now to 32.4 °C in an hour, while the site is +0.6 °C above forecast; crews A, B’s acclimatised workers, and C are each projected at 99% of their limit in 30 min."
+     "trend": "Forecast sun WBGT falls from 33.3 °C now to 32.4 °C in an hour, but the site is +0.6 °C above forecast; in 30 min, Crews A, acclimatised B and C are each projected at 99% of the heat limit."
     }
    },
    {
@@ -2742,33 +2734,33 @@
     "clock": "07:30",
     "source": "model",
     "reason": null,
-    "ms": 6012,
+    "ms": 8574,
     "check": null,
     "urgentOnBoard": 0,
     "supported": false,
     "missedUrgent": false,
-    "changedInstruction": true,
-    "note": "The board says the crews are resting, but does not identify this as a break; the brief calls it a break. The stated rest places, end times, exposure shares, forecast, and alert status match the board.",
+    "changedInstruction": false,
+    "note": "The brief omits Crew B workers on the new-worker limit, who are on a cooled-room break until about 08:00 before returning to the main task. Other stated figures and instructions match the board; there are no recent alerts.",
     "brief": {
-     "headline": "The site station is +1.2 °C above forecast, while crews are resting and no alerts have been raised.",
+     "headline": "Sun WBGT is 32.5 °C, and the site has been +1.2 °C above forecast.",
      "priorities": [
       {
        "crew": "A",
        "when": "next 15 min",
-       "text": "Keep Crew A in the cooled room on its break until about 07:33; its rolling exposure is at 93% of the limit."
+       "text": "Crew A is on a cooled-room break until about 07:33, then returns to the main task as scheduled."
       },
       {
        "crew": "B",
        "when": "next 15 min",
-       "text": "Keep the acclimatised workers in the cooled room on their break until about 07:33; their rolling exposure is at 93% of the limit."
+       "text": "Crew B acclimatised workers are on a cooled-room break until about 07:33, then return to the main task as scheduled."
       },
       {
-       "crew": "B",
+       "crew": "C",
        "when": "later",
-       "text": "Keep workers on the new-worker limit in the cooled room on their break until about 08:00; their rolling exposure is at 97% of the limit."
+       "text": "Crew C stays on its cooled-room break until about 07:51, then returns to the main task as scheduled."
       }
      ],
-     "trend": "Over the next hour, forecast sun WBGT rises from 31.3 °C now to 32.4 °C, the site is +1.2 °C above forecast, and projected 30-minute shares are 98% for Crew A, 98% for Crew B acclimatised workers, 99% for Crew B workers on the new-worker limit, and 97% for Crew C."
+     "trend": "The sun forecast rises from 31.3 °C now to 32.4 °C in an hour; the site has been +1.2 °C above forecast, and in 30 minutes Crew A and Crew B acclimatised workers are projected at 98% of their limit, Crew B workers on the new-worker limit at 99%, and Crew C at 97%."
     }
    },
    {
@@ -2776,28 +2768,33 @@
     "clock": "09:00",
     "source": "model",
     "reason": null,
-    "ms": 3069,
+    "ms": 10870,
     "check": null,
     "urgentOnBoard": 0,
     "supported": true,
     "missedUrgent": false,
     "changedInstruction": false,
-    "note": "The brief accurately reflects the board’s alerts, break times and durations, rest location, forecast, and projected shares.",
+    "note": "The brief accurately reflects the crews’ statuses, break times and instructions, and the forecast, station difference, and 30-minute projections. The board contains no urgent or act alert from the last 15 minutes.",
     "brief": {
-     "headline": "The site station is 1.4 °C hotter than forecast, and Crew B’s new-worker-limit group and Crew C have scheduled breaks approaching.",
+     "headline": "At 09:00, A and B’s acclimatised workers are resting until about 09:03, while B’s new-worker group and C are working with scheduled breaks approaching.",
      "priorities": [
       {
        "crew": "B",
        "when": "next 15 min",
-       "text": "Finish the current task by 09:05, then rest in the cooled rest room for 36 min and drink a cup of water, as directed by the alert."
+       "text": "For workers on the new-worker limit, finish the current task by 09:05, then rest in the cooled rest room and drink a cup of water; the scheduled 36 min break starts then."
       },
       {
        "crew": "C",
        "when": "next 15 min",
-       "text": "Finish the current task by 09:08, then rest in the cooled rest room for 24 min and drink a cup of water, as directed by the alert."
+       "text": "Finish the current task by 09:08, then rest in the cooled rest room and drink a cup of water; the scheduled 24 min break starts then."
+      },
+      {
+       "crew": "A",
+       "when": "now",
+       "text": "Remain in the cooled room until about 09:03, then return to the main task as scheduled."
       }
      ],
-     "trend": "The sun forecast stays at 32.6 °C now and in an hour, while the site station is 1.4 °C hotter than forecast; in 30 min, projected shares are 99% for Crew A, 99% for Crew B’s acclimatised workers, 85% for Crew B’s new-worker-limit group, and 94% for Crew C."
+     "trend": "The sun forecast stays at 32.6 °C now and in an hour, while the site station has been +1.4 °C above forecast; in 30 min, projected shares are 99% for A, 99% for B’s acclimatised workers, 85% for B’s workers on the new-worker limit, and 94% for C."
     }
    },
    {
@@ -2805,15 +2802,15 @@
     "clock": "10:15",
     "source": "model",
     "reason": null,
-    "ms": 5691,
+    "ms": 6758,
     "check": null,
     "urgentOnBoard": 0,
     "supported": true,
     "missedUrgent": false,
     "changedInstruction": false,
-    "note": "The brief matches the board’s 10:14 alert and the listed break instructions. The 30-minute projected shares and forecast values also match.",
+    "note": "The brief accurately reflects the 10:14 alert, the 10:21 break instructions for A and acclimatised B, and the forecast and projected heat-limit figures. The 09:45 act alert is outside the last 15 minutes; the 10:14 alert is a watch.",
     "brief": {
-     "headline": "The site is 2.2 °C hotter than forecast, and the morning plan is out of date.",
+     "headline": "The site is 2.2 °C hotter than forecast, so the morning plan is out of date.",
      "priorities": [
       {
        "crew": "site",
@@ -2822,16 +2819,16 @@
       },
       {
        "crew": "A",
-       "when": "next 15 min",
-       "text": "Finish the current task by 10:21, then take the 12 min break in the cooled rest room and drink a cup of water."
+       "when": "now",
+       "text": "Finish the current task by 10:21, then rest in the cooled rest room for 12 min and drink a cup of water."
       },
       {
        "crew": "B",
-       "when": "next 15 min",
-       "text": "For acclimatised workers, finish the current task by 10:21, then take the 12 min break in the cooled rest room and drink a cup of water."
+       "when": "now",
+       "text": "For acclimatised workers, finish the current task by 10:21, then rest in the cooled rest room for 12 min and drink a cup of water."
       }
      ],
-     "trend": "The forecast rises from 32.9 °C now to 33.7 °C in an hour, while the site is 2.2 °C hotter than forecast; in 30 min, projected crew shares are 99% for A, 99% for B acclimatised workers, 98% for B workers on the new-worker limit, and 99% for C."
+     "trend": "The forecast rises from 32.9 °C now to 33.7 °C in an hour; the site is 2.2 °C hotter than forecast, and projected shares in 30 min are 99% for A, 99% for B acclimatised workers, 98% for B workers on the new-worker limit, and 99% for C."
     }
    },
    {
@@ -2839,33 +2836,33 @@
     "clock": "12:15",
     "source": "model",
     "reason": null,
-    "ms": 6093,
+    "ms": 6744,
     "check": null,
     "urgentOnBoard": 1,
     "supported": true,
     "missedUrgent": false,
     "changedInstruction": false,
-    "note": "The brief accurately includes the 12:11 dust action alert, the 12:21 breaks and their duration, rest place and water instruction, and the listed forecast, bias and 30-minute limit-share values.",
+    "note": "The brief accurately includes the 12:11 dust alert and the break instructions for Crews A and B’s acclimatised workers. It also reports the forecast trend, the 30-minute projections, and the station’s +1.6 °C average difference from forecast.",
     "brief": {
-     "headline": "Act on the unhealthy dust alert now while keeping crews to their scheduled breaks.",
+     "headline": "Unhealthy dust requires FFP2/N95 masks for all outdoor work, and the site station has been +1.6 °C above forecast.",
      "priorities": [
       {
        "crew": "site",
        "when": "now",
-       "text": "Use FFP2/N95 masks for all outdoor work and postpone cutting, grinding and sweeping; dust is unhealthy, and masks make heavy work harder."
+       "text": "Use FFP2/N95 masks for all outdoor work and postpone cutting, grinding and sweeping because dust is unhealthy; keep to the break schedule because masks make heavy work harder."
       },
       {
        "crew": "A",
        "when": "next 15 min",
-       "text": "Finish the current task by 12:21, then take the 9 min break in the cooled rest room and drink a cup of water."
+       "text": "Finish the current task by 12:21, then take the scheduled 9 min break in the cooled rest room and drink a cup of water."
       },
       {
        "crew": "B",
        "when": "next 15 min",
-       "text": "For acclimatised workers, finish the current task by 12:21, then take the 9 min break in the cooled rest room and drink a cup of water."
+       "text": "For acclimatised workers, finish the current task by 12:21, then take the scheduled 9 min break in the cooled rest room and drink a cup of water."
       }
      ],
-     "trend": "The sun forecast is 34 °C now and 33.7 °C in an hour, while the site has been +1.6 °C above forecast; in 30 min, crews A, B acclimatised, B on the new-worker limit, and C are each projected at 99% of their limit."
+     "trend": "The sun forecast eases from 34 °C now to 33.7 °C in an hour, while the site station has averaged +1.6 °C above forecast; in 30 min, Crew A, Crew B acclimatised workers, Crew B workers on the new-worker limit, and Crew C are each projected at 99% of their limit."
     }
    },
    {
@@ -2873,33 +2870,33 @@
     "clock": "16:00",
     "source": "model",
     "reason": null,
-    "ms": 7220,
+    "ms": 9114,
     "check": null,
     "urgentOnBoard": 0,
     "supported": true,
     "missedUrgent": false,
     "changedInstruction": false,
-    "note": "The brief accurately reflects the forecast, bias, break times, durations, rest place, and projected limit shares. The board has no alerts.",
+    "note": "The brief accurately reports the board’s conditions, break schedules, and projections. The board lists no recent alerts.",
     "brief": {
-     "headline": "The site is 0.9 °C hotter than forecast, and Crew B’s new-worker group has the next scheduled break at 16:25.",
+     "headline": "Sun WBGT is 33.4 °C and severe dust is present at 437 µg/m³.",
      "priorities": [
       {
        "crew": "B",
        "when": "later",
-       "text": "Crew B workers on the new-worker limit: take the scheduled 35 min cooled-room break starting 16:25."
+       "text": "Workers on the new-worker limit have their cooled-room break at 16:25 for 35 min; their projected share in 30 min is 99%."
       },
       {
        "crew": "A",
        "when": "later",
-       "text": "Crew A: take the scheduled 25 min cooled-room break starting 16:35."
+       "text": "Take the scheduled cooled-room break at 16:35 for 25 min; the projected share in 30 min is 97%."
       },
       {
-       "crew": "B",
+       "crew": "C",
        "when": "later",
-       "text": "Crew B acclimatised workers: take the scheduled 25 min cooled-room break starting 16:35."
+       "text": "Take the scheduled cooled-room break at 16:38 for 22 min; the projected share in 30 min is 98%."
       }
      ],
-     "trend": "The sun forecast is 32.5 °C now and 31.9 °C in an hour, the site is +0.9 °C versus forecast, and in 30 min Crew A and Crew B acclimatised workers are projected at 97% of their limits, Crew B workers on the new-worker limit at 99%, and Crew C at 98%."
+     "trend": "Sun forecast WBGT falls from 32.5 °C now to 31.9 °C in an hour, while the site has averaged +0.9 °C above forecast over the last 30 min; in 30 min, projected shares are A 97%, B acclimatised workers 97%, B workers on the new-worker limit 99%, and C 98%."
     }
    },
    {
@@ -2907,33 +2904,33 @@
     "clock": "17:30",
     "source": "model",
     "reason": null,
-    "ms": 6042,
+    "ms": 6674,
     "check": null,
     "urgentOnBoard": 0,
-    "supported": false,
+    "supported": true,
     "missedUrgent": false,
     "changedInstruction": false,
-    "note": "The board gives a site-station WBGT of 32.2 °C in sun and 31.2 °C in shade, but does not say the station is above forecast; the brief also calls the station’s +0.7 °C bias an average over the last 30 minutes, which the board does not specify. The remaining listed break actions, times, durations, and projected limit shares match the board.",
+    "note": "The brief accurately reports the heat and dust readings, scheduled break instructions, and forecast/trend and heat-limit projections. The recent alerts are watch alerts, not urgent or act alerts.",
     "brief": {
-     "headline": "Heat at the site station is above forecast, and the scheduled cooled-room breaks for crews A and B’s acclimatised workers begin at 17:37.",
+     "headline": "Sun WBGT is 32.2 °C and dust is severe, so keep each crew’s scheduled cooled-room break on track.",
      "priorities": [
       {
        "crew": "A",
        "when": "next 15 min",
-       "text": "Finish the current task by 17:37, then rest in the cooled rest room for 23 min and drink a cup of water, as the alert directs."
+       "text": "Finish the current task by 17:37, then rest in the cooled rest room for 23 min and drink a cup of water."
       },
       {
        "crew": "B",
        "when": "next 15 min",
-       "text": "For acclimatised workers, finish the current task by 17:37, then rest in the cooled rest room for 23 min and drink a cup of water, as the alert directs."
+       "text": "Acclimatised workers: finish the current task by 17:37, then rest in the cooled rest room for 23 min and drink a cup of water."
       },
       {
        "crew": "C",
        "when": "next 15 min",
-       "text": "Finish the current task by 17:40, then rest in the cooled rest room for 20 min and drink a cup of water, as the alert directs."
+       "text": "Finish the current task by 17:40, then rest in the cooled rest room for 20 min and drink a cup of water."
       }
      ],
-     "trend": "The sun forecast falls from 31.5 °C now to 30.4 °C in an hour, while the station averaged +0.7 °C above forecast over the last 30 min; crews A, B’s acclimatised workers, and C are each projected at 99% of their heat limit in 30 min following the schedule."
+     "trend": "Forecast sun WBGT falls from 31.5 °C now to 30.4 °C in an hour, while the site station has averaged +0.7 °C above forecast; crews A, B’s acclimatised workers, and C are each projected at 99% of their heat limit in 30 min following the schedule."
     }
    },
    {
@@ -2941,23 +2938,33 @@
     "clock": "07:30",
     "source": "model",
     "reason": null,
-    "ms": 5074,
+    "ms": 7258,
     "check": null,
     "urgentOnBoard": 0,
     "supported": true,
     "missedUrgent": false,
     "changedInstruction": false,
-    "note": "The brief matches the 07:25 watch alert and accurately reports the forecast and 30-minute projected shares. No urgent or act alert is present.",
+    "note": "The brief’s statements match the board. It includes the 07:25 Crew C watch alert and accurately reports the break timing, rest location, water instruction, forecast/site comparison, and projected heat-limit shares.",
     "brief": {
-     "headline": "Crew C must finish the current task by 07:40, then rest in the cooled rest room and drink a cup of water.",
+     "headline": "Crew C should finish the current task by 07:40, then take its scheduled break in the cooled rest room and drink a cup of water.",
      "priorities": [
       {
        "crew": "C",
-       "when": "now",
-       "text": "Finish the current task by 07:40, then rest in the cooled rest room and drink a cup of water, as directed by the 07:25 alert."
+       "when": "next 15 min",
+       "text": "Finish the current task by 07:40, then rest in the cooled rest room for 11 min and drink a cup of water, as directed by the alert."
+      },
+      {
+       "crew": "A",
+       "when": "later",
+       "text": "Crew A is on a cooled-room break until about 07:47, then returns to the main task."
+      },
+      {
+       "crew": "B",
+       "when": "later",
+       "text": "Crew B workers on the new-worker limit are on a cooled-room break until about 08:02, then return to the main task."
       }
      ],
-     "trend": "Forecast sun WBGT rises from 33.6 °C now to 34.6 °C in an hour; the site station is 1.3 °C below forecast, while projected shares in 30 minutes are 99% for Crew A, 99% for Crew B's acclimatised workers, 97% for Crew B's workers on the new-worker limit, and 99% for Crew C."
+     "trend": "Forecast sun WBGT rises from 33.6 °C now to 34.6 °C in an hour, while the site station is -1.3 °C versus forecast; in 30 min, projected shares are 99% for Crew A, 99% for Crew B acclimatised workers, 97% for Crew B workers on the new-worker limit, and 99% for Crew C."
     }
    },
    {
@@ -2965,67 +2972,67 @@
     "clock": "09:00",
     "source": "model",
     "reason": null,
-    "ms": 4598,
+    "ms": 6191,
     "check": null,
     "urgentOnBoard": 0,
     "supported": true,
     "missedUrgent": false,
     "changedInstruction": false,
-    "note": "The temperatures, break details, rest location and water action match the board. The board lists 99% for each crew group’s 30-minute limit share and a bias of −0.1 °C.",
+    "note": "The brief’s break instructions match the board and recent alerts. It accurately reports the forecast trend, station difference, and 30-minute projections for all crew groups.",
     "brief": {
-     "headline": "Heat is forecast to rise from 34.8 °C now to 36.2 °C in an hour; Crew A and Crew B’s acclimatised workers break at 09:03.",
+     "headline": "Crew A and Crew B’s acclimatised workers must finish their current tasks by 09:03 and start their scheduled cooled-room breaks.",
      "priorities": [
       {
        "crew": "A",
-       "when": "now",
-       "text": "Finish the current task by 09:03, then rest in the cooled rest room for 12 min and drink a cup of water; the break is due then."
+       "when": "next 15 min",
+       "text": "Finish the current task by 09:03, then rest in the cooled rest room for 12 min and drink a cup of water, as directed by the alert."
       },
       {
        "crew": "B",
-       "when": "now",
-       "text": "Acclimatised workers: finish the current task by 09:03, then rest in the cooled rest room for 12 min and drink a cup of water; the break is due then."
+       "when": "next 15 min",
+       "text": "Acclimatised workers: finish the current task by 09:03, then rest in the cooled rest room for 12 min and drink a cup of water, as directed by the alert."
       },
       {
        "crew": "C",
        "when": "next 15 min",
-       "text": "Finish the current task by 09:09, then rest in the cooled rest room for 14 min and drink a cup of water; the break is due then."
+       "text": "Finish the current task by 09:09, then rest in the cooled rest room for 14 min and drink a cup of water, as directed by the alert."
       }
      ],
-     "trend": "The forecast rises from 34.8 °C now to 36.2 °C in an hour, while the site-versus-forecast difference is -0.1 °C; all crews are projected at 99% of their limit in 30 min following the schedule."
+     "trend": "The forecast rises from 34.8 °C now to 36.2 °C in an hour; the site station has been 0.1 °C below forecast, and every crew group is projected at 99% of its limit in 30 min following the schedule."
     }
    },
    {
     "day": "Hottest day of summer 2025",
     "clock": "10:15",
-    "source": "model",
-    "reason": null,
-    "ms": 6756,
+    "source": "rules",
+    "reason": "model output rejected: unknown crew B (workers on the new-worker limit)",
+    "ms": 6791,
     "check": null,
     "urgentOnBoard": 0,
-    "supported": true,
+    "supported": false,
     "missedUrgent": false,
-    "changedInstruction": false,
-    "note": "The brief matches the listed break times, durations, rest location, and actions. The forecast and +0.3 °C bias are supported by the board; all crew entries show 99% projected in 30 minutes. No urgent or act alert appears in the last 15 minutes.",
+    "changedInstruction": true,
+    "note": "The station was back online at 10:00, so the offline headline and instruction to restore it or take a manual reading are stale. The brief also omits the 10:26 break for Crew B workers on the new-worker limit.",
     "brief": {
-     "headline": "Crew B workers on the new-worker limit must finish their current task by 10:26, then take their scheduled 38 min break in the cooled rest room and drink a cup of water.",
+     "headline": "Site station offline: forecast only.",
      "priorities": [
       {
-       "crew": "B",
-       "when": "next 15 min",
-       "text": "Workers on the new-worker limit: finish the current task by 10:26, then rest in the cooled rest room for 38 min and drink a cup of water."
+       "crew": "site",
+       "when": "now",
+       "text": "Site station offline: forecast only. Breaks are timed from the forecast with 1 °C added for safety, so crews rest more. Restore the station or take a manual WBGT reading."
       },
       {
        "crew": "A",
        "when": "next 15 min",
-       "text": "Finish the current task by 10:30, then rest in the cooled rest room for 30 min and drink a cup of water."
+       "text": "Crew A: break at 10:30 for 30 min. Finish the current task by 10:30, then rest in the cooled rest room and drink a cup of water."
       },
       {
        "crew": "B",
        "when": "next 15 min",
-       "text": "Acclimatised workers: finish the current task by 10:30, then rest in the cooled rest room for 30 min and drink a cup of water."
+       "text": "Crew B (acclimatised workers): break at 10:30 for 30 min. Finish the current task by 10:30, then rest in the cooled rest room and drink a cup of water."
       }
      ],
-     "trend": "The sun forecast is 36.1 °C now and 36 °C in an hour; the site station has averaged +0.3 °C versus forecast, and each crew is projected at 99% of its heat limit in 30 min following the schedule."
+     "trend": "Heat now 36.4 °C WBGT in the sun from site station; the forecast holds steady over the next hour."
     }
    },
    {
@@ -3033,33 +3040,33 @@
     "clock": "12:15",
     "source": "model",
     "reason": null,
-    "ms": 5796,
+    "ms": 4166,
     "check": null,
     "urgentOnBoard": 0,
     "supported": true,
     "missedUrgent": false,
     "changedInstruction": false,
-    "note": "The brief accurately reports the forecast, +1 °C bias, scheduled breaks and their actions, and projected limit shares. No urgent or act alert is present; all listed alerts are watch alerts.",
+    "note": "The brief accurately reports the three recent break alerts and their instructions, times, and durations. Its trend figures match the board; no urgent or act alert is omitted.",
     "brief": {
-     "headline": "The site station is +1 °C above forecast, with Crew A and both Crew B groups due for cooled-room breaks shortly.",
+     "headline": "Crew A and Crew B’s acclimatised workers have breaks at 12:22; Crew B’s workers on the new-worker limit have a break at 12:26.",
      "priorities": [
       {
        "crew": "A",
        "when": "next 15 min",
-       "text": "Finish the current task by 12:22, then rest in the cooled rest room for 8 min and drink a cup of water; the scheduled break is due at 12:22."
+       "text": "Finish the current task by 12:22, then rest in the cooled rest room and drink a cup of water; the alert gives this break as 8 min."
       },
       {
        "crew": "B",
        "when": "next 15 min",
-       "text": "For acclimatised workers, finish the current task by 12:22, then rest in the cooled rest room for 8 min and drink a cup of water; the scheduled break is due at 12:22."
+       "text": "Acclimatised workers: finish the current task by 12:22, then rest in the cooled rest room and drink a cup of water; the alert gives this break as 8 min."
       },
       {
        "crew": "B",
        "when": "next 15 min",
-       "text": "For workers on the new-worker limit, finish the current task by 12:26, then rest in the cooled rest room for 4 min and drink a cup of water; the scheduled break is due at 12:26."
+       "text": "Workers on the new-worker limit: finish the current task by 12:26, then rest in the cooled rest room and drink a cup of water; the alert gives this break as 4 min."
       }
      ],
-     "trend": "Forecast WBGT in the sun falls from 36.2 °C now to 35.8 °C in an hour, while the site station has averaged +1 °C above forecast; in 30 minutes, projected shares are 98% for Crew A and acclimatised Crew B, and 99% for new-worker-limit Crew B and Crew C."
+     "trend": "The sun WBGT is 37.2 °C now, with forecast at 36.2 °C now and 35.8 °C in an hour; the site is +1 °C versus forecast, while projected shares in 30 minutes are A 98%, B acclimatised workers 98%, B workers on the new-worker limit 99%, and C 99%."
     }
    },
    {
@@ -3067,33 +3074,33 @@
     "clock": "16:00",
     "source": "model",
     "reason": null,
-    "ms": 5996,
+    "ms": 7820,
     "check": null,
     "urgentOnBoard": 0,
     "supported": true,
     "missedUrgent": false,
     "changedInstruction": false,
-    "note": "The brief accurately reports the listed heat-limit shares, forecast, station bias, and break instructions. Crew C’s scheduled break is omitted, but the board has no urgent or act alert.",
+    "note": "The brief accurately reports the listed break times, durations, location, heat-limit readings, and forecast trend. The board has no recent alerts.",
     "brief": {
-     "headline": "The site station is averaging 1.2 °C above forecast, and all crews are at 99% of their heat limit.",
+     "headline": "Crew B workers on the new-worker limit are at 99% of the heat limit, with their cooled-room break starting at 16:23.",
      "priorities": [
       {
        "crew": "B",
        "when": "later",
-       "text": "Workers on the new-worker limit: take the scheduled 16:23 break for 37 min in the cooled room."
+       "text": "Crew B workers on the new-worker limit: take the scheduled 37 min cooled-room break starting 16:23; they are at 99% of the limit."
       },
       {
        "crew": "A",
        "when": "later",
-       "text": "Take the scheduled 16:32 break for 28 min in the cooled room."
+       "text": "Crew A: take the scheduled 28 min cooled-room break starting 16:32; the crew is at 99% of the limit."
       },
       {
        "crew": "B",
        "when": "later",
-       "text": "Acclimatised workers: take the scheduled 16:32 break for 28 min in the cooled room."
+       "text": "Crew B acclimatised workers: take the scheduled 28 min cooled-room break starting 16:32; the crew is at 99% of the limit."
       }
      ],
-     "trend": "Forecast WBGT in the sun is 33.8 °C now and 33 °C in an hour, while the site station is averaging 1.2 °C above forecast; each crew is projected to be at 99% of its limit in 30 minutes following the schedule."
+     "trend": "The sun forecast falls from 33.8 °C now to 33 °C in an hour, while the site station has been +1.2 °C above forecast; every crew is projected to be at 99% of its limit in 30 min following the schedule."
     }
    },
    {
@@ -3101,33 +3108,280 @@
     "clock": "17:30",
     "source": "model",
     "reason": null,
-    "ms": 5258,
+    "ms": 6547,
     "check": null,
     "urgentOnBoard": 0,
-    "supported": false,
+    "supported": true,
     "missedUrgent": false,
     "changedInstruction": false,
-    "note": "The brief incorrectly says the site station has averaged +1.1 °C versus forecast. The board gives a bias of +1.1 °C but does not say it is an average.",
+    "note": "The brief accurately reflects the listed break times, durations, rest instructions, forecast trend, site-versus-forecast difference, and projected limits. It does not mention Crew B workers on the new-worker limit, who are indoors at 75% of the heat limit.",
     "brief": {
-     "headline": "Crews A, B’s acclimatised workers, and C have scheduled cooled-room breaks starting within the next 6 minutes.",
+     "headline": "Crews A and B (acclimatised workers) have breaks at 17:34, followed by Crew C at 17:36.",
      "priorities": [
       {
        "crew": "A",
        "when": "next 15 min",
-       "text": "Finish the current task by 17:34, then rest in the cooled rest room for 26 min and drink a cup of water; the crew is at 98% of its heat limit."
+       "text": "Finish the current task by 17:34, then rest in the cooled rest room for 26 min and drink a cup of water, as the watch alert directs."
       },
       {
        "crew": "B",
        "when": "next 15 min",
-       "text": "For acclimatised workers, finish the current task by 17:34, then rest in the cooled rest room for 26 min and drink a cup of water; this group is at 98% of its heat limit."
+       "text": "Acclimatised workers: finish the current task by 17:34, then rest in the cooled rest room for 26 min and drink a cup of water, as the watch alert directs."
       },
       {
        "crew": "C",
        "when": "next 15 min",
-       "text": "Finish the current task by 17:36, then rest in the cooled rest room for 24 min and drink a cup of water; the crew is at 97% of its heat limit."
+       "text": "Finish the current task by 17:36, then rest in the cooled rest room for 24 min and drink a cup of water, as the watch alert directs."
       }
      ],
-     "trend": "Forecast sun WBGT is 32.6 °C now and 31.9 °C in an hour, while the site station has averaged +1.1 °C versus forecast; following the schedule, A and B’s acclimatised workers project to 99% of their limits in 30 min, as does C."
+     "trend": "The sun forecast falls from 32.6 °C now to 31.9 °C in an hour, while the site has been +1.1 °C over forecast; in 30 min, A, B acclimatised workers, and C are each projected at 99% of their limit."
+    }
+   }
+  ]
+ },
+ "report": {
+  "total": 8,
+  "fromModel": 8,
+  "rejectedByChecks": 0,
+  "rejectionReasons": [],
+  "supported": 8,
+  "missedConcern": 1,
+  "inventedAction": 1,
+  "latencyMs": {
+   "median": 8104,
+   "p90": 8821
+  },
+  "rows": [
+   {
+    "day": "The forecast was wrong",
+    "station": "on",
+    "source": "model",
+    "reason": null,
+    "ms": 7813,
+    "check": null,
+    "supported": true,
+    "missedConcern": false,
+    "inventedAction": false,
+    "note": "The record’s claims and tomorrow actions are supported by the figures. It includes the over-limit minutes, heat-time cap, and indoor work after the cap.",
+    "record": {
+     "summary": "Peak WBGT in the sun was 38.2 °C at 11:05, and the site ran up to 3.8 °C above the forecast. The station was live for 630 minutes; breaks were announced ahead, with 3 moved earlier and 0 unable to be announced ahead. The record shows 5 alerts to act on, including 1 urgent, and 1 heat-time cap reached.",
+     "wentWell": [
+      "The station was live for 630 minutes, with 0 minutes without it.",
+      "0 breaks could not be announced ahead.",
+      "Dust was elevated for 9 minutes, with 0 unhealthy and 0 severe minutes."
+     ],
+     "concerns": [
+      "Crew C had 10 estimated minutes over the limit and reached 107% of the limit.",
+      "1 heat-time cap was reached; the record notes 406 min of indoor work after reaching the cap for the group on the new-worker limit.",
+      "Review the 5 alerts to act on, including 1 urgent."
+     ],
+     "forTomorrow": [
+      "Review Crew C’s task and rotation timing in light of the estimated minutes over the limit.",
+      "Review how the heat-time cap was managed, including indoor work after the cap was reached.",
+      "Follow up on the 5 alerts to act on, including the urgent alert."
+     ]
+    }
+   },
+   {
+    "day": "The forecast was wrong",
+    "station": "outage",
+    "source": "model",
+    "reason": null,
+    "ms": 8111,
+    "check": null,
+    "supported": true,
+    "missedConcern": false,
+    "inventedAction": false,
+    "note": "The record’s statements are supported by the figures. It includes the station gap, Crew C’s over-limit minutes, the heat-time cap and related indoor work, and the elevated dust. The proposed reviews refer to recorded facts.",
+    "record": {
+     "summary": "The sun WBGT peaked at 36.9 °C at 12:29, and the site ran up to 2.2 °C above the forecast. The station was live for 460 minutes and unavailable for 170 minutes; crews had indoor rotations and rest, and 2 breaks were moved earlier. The record also shows 3 minutes of elevated dust and a heat-time cap reached.",
+     "wentWell": [
+      "41 breaks were announced ahead; 0 could not be announced ahead.",
+      "Estimated minutes over the limit were 0 for Crew A and both Crew B groups."
+     ],
+     "concerns": [
+      "Station unavailable for 170 minutes; 3 station events recorded.",
+      "Crew C had 10 estimated minutes over the limit and a peak of 107% of the limit.",
+      "A heat-time cap was reached; the new-worker-limit Crew B group had 406 minutes of indoor work after reaching it. Dust was elevated for 3 minutes."
+     ],
+     "forTomorrow": [
+      "Review the station events and the 170 minutes without live station coverage.",
+      "Review Crew C task and rotation timing in light of the estimated minutes over the limit and peak recorded.",
+      "Review the heat-time-cap timing and indoor-work arrangement for the Crew B group on the new-worker limit."
+     ]
+    }
+   },
+   {
+    "day": "Hottest day of summer 2026",
+    "station": "on",
+    "source": "model",
+    "reason": null,
+    "ms": 7484,
+    "check": null,
+    "supported": true,
+    "missedConcern": false,
+    "inventedAction": false,
+    "note": "The record’s statements match the figures. It includes the Crew C minutes over the limit, the heat-time cap and subsequent indoor work, and the unhealthy dust period in its concerns. The proposed reviews rely on recorded facts.",
+    "record": {
+     "summary": "During the 2026-08-22 shift, peak WBGT in the sun was 36.9 °C at 12:29, and the site ran up to 1.6 °C above the forecast. The station was live for 630 minutes; breaks were announced ahead, and the record shows no breaks that could not be announced ahead. Dust was elevated for 322 minutes, including 17 unhealthy minutes, and the shift recorded 2 alerts to act on, including 1 urgent.",
+     "wentWell": [
+      "The station was live for 630 minutes, with 0 minutes without it.",
+      "Breaks moved earlier: 0; breaks that could not be announced ahead: 0."
+     ],
+     "concerns": [
+      "Crew C had 11 estimated minutes over the limit and a peak of 108% of the limit.",
+      "The heat-time cap was reached once; the record notes 364 min indoor work after reaching the cap.",
+      "Dust was elevated for 322 minutes, including 17 unhealthy minutes; there was 1 dust event."
+     ],
+     "forTomorrow": [
+      "Review Crew C's task and rest schedule in light of the estimated minutes over the limit and peak.",
+      "Review the work plan for the heat-time cap reached and the recorded indoor work after reaching it.",
+      "Review the dust event and plan for the recorded elevated and unhealthy dust periods."
+     ]
+    }
+   },
+   {
+    "day": "Hottest day of summer 2026",
+    "station": "outage",
+    "source": "model",
+    "reason": null,
+    "ms": 8104,
+    "check": null,
+    "supported": true,
+    "missedConcern": true,
+    "inventedAction": true,
+    "note": "The figures support the record, but it omits the 2 unhealthy dust minutes. Checking station mounting and power assumes causes not given in the figures.",
+    "record": {
+     "summary": "The shift ran from 06:00–18:59, with peak WBGT in the sun of 38.1 °C at 11:59; the site ran up to 1.6 °C above the forecast. The station was live for 460 minutes and unavailable for 170 minutes; breaks and indoor rotations were recorded, and the heat-time cap was reached once.",
+     "wentWell": [
+      "49 breaks were announced ahead; 0 breaks could not be announced ahead.",
+      "Crews A and B (acclimatised workers) each recorded 175 min rest and 120 min indoor rotation, with estimated minutes over the limit of 0."
+     ],
+     "concerns": [
+      "The station was unavailable for 170 minutes, and 3 station events were recorded.",
+      "Crew C had 11 estimated minutes over the limit and a peak of 108% of the limit.",
+      "The heat-time cap was reached once; the new-worker-limit crew B record shows 377 min of indoor work after reaching the cap."
+     ],
+     "forTomorrow": [
+      "Check station mounting and power and review coverage during the 170 minutes without the station.",
+      "Review the work plan for Crew C in light of 11 estimated minutes over the limit and a peak of 108% of the limit.",
+      "Plan indoor work and task timing for Crew B on the new-worker limit so work after reaching the heat-time cap is avoided."
+     ]
+    }
+   },
+   {
+    "day": "Dust storm",
+    "station": "on",
+    "source": "model",
+    "reason": null,
+    "ms": 8337,
+    "check": null,
+    "supported": true,
+    "missedConcern": false,
+    "inventedAction": false,
+    "note": "The record’s figures and concerns match the supplied data. It covers the over-limit minutes, unhealthy dust, and heat-time cap; no station gap or unannounced breaks were reported. The proposed follow-ups are grounded in the recorded conditions.",
+    "record": {
+     "summary": "Peak WBGT in the sun was 35.6 °C at 11:27, and the site ran up to 2.1 °C above the forecast. The station was live for 630 minutes; 42 breaks were announced ahead, and 0 could not be announced ahead. Dust was elevated for 254 minutes, including 52 unhealthy and 208 severe; there were 3 dust events and 1 heat-time cap reached.",
+     "wentWell": [
+      "The station was live for 630 minutes with 0 minutes without it.",
+      "42 breaks were announced ahead, and 0 could not be announced ahead."
+     ],
+     "concerns": [
+      "Crew C had 3 estimated minutes over the limit and a peak of 102% of the limit.",
+      "The new-worker-limit group reached the heat-time cap and had 408 min indoor work after reaching it.",
+      "Dust was elevated for 254 minutes, including 52 unhealthy and 208 severe; 3 dust events were recorded."
+     ],
+     "forTomorrow": [
+      "Review Crew C's task timing and controls in light of the estimated minutes over the limit.",
+      "Review the new-worker-limit group's work plan after the heat-time cap was reached.",
+      "Plan for the recorded dust conditions and follow up on the 3 dust events."
+     ]
+    }
+   },
+   {
+    "day": "Dust storm",
+    "station": "outage",
+    "source": "model",
+    "reason": null,
+    "ms": 7806,
+    "check": null,
+    "supported": true,
+    "missedConcern": false,
+    "inventedAction": false,
+    "note": "The record accurately reflects the figures, including the station gap, unhealthy and severe dust, the heat-time cap, and Crew C’s minutes over the limit. Its tomorrow actions are grounded in those figures.",
+    "record": {
+     "summary": "The shift ran 06:00–18:59, with peak WBGT in the sun 35.7 °C at 12:07 and site conditions up to 1.7 °C above the forecast. The station was live for 460 minutes and unavailable for 170 minutes; crews had indoor rotations and rest, and 41 breaks were announced ahead. The record shows 265 minutes of elevated dust, including 37 unhealthy and 214 severe, and one heat-time cap reached.",
+     "wentWell": [
+      "41 breaks were announced ahead; 0 breaks could not be announced ahead.",
+      "Crew A and both Crew B groups had estimated minutes over the limit of 0."
+     ],
+     "concerns": [
+      "The station was unavailable for 170 minutes, with 3 station events.",
+      "Dust was elevated for 265 minutes, including 37 unhealthy and 214 severe; peak PM10 was 536 µg/m³.",
+      "One heat-time cap was reached; Crew C had 3 estimated minutes over the limit and a peak of 102% of the limit."
+     ],
+     "forTomorrow": [
+      "Review the 3 station events and the 170 minutes without station coverage.",
+      "Plan for dust conditions in light of the 265 elevated minutes and 214 severe minutes.",
+      "Review the heat-time cap and Crew C’s estimated minutes over the limit and peak before assigning similar work."
+     ]
+    }
+   },
+   {
+    "day": "Hottest day of summer 2025",
+    "station": "on",
+    "source": "model",
+    "reason": null,
+    "ms": 7992,
+    "check": null,
+    "supported": true,
+    "missedConcern": false,
+    "inventedAction": false,
+    "note": "The record accurately reflects the figures, including Crew C’s over-limit minutes and the new-worker heat-time cap. Its tomorrow actions are grounded in those figures.",
+    "record": {
+     "summary": "Peak WBGT in the sun was 38.5 °C at 11:12, and the site ran up to 2.5 °C above the forecast. The station was live for 630 minutes; breaks and indoor rotations were recorded, with one heat-time cap reached and estimated minutes over the limit for Crew C.",
+     "wentWell": [
+      "The station was live for 630 minutes, with 0 minutes without it.",
+      "48 breaks were announced ahead; 0 breaks could not be announced ahead."
+     ],
+     "concerns": [
+      "One heat-time cap was reached; the worker on the new-worker limit had 392 min of indoor work after reaching the cap.",
+      "Crew C had 6 estimated minutes over the limit and a peak of 103% of the limit."
+     ],
+     "forTomorrow": [
+      "Review Crew C task timing and indoor rotations in light of the recorded estimated minutes over the limit.",
+      "Review the indoor-work arrangement after the heat-time cap for the worker on the new-worker limit.",
+      "Plan for conditions running above the forecast when setting the next shift’s heat controls."
+     ]
+    }
+   },
+   {
+    "day": "Hottest day of summer 2025",
+    "station": "outage",
+    "source": "model",
+    "reason": null,
+    "ms": 8821,
+    "check": null,
+    "supported": true,
+    "missedConcern": false,
+    "inventedAction": false,
+    "note": "The record’s figures and concerns match the source. The tomorrow actions are grounded in the station gaps and events, Crew C’s over-limit minutes, and the recorded heat-time cap and indoor work.",
+    "record": {
+     "summary": "Peak WBGT in the sun was 37.6 °C at 12:01, and the site ran up to 1.3 °C above the forecast. The station was live for 460 minutes and unavailable for 170 minutes; crews had announced breaks and indoor rotations, while Crew C had 6 estimated minutes over the limit and reached a peak of 103% of the limit.",
+     "wentWell": [
+      "44 breaks were announced ahead; 0 breaks could not be announced ahead.",
+      "Dust was elevated for 0 minutes; there were 0 dust events."
+     ],
+     "concerns": [
+      "The station had 170 minutes without coverage and 3 station events.",
+      "Crew C had 6 estimated minutes over the limit and a peak of 103% of the limit.",
+      "1 heat-time cap was reached; the record notes 392 minutes of indoor work after the cap for the worker on the new-worker limit."
+     ],
+     "forTomorrow": [
+      "Review the 3 station events and address the gaps in station coverage.",
+      "Review Crew C's task, indoor rotation, and rest timing in light of the estimated minutes over the limit.",
+      "Plan for the heat-time cap on the new-worker limit and maintain the recorded indoor work arrangement after the cap."
+     ]
     }
    }
   ]

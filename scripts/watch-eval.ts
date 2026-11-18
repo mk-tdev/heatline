@@ -15,7 +15,7 @@
 // Writes data/watch/evaluation.json. Run: npm run eval:watch
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import template from '../data/scenario/saadiyat-tower.json' with { type: 'json' };
-import { FUSION, buildDayPlan, conditionsFrom, crossingLeads, dayAheadRows, defaultCrews, pm10From, runWatch, shiftsFor, siteTruth, stationFrom, weatherRows, dustLevel, type OpenMeteoHourly, type WatchRun } from '@heatline/sim';
+import { noorTriggers, FUSION, buildDayPlan, conditionsFrom, crossingLeads, dayAheadRows, defaultCrews, pm10From, runWatch, shiftsFor, siteTruth, stationFrom, weatherRows, dustLevel, type OpenMeteoHourly, type WatchRun } from '@heatline/sim';
 
 const YEARS = [2025, 2026];
 const load = (name: string) => JSON.parse(readFileSync(`data/weather/${name}`, 'utf8'));
@@ -29,19 +29,21 @@ const pct = (a: number, b: number) => round((100 * a) / Math.max(1, b));
 const median = (xs: number[]) => (xs.length ? [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)]! : null);
 const quantile = (xs: number[], q: number) => (xs.length ? [...xs].sort((a, b) => a - b)[Math.min(xs.length - 1, Math.floor(xs.length * q))]! : null);
 
-type Strategy = 'routine' | 'forecast' | 'forecast+1' | 'live' | 'live-outage';
+type Strategy = 'routine' | 'forecast' | 'forecast+1' | 'live' | 'live-outage' | 'live+rotation';
 const STRATEGIES: { id: Strategy; label: string }[] = [
   { id: 'routine', label: 'Fixed routine: 50 min work, 10 min rest' },
   { id: 'forecast', label: 'Breaks from the day-ahead forecast only' },
   { id: 'forecast+1', label: 'Day-ahead forecast with Heatline’s +1 °C margin' },
   { id: 'live', label: 'Live: site station fused with the forecast' },
   { id: 'live-outage', label: 'Live, with the station down 09:00–12:00' },
+  { id: 'live+rotation', label: 'Live, rotating to a shaded lighter task before resting' },
 ];
 
-interface Totals { workerDays: number; byLevel: Record<string, number>; workerShiftMin: number; workerOverMin: number; workerWorkMin: number; groupDays: number; groupDaysOver15: number; breaks: number; breaksAnnounced10: number; leads: number[]; alerts: number; alertDays: number }
-const empty = (): Totals => ({ workerDays: 0, byLevel: { info: 0, watch: 0, act: 0, urgent: 0 }, workerShiftMin: 0, workerOverMin: 0, workerWorkMin: 0, groupDays: 0, groupDaysOver15: 0, breaks: 0, breaksAnnounced10: 0, leads: [], alerts: 0, alertDays: 0 });
+interface Totals { workerRotateMin: number; workerDays: number; byLevel: Record<string, number>; workerShiftMin: number; workerOverMin: number; workerWorkMin: number; groupDays: number; groupDaysOver15: number; breaks: number; breaksAnnounced10: number; leads: number[]; alerts: number; alertDays: number }
+const empty = (): Totals => ({ workerRotateMin: 0, workerDays: 0, byLevel: { info: 0, watch: 0, act: 0, urgent: 0 }, workerShiftMin: 0, workerOverMin: 0, workerWorkMin: 0, groupDays: 0, groupDaysOver15: 0, breaks: 0, breaksAnnounced10: 0, leads: [], alerts: 0, alertDays: 0 });
 const totals = Object.fromEntries(STRATEGIES.map((s) => [s.id, empty()])) as Record<Strategy, Totals>;
 const crossing = { crossings: 0, warned: 0, leads: [] as number[] };
+const briefs: number[] = [];
 
 // Forecast skill, per working hour 06:00–19:00.
 const skill = { hours: 0, sumErr: 0, sumAbs: 0, coolBy1: 0, coolBy2: 0, siteSumErr: 0, siteCoolBy1: 0 };
@@ -64,6 +66,7 @@ for (const year of YEARS) {
     const pm10 = pm10From(aq, date);
     const shifts = shiftsFor(date);
     const crews = defaultCrews(date, template.workers);
+    const rotCrews = defaultCrews(date, template.workers, { rotation: true });
     const readings = stationFrom(truth, date, 300, 1200, [], pm10);
     const outage = stationFrom(truth, date, 300, 1200, [{ from: 540, to: 720 }], pm10);
 
@@ -104,7 +107,9 @@ for (const year of YEARS) {
       'forecast+1': runWatch({ date, shifts, crews, forecast, truth, readings: [], pm10, policy: 'follow', record: false }),
       live: runWatch({ date, shifts, crews, forecast, truth, readings, pm10, policy: 'follow', record: false }),
       'live-outage': runWatch({ date, shifts, crews, forecast, truth, readings: outage, pm10, policy: 'follow', record: false }),
+      'live+rotation': runWatch({ date, shifts, crews: rotCrews, forecast, truth, readings, pm10, policy: 'follow', record: false }),
     };
+    briefs.push(noorTriggers(runs['live+rotation']).length);
     const c = crossingLeads(runs.routine);
     crossing.crossings += c.crossings;
     crossing.warned += c.warned;
@@ -120,6 +125,7 @@ for (const year of YEARS) {
         t.workerShiftMin += g.shiftMin * g.headcount;
         t.workerOverMin += g.overLimitMin * g.headcount;
         t.workerWorkMin += g.workMin * g.headcount;
+        t.workerRotateMin += g.rotateMin * g.headcount;
         t.groupDays++;
         if (g.overLimitMin > 15) t.groupDaysOver15++;
         for (const b of g.breaks) {
@@ -140,6 +146,9 @@ const strategies = STRATEGIES.map((s) => {
     label: s.label,
     overLimitSharePct: pct(t.workerOverMin, t.workerShiftMin),
     workMinPerWorkerDay: round(t.workerWorkMin / Math.max(1, t.workerDays), 0),
+    rotateMinPerWorkerDay: round(t.workerRotateMin / Math.max(1, t.workerDays), 0),
+    productiveMinPerWorkerDay: round((t.workerWorkMin + t.workerRotateMin) / Math.max(1, t.workerDays), 0),
+    restMinPerWorkerDay: round((t.workerShiftMin - t.workerWorkMin - t.workerRotateMin) / Math.max(1, t.workerDays), 0),
     overLimitMinPerWorkerDay: round(t.workerOverMin / Math.max(1, t.workerDays), 0),
     workSharePct: pct(t.workerWorkMin, t.workerShiftMin),
     groupDaysOver15Pct: pct(t.groupDaysOver15, t.groupDays),
@@ -196,6 +205,7 @@ const report = {
     note: 'Under the fixed routine (alerts ignored): each time a crew group crossed the limit on site conditions, was a break announced at least 5 minutes before, within the previous 90 minutes?',
   },
   strategies,
+  noorBriefsPerDay: { mean: round(briefs.reduce((x, y) => x + y, 0) / Math.max(1, briefs.length)), max: Math.max(...briefs), note: 'Automatic briefs per day for the live strategy with rotation: significant board changes, at least 20 minutes apart.' },
 };
 mkdirSync('data/watch', { recursive: true });
 writeFileSync('data/watch/evaluation.json', JSON.stringify(report, null, 1));

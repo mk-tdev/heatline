@@ -14,6 +14,7 @@ const LIMITS = {
   planner: { max: 6, windowMs: 10 * 60_000 },
   watch: { max: 20, windowMs: 60_000 },
   telemetry: { max: 120, windowMs: 60_000 },
+  report: { max: 10, windowMs: 60_000 },
 } as const;
 export type Limited = keyof typeof LIMITS;
 

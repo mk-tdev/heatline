@@ -16,4 +16,4 @@ export { dustLevel, DUST_ADVICE, DUST_RANK, PM10_BANDS, type DustLevel } from '.
 export { runWatch, crossingLeads, type WatchInput, type WatchRun, type WatchAlert, type WatchCrew, type WatchGroup, type WatchMinute, type GroupMinute, type GroupSummary, type AlertKind, type AlertLevel, type Conditions } from './watch';
 export { conditionsFrom, dayAheadRows, siteTruth, stationFrom, pm10From, shiftsFor, defaultCrews, rng, SITE } from './watchday';
 export { broadcast, broadcastFact, broadcastLines, BROADCAST_LANGUAGES } from './broadcast';
-export { watchContext, limitShare } from './watchcontext';
+export { watchContext, limitShare, noorTriggers, shiftSummary, type NoorTrigger, type ShiftSummary } from './watchcontext';

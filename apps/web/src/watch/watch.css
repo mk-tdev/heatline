@@ -142,3 +142,10 @@
   .watch-top { padding: 10px 16px; } .watch-tag { display: none; } .watch-modes { margin-left: 0; order: 3; width: 100%; } .watch-modes button { flex: 1; }
   .watch-player { top: 96px; } .watch-strip { grid-template-columns: 1fr; } .watch-outcome-grid, .watch-privacy-grid { grid-template-columns: 1fr; } .watch-custom { margin-left: 0; }
 }
+
+.watch-noor-log { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.watch-brief-why { display: block; font-size: 11px; font-weight: 650; color: var(--w-accent); margin-bottom: 4px; }
+.watch .watch-record .watch-feed-head button, .watch .watch-briefing-actions button, .watch .watch-noor .watch-inline button { background: var(--w-accent); color: #fff; border: 1px solid var(--w-accent); padding: 8px 14px; }
+.watch-record ul { margin: 4px 0 8px; padding-left: 18px; font-size: 13px; display: grid; gap: 3px; }
+.watch-record-h { display: block; font-size: 12px; margin-top: 6px; color: var(--w-ink); }
+.watch-briefing-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 8px; }

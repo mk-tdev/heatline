@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-17T15:14:37.011Z",
+ "generated": "2026-11-18T16:01:22.564Z",
  "days": 186,
  "seasons": "15 June – 15 September, 2025 and 2026",
  "site": "Saadiyat Island grid point (24.50 N, 54.42 E); three crews of the demonstration site (20 workers, one on a new-worker build-up)",
@@ -47,18 +47,21 @@
    "label": "Fixed routine: 50 min work, 10 min rest",
    "overLimitSharePct": 84.2,
    "workMinPerWorkerDay": 513,
+   "rotateMinPerWorkerDay": 0,
+   "productiveMinPerWorkerDay": 513,
+   "restMinPerWorkerDay": 117,
    "overLimitMinPerWorkerDay": 531,
    "workSharePct": 81.4,
    "groupDaysOver15Pct": 100,
    "breaksPerGroupDay": 8.3,
    "breaksAnnounced10Pct": null,
    "medianLeadMin": null,
-   "alertsPerDay": 44.1,
-   "alarmsPerDay": 8.3,
+   "alertsPerDay": 43.1,
+   "alarmsPerDay": 7.3,
    "byLevelPerDay": {
     "info": 0.3,
     "watch": 35.5,
-    "act": 2.1,
+    "act": 1.1,
     "urgent": 6.2
    }
   },
@@ -67,6 +70,9 @@
    "label": "Breaks from the day-ahead forecast only",
    "overLimitSharePct": 36.3,
    "workMinPerWorkerDay": 374,
+   "rotateMinPerWorkerDay": 0,
+   "productiveMinPerWorkerDay": 374,
+   "restMinPerWorkerDay": 256,
    "overLimitMinPerWorkerDay": 229,
    "workSharePct": 59.4,
    "groupDaysOver15Pct": 92.2,
@@ -74,7 +80,7 @@
    "breaksAnnounced10Pct": 99.9,
    "medianLeadMin": 15,
    "alertsPerDay": 54.6,
-   "alarmsPerDay": 1.4,
+   "alarmsPerDay": 1.3,
    "byLevelPerDay": {
     "info": 0.2,
     "watch": 53,
@@ -87,6 +93,9 @@
    "label": "Day-ahead forecast with Heatline’s +1 °C margin",
    "overLimitSharePct": 10,
    "workMinPerWorkerDay": 351,
+   "rotateMinPerWorkerDay": 0,
+   "productiveMinPerWorkerDay": 351,
+   "restMinPerWorkerDay": 279,
    "overLimitMinPerWorkerDay": 63,
    "workSharePct": 55.7,
    "groupDaysOver15Pct": 49.9,
@@ -107,6 +116,9 @@
    "label": "Live: site station fused with the forecast",
    "overLimitSharePct": 1.9,
    "workMinPerWorkerDay": 364,
+   "rotateMinPerWorkerDay": 0,
+   "productiveMinPerWorkerDay": 364,
+   "restMinPerWorkerDay": 266,
    "overLimitMinPerWorkerDay": 12,
    "workSharePct": 57.8,
    "groupDaysOver15Pct": 30,
@@ -127,6 +139,9 @@
    "label": "Live, with the station down 09:00–12:00",
    "overLimitSharePct": 5.5,
    "workMinPerWorkerDay": 363,
+   "rotateMinPerWorkerDay": 0,
+   "productiveMinPerWorkerDay": 363,
+   "restMinPerWorkerDay": 267,
    "overLimitMinPerWorkerDay": 35,
    "workSharePct": 57.6,
    "groupDaysOver15Pct": 47.8,
@@ -134,13 +149,41 @@
    "breaksAnnounced10Pct": 99.1,
    "medianLeadMin": 15,
    "alertsPerDay": 59.2,
-   "alarmsPerDay": 3.5,
+   "alarmsPerDay": 3.4,
    "byLevelPerDay": {
     "info": 1.2,
     "watch": 54.5,
     "act": 3.2,
     "urgent": 0.3
    }
+  },
+  {
+   "id": "live+rotation",
+   "label": "Live, rotating to a shaded lighter task before resting",
+   "overLimitSharePct": 2.6,
+   "workMinPerWorkerDay": 338,
+   "rotateMinPerWorkerDay": 163,
+   "productiveMinPerWorkerDay": 500,
+   "restMinPerWorkerDay": 130,
+   "overLimitMinPerWorkerDay": 17,
+   "workSharePct": 53.6,
+   "groupDaysOver15Pct": 36,
+   "breaksPerGroupDay": 12,
+   "breaksAnnounced10Pct": 99.1,
+   "medianLeadMin": 15,
+   "alertsPerDay": 52.5,
+   "alarmsPerDay": 2.7,
+   "byLevelPerDay": {
+    "info": 0.3,
+    "watch": 49.5,
+    "act": 1.9,
+    "urgent": 0.8
+   }
   }
- ]
+ ],
+ "noorBriefsPerDay": {
+  "mean": 3.8,
+  "max": 8,
+  "note": "Automatic briefs per day for the live strategy with rotation: significant board changes, at least 20 minutes apart."
+ }
 }

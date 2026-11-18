@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Language } from '@heatline/contracts';
 import { formatClock } from '@heatline/contracts';
-import { BROADCAST_LANGUAGES, DUST_ADVICE, broadcast, limitShare, parseStationCsv, watchContext, type StationReading, type WatchAlert, type WatchCrew, type WatchMinute, type WatchRun } from '@heatline/sim';
+import { BROADCAST_LANGUAGES, DUST_ADVICE, broadcast, limitShare, noorTriggers, parseStationCsv, shiftSummary, watchContext, type StationReading, type WatchAlert, type WatchCrew, type WatchMinute, type WatchRun } from '@heatline/sim';
 import { BrandMark } from '../components/BrandMark';
 import { SITES } from '../planner/sites';
 import { REPLAY_DAYS, REPLAY_SITE, crewsFor, evaluation, fetchReplayDay, fetchTelemetry, fetchToday, liveRun, replayRuns, type ReplayDay, type StationMode } from './data';
@@ -18,7 +18,7 @@ const SOURCE: Record<WatchMinute['source'], { label: string; tone: string }> = {
   'station-stale': { label: 'Station delayed · +0.5 °C margin', tone: 'warn' },
   forecast: { label: 'Forecast only · +1 °C margin', tone: 'warn' },
 };
-const STATUS: Record<string, string> = { work: 'Working', rest: 'On break', off: 'Off shift', capped: 'Indoor work' };
+const STATUS: Record<string, string> = { work: 'Working', rotate: 'Indoor rotation', rest: 'On break', off: 'Off shift', capped: 'Indoor work (cap)' };
 const LEVEL_WORD: Record<WatchAlert['level'], string> = { info: 'Info', watch: 'Heads-up', act: 'Act', urgent: 'Urgent' };
 const f1 = (x: number) => x.toFixed(1);
 const signed = (x: number) => `${x >= 0 ? '+' : '−'}${Math.abs(x).toFixed(1)}`;
@@ -67,12 +67,13 @@ function Replay() {
   const [error, setError] = useState<string | null>(null);
   const [station, setStation] = useState<StationMode>('on');
   const [policy, setPolicy] = useState<'follow' | 'fixed'>('follow');
+  const [rotation, setRotation] = useState(true);
   const [minute, setMinute] = useState(600);
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(4);
 
   const day = custom && custom.date === dayKey ? custom : REPLAY_DAYS.find((d) => d.date === dayKey) ?? REPLAY_DAYS[0]!;
-  const runs = useMemo(() => replayRuns(day, station), [day, station]);
+  const runs = useMemo(() => replayRuns(day, station, rotation), [day, station, rotation]);
   const run = policy === 'follow' ? runs.follow : runs.fixed;
   const first = run.minutes[0]!.minute;
   const last = run.minutes[run.minutes.length - 1]!.minute;
@@ -127,9 +128,15 @@ function Replay() {
               <option value="none">None: forecast only</option>
             </select>
           </label>
+          <label><span>Relief</span>
+            <select value={rotation ? 'rotate' : 'rest'} onChange={(e) => setRotation(e.target.value === 'rotate')} disabled={policy === 'fixed'}>
+              <option value="rotate">Rotate to indoor tasks, rest if needed</option>
+              <option value="rest">Rest breaks only</option>
+            </select>
+          </label>
           <label><span>Crews</span>
             <select value={policy} onChange={(e) => setPolicy(e.target.value as 'follow' | 'fixed')}>
-              <option value="follow">Take Heatline's breaks</option>
+              <option value="follow">Follow Heatline's schedule</option>
               <option value="fixed">Keep a fixed 50/10 routine</option>
             </select>
           </label>
@@ -147,7 +154,7 @@ function Replay() {
         </select>
       </div>
 
-      <Board run={run} minute={minute} date={day.date} onSeek={setMinute} />
+      <Board run={run} minute={minute} date={day.date} onSeek={setMinute} rotation={rotation && policy === 'follow'} />
       <Outcome runs={runs} />
       <WatchEvidence />
     </main>
@@ -155,7 +162,8 @@ function Replay() {
 }
 
 function Outcome({ runs }: { runs: { follow: WatchRun; fixed: WatchRun } }) {
-  const total = (r: WatchRun, k: 'overLimitMin' | 'workMin' | 'shiftMin') => r.groups.reduce((s, g) => s + g[k] * g.headcount, 0);
+  const total = (r: WatchRun, k: 'overLimitMin' | 'workMin' | 'rotateMin' | 'shiftMin') => r.groups.reduce((s, g) => s + g[k] * g.headcount, 0);
+  const productive = (r: WatchRun) => total(r, 'workMin') + total(r, 'rotateMin');
   const workers = runs.follow.groups.reduce((s, g) => s + g.headcount, 0);
   const breaks = runs.follow.groups.flatMap((g) => g.breaks);
   const announced = breaks.filter((b) => b.lead !== null && b.lead >= 10).length;
@@ -164,7 +172,7 @@ function Outcome({ runs }: { runs: { follow: WatchRun; fixed: WatchRun } }) {
       <h3>How this day ends</h3>
       <div className="watch-outcome-grid">
         <div><span>Time over the heat limit, per worker</span><b>{Math.round(total(runs.follow, 'overLimitMin') / workers)} min</b><small>with Heatline's breaks, against {Math.round(total(runs.fixed, 'overLimitMin') / workers)} min on a fixed 50/10 routine</small></div>
-        <div><span>Work time, per worker</span><b>{Math.round(total(runs.follow, 'workMin') / workers)} min</b><small>against {Math.round(total(runs.fixed, 'workMin') / workers)} min on the fixed routine: the cost, shown plainly</small></div>
+        <div><span>Productive time, per worker</span><b>{Math.round(productive(runs.follow) / workers)} min</b><small>{total(runs.follow, 'rotateMin') ? `${Math.round(total(runs.follow, 'workMin') / workers)} on the main task and ${Math.round(total(runs.follow, 'rotateMin') / workers)} on indoor rotation; ` : ''}{Math.round(productive(runs.fixed) / workers)} min on the fixed routine</small></div>
         <div><span>Breaks announced at least 10 min ahead</span><b>{breaks.length ? Math.round((100 * announced) / breaks.length) : 0}%</b><small>{breaks.length} breaks across the crews today</small></div>
       </div>
       <p className="watch-note">"Over the limit" is measured on the site's real conditions, which the scheduler never sees. Site conditions are reanalysis weather plus stated site effects; the workers are the demonstration site's twenty. Across both summers: <a href="#watch-evidence" onClick={(ev) => { ev.preventDefault(); document.getElementById('watch-evidence')?.scrollIntoView({ behavior: 'smooth' }); }}>see the evaluation below</a>.</p>
@@ -269,9 +277,9 @@ function Live() {
 
 // ---- The board --------------------------------------------------------------------------------
 
-function Board({ run, minute, date, onSeek }: { run: WatchRun; minute: number; date: string; onSeek?: (m: number) => void }) {
+function Board({ run, minute, date, onSeek, rotation = true }: { run: WatchRun; minute: number; date: string; onSeek?: (m: number) => void; rotation?: boolean }) {
   const rec = run.minutes.find((m) => m.minute === minute) ?? run.minutes[run.minutes.length - 1]!;
-  const crews = useMemo(() => crewsFor(date), [date]);
+  const crews = useMemo(() => crewsFor(date, rotation), [date, rotation]);
   const visible = run.alerts.filter((a) => a.minute <= minute);
   const [alarmsOnly, setAlarmsOnly] = useState(false);
   const feed = visible.filter((a) => !alarmsOnly || a.level === 'act' || a.level === 'urgent').slice(-40).reverse();
@@ -315,6 +323,7 @@ function Board({ run, minute, date, onSeek }: { run: WatchRun; minute: number; d
             <div className="watch-crews">{crews.map((c) => <CrewCard key={c.id} crew={c} rec={rec} />)}</div>
           </section>
           <NoorPanel run={run} minute={minute} crews={crews} />
+          <ShiftRecordPanel run={run} minute={minute} crews={crews} />
           <Privacy />
         </div>
         <section className="watch-panel watch-feed" aria-label="Alerts">
@@ -337,7 +346,7 @@ function CrewCard({ crew, rec }: { crew: WatchCrew; rec: WatchMinute }) {
     <div className="watch-crew">
       <div className="watch-crew-head">
         <span className="watch-crew-badge">{crew.id}</span>
-        <div><b>{crew.label}</b><small>{crewTask(crew)} · rests in {rest === 'cool-room' ? 'cooled room' : 'shade'}{rest !== crew.rest ? ' (moved from shade)' : ''}{crew.clothingAdjustC ? ` · coveralls (+${crew.clothingAdjustC} °C)` : ''}</small></div>
+        <div><b>{crew.label}</b><small>{crewTask(crew)} · rests in {rest === 'cool-room' ? 'cooled room' : 'shade'}{rest !== crew.rest ? ' (moved from shade)' : ''}{crew.clothingAdjustC ? ` · coveralls (+${crew.clothingAdjustC} °C)` : ''}{crew.rotation ? ` · rotates to ${crew.rotation.label}` : ''}</small></div>
       </div>
       {groups.map((g) => {
         // Only a real breach shows 100% or more: 99.6% under the limit reads 99%.
@@ -353,7 +362,7 @@ function CrewCard({ crew, rec }: { crew: WatchCrew; rec: WatchMinute }) {
             <div className="watch-group-line">
               <span className={`watch-status s-${g.status}`}>{STATUS[g.status]}</span>
               <span>{pct}% of limit</span>
-              <span>{g.status === 'work' && g.nextBreak ? `Break ${formatClock(g.nextBreak.at)} for ${g.nextBreak.forMin} min` : g.status === 'work' ? 'No break due in 90 min' : g.status === 'capped' ? `Heat-time cap reached (${g.heatMin} min)` : ''}</span>
+              <span>{g.status === 'work' && g.nextBreak ? `${g.nextBreak.mode === 'rotate' ? 'Rotate' : 'Break'} ${formatClock(g.nextBreak.at)} for ${g.nextBreak.forMin} min` : g.status === 'work' ? 'No break due in 90 min' : g.status === 'capped' ? `Heat-time cap reached (${g.heatMin} min)` : g.resumeAt ? `Back on the main task about ${formatClock(g.resumeAt)}` : ''}</span>
             </div>
           </div>
         );
@@ -468,35 +477,126 @@ function HeatChart({ run, minute, onSeek }: { run: WatchRun; minute: number; onS
   );
 }
 
+/** Briefs already written, kept across re-renders and scrubbing so a moment is never briefed twice. */
+const briefCache = new Map<string, Brief & { at: number; reason: string }>();
+
 function NoorPanel({ run, minute, crews }: { run: WatchRun; minute: number; crews: WatchCrew[] }) {
-  const [brief, setBrief] = useState<(Brief & { at: number }) | null>(null);
+  const [auto, setAuto] = useState(true);
+  const [log, setLog] = useState<(Brief & { at: number; reason: string })[]>([]);
   const [busy, setBusy] = useState(false);
-  const ask = async () => {
-    setBusy(true);
-    const ctx = watchContext(run, minute, crews);
+  const runKey = `${run.date}|${run.alerts.length}|${run.groups.map((g) => g.workMin + g.rotateMin).join(',')}`;
+  const triggers = useMemo(() => noorTriggers(run), [run]);
+
+  const brief = async (at: number, reason: string) => {
+    const key = `${runKey}|${at}`;
+    const cached = briefCache.get(key);
+    if (cached) return cached;
+    let out: Brief & { at: number; reason: string };
     try {
-      const r = await fetch('/api/watch-brief', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(ctx), signal: AbortSignal.timeout(20_000) });
+      const r = await fetch('/api/watch-brief', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(watchContext(run, at, crews)), signal: AbortSignal.timeout(20_000) });
       if (!r.ok) throw new Error(String(r.status));
-      setBrief({ ...((await r.json()) as Brief), at: minute });
+      out = { ...((await r.json()) as Brief), at, reason };
     } catch {
-      setBrief({ headline: 'Noor is unavailable. The alerts on the right are complete without her.', priorities: [], trend: '', source: 'rules', at: minute });
+      out = { headline: 'Noor is unavailable. The alerts are complete without her.', priorities: [], trend: '', source: 'rules', at, reason };
+    }
+    briefCache.set(key, out);
+    return out;
+  };
+
+  // Rebuild the log for this run and time: cached briefs for every trigger already passed.
+  useEffect(() => {
+    setLog(triggers.filter((t) => t.minute <= minute).map((t) => briefCache.get(`${runKey}|${t.minute}`)).filter((x): x is NonNullable<typeof x> => !!x).reverse());
+  }, [runKey, minute, triggers]);
+
+  // On watch: brief the most recent trigger passed that has no brief yet. One request at a time.
+  useEffect(() => {
+    if (!auto || busy) return;
+    const due = [...triggers].reverse().find((t) => t.minute <= minute && minute - t.minute <= 30 && !briefCache.has(`${runKey}|${t.minute}`));
+    if (!due) return;
+    setBusy(true);
+    void brief(due.minute, due.reason).then(() => setLog((l) => [...l])).finally(() => setBusy(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auto, busy, minute, triggers, runKey]);
+
+  const askNow = async () => {
+    setBusy(true);
+    await brief(minute, 'Asked by the supervisor');
+    setLog((l) => [briefCache.get(`${runKey}|${minute}`)!, ...l.filter((x) => x.at !== minute)]);
+    setBusy(false);
+  };
+
+  return (
+    <section className="watch-panel watch-noor">
+      <div className="watch-feed-head">
+        <h3>Noor on watch</h3>
+        <div className="watch-inline">
+          <label className="watch-check"><input type="checkbox" checked={auto} onChange={(e) => setAuto(e.target.checked)} /> Brief automatically</label>
+          <button onClick={askNow} disabled={busy}>{busy ? 'Noor is reading the board…' : `Ask now (${formatClock(minute)})`}</button>
+        </div>
+      </div>
+      <p className="watch-sub">Noor reads the crew-level board and briefs the supervisor on her own whenever something significant changes: an alert to act on, the station dropping or returning, the site running hotter than forecast, dust, a crew moved to the cooled room, a heat-time cap. She cannot change a break: her answer is checked and replaced with the rules' summary if it mentions a time, crew or name not on the board.</p>
+      {!log.length && <p className="watch-sub">{auto ? `Next brief at the next significant change${triggers.find((t) => t.minute > minute) ? ` (around ${formatClock(triggers.find((t) => t.minute > minute)!.minute)})` : ''}.` : 'Automatic briefs are off.'}</p>}
+      <ol className="watch-noor-log">
+        {log.slice(0, 6).map((b) => (
+          <li key={b.at} className="watch-brief">
+            <small className="watch-brief-why">{formatClock(b.at)} · {b.reason}</small>
+            <p className="watch-brief-head">{b.headline}</p>
+            {b.priorities.length > 0 && <ol>{b.priorities.map((p, i) => <li key={i}><em>{p.crew === 'site' ? 'Site' : `Crew ${p.crew}`} · {p.when}</em> {p.text}</li>)}</ol>}
+            {b.trend && <p className="watch-sub">{b.trend}</p>}
+            <small>{b.source === 'model' ? `Written by ${b.model}, checked against the board` : `Rules summary${b.reason ? '' : ''}`}</small>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
+interface Record_ { summary: string; wentWell: string[]; concerns: string[]; forTomorrow: string[]; source: 'model' | 'rules'; model?: string; reason?: string }
+
+/** The shift recorder: drafts the end-of-shift heat-safety record from the crew-level day. */
+function ShiftRecordPanel({ run, minute, crews }: { run: WatchRun; minute: number; crews: WatchCrew[] }) {
+  const [record, setRecord] = useState<(Record_ & { at: number; summaryData: ReturnType<typeof shiftSummary> }) | null>(null);
+  const [busy, setBusy] = useState(false);
+  const end = run.minutes[run.minutes.length - 1]!.minute;
+  const draft = async () => {
+    setBusy(true);
+    const data = shiftSummary(run, crews, minute);
+    try {
+      const r = await fetch('/api/shift-report', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(data), signal: AbortSignal.timeout(30_000) });
+      if (!r.ok) throw new Error(String(r.status));
+      setRecord({ ...((await r.json()) as Record_), at: minute, summaryData: data });
+    } catch {
+      setRecord({ summary: 'The recorder is unavailable. The figures below are complete without it.', wentWell: [], concerns: [], forTomorrow: [], source: 'rules', at: minute, summaryData: data });
     } finally {
       setBusy(false);
     }
   };
+  const text = record ? [
+    `Heat-safety record · ${record.summaryData.date} · ${record.summaryData.from}–${record.summaryData.to}`, '', record.summary, '',
+    'What went well:', ...record.wentWell.map((x) => `- ${x}`), '', 'Concerns:', ...(record.concerns.length ? record.concerns.map((x) => `- ${x}`) : ['- None recorded']), '',
+    'For tomorrow:', ...record.forTomorrow.map((x) => `- ${x}`), '',
+    'Crew figures (scheduler estimates):',
+    ...record.summaryData.groups.map((g) => `- Crew ${g.crew}${g.workers === 'whole crew' ? '' : ` (${g.workers})`}: ${g.mainTaskMin} min main task, ${g.indoorRotationMin} min indoor rotation, ${g.restMin} min rest, ${g.minutesOverLimitEstimated} min estimated over the limit, peak ${g.peakLimitSharePct}%`),
+    '', 'Drafted by Heatline for review. Not a safety certificate. Signed: ______________',
+  ].join('\n') : '';
   return (
-    <section className="watch-panel watch-noor">
+    <section className="watch-panel watch-record">
       <div className="watch-feed-head">
-        <h3>Noor's summary</h3>
-        <button onClick={ask} disabled={busy}>{busy ? 'Noor is reading the board…' : brief ? `Ask again at ${formatClock(minute)}` : 'Ask Noor what matters now'}</button>
+        <h3>Shift record</h3>
+        <button onClick={draft} disabled={busy}>{busy ? 'Drafting…' : minute >= end ? 'Draft the end-of-shift record' : `Draft the record so far (${formatClock(minute)})`}</button>
       </div>
-      <p className="watch-sub">Noor reads the crew-level board and the alerts, then says what matters in the next fifteen minutes and why. She cannot change a break time: her answer is checked and replaced with the rules' own summary if it mentions a time, crew or name that is not on the board.</p>
-      {brief && (
+      <p className="watch-sub">The recorder writes the day's heat-safety record for the site file from crew-level figures: conditions, breaks, rotations, station gaps, dust and anything over the limit. Every number in the draft must come from those figures, or the rules write the record instead. A manager reviews and signs it.</p>
+      {record && (
         <div className="watch-brief">
-          <p className="watch-brief-head">{brief.headline}</p>
-          {brief.priorities.length > 0 && <ol>{brief.priorities.map((p, i) => <li key={i}><em>{p.crew === 'site' ? 'Site' : `Crew ${p.crew}`} · {p.when}</em> {p.text}</li>)}</ol>}
-          {brief.trend && <p className="watch-sub">{brief.trend}</p>}
-          <small>{formatClock(brief.at)} · {brief.source === 'model' ? `written by ${brief.model}, checked against the board` : `rules summary${brief.reason ? ` (${brief.reason})` : ''}`}</small>
+          <p className="watch-brief-head">{record.summary}</p>
+          {record.wentWell.length > 0 && <><b className="watch-record-h">What went well</b><ul>{record.wentWell.map((x, i) => <li key={i}>{x}</li>)}</ul></>}
+          <b className="watch-record-h">Concerns</b>
+          {record.concerns.length ? <ul>{record.concerns.map((x, i) => <li key={i}>{x}</li>)}</ul> : <p className="watch-sub">None recorded.</p>}
+          {record.forTomorrow.length > 0 && <><b className="watch-record-h">For tomorrow</b><ul>{record.forTomorrow.map((x, i) => <li key={i}>{x}</li>)}</ul></>}
+          <div className="watch-briefing-actions">
+            <button onClick={() => { void navigator.clipboard?.writeText(text).catch(() => undefined); }}>Copy record</button>
+            <small>{formatClock(record.at)} · {record.source === 'model' ? `Drafted by ${record.model}; every number checked against the figures` : `Written by the rules${record.reason ? ` (${record.reason})` : ''}`}</small>
+          </div>
         </div>
       )}
     </section>
@@ -542,11 +642,11 @@ export function WatchEvidence() {
       <p className="watch-sub">Every day from 15 June to 15 September, 2025 and 2026, with the same three crews. The scheduler only ever sees the forecast issued the day before and, when present, the station. "Over the limit" is measured on the site's actual conditions.</p>
       <div className="watch-table-wrap">
         <table>
-          <thead><tr><th>How breaks are timed</th><th>Time over the limit</th><th>Over the limit, per worker a day</th><th>Work, per worker a day</th><th>Breaks announced ≥10 min ahead</th><th>Alerts to act on, per day</th></tr></thead>
+          <thead><tr><th>How breaks are timed</th><th>Time over the limit</th><th>Over the limit, per worker a day</th><th>Productive time, per worker a day</th><th>Breaks announced ≥10 min ahead</th><th>Alerts to act on, per day</th></tr></thead>
           <tbody>
             {e.strategies.map((x) => (
-              <tr key={x.id} className={x.id === 'live' ? 'best' : ''}>
-                <td>{x.label}</td><td>{x.overLimitSharePct}%</td><td>{x.overLimitMinPerWorkerDay} min</td><td>{x.workMinPerWorkerDay} min</td><td>{x.breaksAnnounced10Pct === null ? '—' : `${x.breaksAnnounced10Pct}%`}</td><td>{x.alarmsPerDay}</td>
+              <tr key={x.id} className={x.id === 'live+rotation' ? 'best' : ''}>
+                <td>{x.label}</td><td>{x.overLimitSharePct}%</td><td>{x.overLimitMinPerWorkerDay} min</td><td>{x.productiveMinPerWorkerDay} min{x.rotateMinPerWorkerDay ? <small> incl. {x.rotateMinPerWorkerDay} indoor</small> : null}</td><td>{x.breaksAnnounced10Pct === null ? '—' : `${x.breaksAnnounced10Pct}%`}</td><td>{x.alarmsPerDay}</td>
               </tr>
             ))}
           </tbody>
@@ -554,6 +654,7 @@ export function WatchEvidence() {
       </div>
       <div className="watch-evidence-notes">
         <p><b>Why live readings matter.</b> With only the forecast, crews were over the limit {s.forecast!.overLimitSharePct}% of the time. Heatline's 1 °C margin cuts that to {s['forecast+1']!.overLimitSharePct}% but costs work. With a station, it falls to {s.live!.overLimitSharePct}% while crews work {s.live!.workMinPerWorkerDay} minutes a day, more than with the margin. When the station fails for three hours a day, the fallback keeps it at {s['live-outage']!.overLimitSharePct}%.</p>
+        <p><b>Rotation keeps the work going.</b> Rest-only breaks cost time: {s.live!.productiveMinPerWorkerDay} productive minutes a day against {s.routine!.productiveMinPerWorkerDay} on the fixed routine. Rotating crews to indoor tasks in a cooled workshop before resting brings it to {s['live+rotation']!.productiveMinPerWorkerDay} minutes, with time over the limit at {s['live+rotation']!.overLimitSharePct}%. Rotation to tasks in shade is rarely possible in this heat: shade alone is above the limit for steady work, and the scheduler only rotates to a task that is itself within its limit.</p>
         <p><b>The forecast itself.</b> Against reanalysis, the day-ahead forecast of WBGT in the sun was off by {e.forecastSkill.meanAbsErrorC} °C on average and too cool by more than 1 °C in {e.forecastSkill.coolerBy1Pct}% of working hours. The shift planner built on it allowed more heavy work than the real weather would in {e.dayAheadPlan.tooGenerousPct}% of hours, and in {e.dayAheadPlan.tooGenerousWithMarginPct}% with a 1 °C margin.</p>
         <p><b>Dust.</b> In {e.dust.shiftHours.toLocaleString('en-GB')} shift hours, modelled PM10 was elevated in {e.dust.elevatedHours}, unhealthy in {e.dust.unhealthyHours} and severe in {e.dust.severeHours}.</p>
         <p><b>Assumptions.</b> {e.assumptions} The forecast and reanalysis are real archives from Open-Meteo; the site effects and the station noise are not measurements.</p>

@@ -76,13 +76,13 @@ export interface ReplayRuns {
 }
 
 /** Both runs for a replay day: crews following Heatline's breaks, and a fixed 50/10 routine. */
-export function replayRuns(day: ReplayDay, station: StationMode, latitude = REPLAY_SITE.latitude, longitude = REPLAY_SITE.longitude): ReplayRuns {
+export function replayRuns(day: ReplayDay, station: StationMode, rotation = true, latitude = REPLAY_SITE.latitude, longitude = REPLAY_SITE.longitude): ReplayRuns {
   const site = { latitude, longitude, utcOffsetHours: 4 };
   const forecast = conditionsFrom(day.dayAhead, day.date, site);
   const truth = siteTruth(conditionsFrom(day.reanalysis, day.date, site), day.date);
   const pm10 = (m: number) => day.pm10[Math.floor(m / 60)] ?? null;
   const readings = station === 'none' ? [] : stationFrom(truth, day.date, 300, 1200, station === 'outage' ? [OUTAGE] : [], pm10);
-  const common = { date: day.date, shifts: shiftsFor(day.date), crews: defaultCrews(day.date, template.workers), forecast, truth, readings, pm10 };
+  const common = { date: day.date, shifts: shiftsFor(day.date), crews: defaultCrews(day.date, template.workers, { rotation }), forecast, truth, readings, pm10 };
   return { follow: runWatch({ ...common, policy: 'follow' }), fixed: runWatch({ ...common, policy: 'fixed' }) };
 }
 
@@ -90,8 +90,8 @@ export function replayRuns(day: ReplayDay, station: StationMode, latitude = REPL
 export function liveRun(date: string, weather: WeatherHour[], pm10: (number | null)[], readings: StationReading[], latitude: number, longitude: number, utcOffsetHours: number): { run: WatchRun; rejected: number } {
   const forecast = conditionsFrom(weather, date, { latitude, longitude, utcOffsetHours });
   const checked = checkReadings(readings);
-  const run = runWatch({ date, shifts: shiftsFor(date), crews: defaultCrews(date, template.workers), forecast, readings: checked.ok as CheckedReading[], pm10: (m) => pm10[Math.floor(m / 60)] ?? null, policy: 'follow' });
+  const run = runWatch({ date, shifts: shiftsFor(date), crews: defaultCrews(date, template.workers, { rotation: true }), forecast, readings: checked.ok as CheckedReading[], pm10: (m) => pm10[Math.floor(m / 60)] ?? null, policy: 'follow' });
   return { run, rejected: checked.rejected.length };
 }
 
-export const crewsFor = (date: string) => defaultCrews(date, template.workers);
+export const crewsFor = (date: string, rotation = true) => defaultCrews(date, template.workers, { rotation });

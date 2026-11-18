@@ -2,13 +2,20 @@
 
 Updated 17 November 2026. The sections below supersede older milestone claims.
 
+## Rotation and two more AI roles (19 Nov)
+
+- **Task rotation**: crews rotate to an indoor task in a cooled workshop before resting, when that task is itself within its limit. Over 186 days: productive time 500 min per worker a day (fixed routine 513, rest-only 364), time over the limit 2.6% (fixed routine 84.2%).
+- **Noor on watch**: automatic briefs on significant board changes, about 4 a day.
+- **Shift recorder** (`/api/shift-report`): drafts the end-of-shift heat-safety record; every number checked against the crew-level figures. 8/8 recorded drafts passed and were judged supported.
+- Tests: 134.
+
 ## Site watch, after early reviewer feedback (17 Nov)
 
 - **Site watch** at `/#watch`: station telemetry (`POST /api/telemetry`, CSV import, `npm run station:sim`), quality checks, fusion with the forecast, rolling NIOSH exposure per crew group, breaks announced 15 minutes ahead, rest moved from shade to the cooled room when needed, heat-time caps, dust alerts with hysteresis, safe fallback when the station fails. Replay mode on four curated days or any day since 2024; live mode for any preset site.
 - **Profiles**: acclimatisation from days worked in the heat (new, returning, restart); task metabolic-rate catalogue.
 - **Explainability**: numbered reasons and a with/without projection on every alert; crew broadcasts in seven languages.
 - **Noor's watch brief** (`/api/watch-brief`): reads the crew-level board only; rejected if it invents a time, crew or name.
-- **Evaluation** over 186 days of 2025–2026 with archived day-ahead forecasts: time over the limit 84.2% (fixed routine), 36.3% (forecast only), 10.0% (+1 °C margin), 1.9% (live), 5.5% (live with a daily three-hour outage). 24 recorded briefs: all from the model and passing the checks; 19 judged fully supported.
+- **Evaluation** over 186 days of 2025–2026 with archived day-ahead forecasts: time over the limit 84.2% (fixed routine), 36.3% (forecast only), 10.0% (+1 °C margin), 1.9% (live), 5.5% (live with a daily three-hour outage). 24 recorded briefs (re-run 19 Nov with rotation): 23 passing the checks, 21 judged fully supported.
 - Tests: 128.
 
 

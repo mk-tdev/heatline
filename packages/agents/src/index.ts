@@ -3,3 +3,4 @@ export * from './guardian';
 export * from './safety';
 export * from './planner';
 export * from './watch';
+export * from './report';

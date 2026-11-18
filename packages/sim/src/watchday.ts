@@ -125,12 +125,19 @@ export function shiftsFor(date: string): { from: Minute; to: Minute }[] {
  * The demonstration site's crews, with acclimatisation worked out from each worker's days in
  * the heat (the same workers as the 3D site). Only crew-level groups leave this function.
  */
-export function defaultCrews(date: string, workers: { crew: string; acclimatisationDay: number; experienced?: boolean }[]): WatchCrew[] {
-  const crews: Omit<WatchCrew, 'groups'>[] = [
+export function defaultCrews(date: string, workers: { crew: string; acclimatisationDay: number; experienced?: boolean }[], options: { rotation?: boolean } = {}): WatchCrew[] {
+  // Each crew's shaded, lighter task to rotate to (when rotation is on). Watts are class estimates.
+  const rotations: Record<string, WatchCrew['rotation']> = {
+    A: { label: 'rebar cutting and bending in the cooled workshop', watts: 300, indoor: true },
+    B: { label: 'formwork and fixings preparation in the cooled workshop', watts: 300, indoor: true },
+    C: { label: 'panel sealing and inspection in the cooled store', watts: 180, indoor: true },
+  };
+  const base: Omit<WatchCrew, 'groups'>[] = [
     { id: 'A', label: 'Rebar yard', taskId: 'rebar', inSun: true, clothingAdjustC: 0, rest: 'cool-room' },
     { id: 'B', label: 'Level 12 deck', taskId: 'concrete', inSun: true, clothingAdjustC: 0, rest: 'cool-room' },
     { id: 'C', label: 'West façade', taskId: 'facade', inSun: true, clothingAdjustC: 1, rest: 'shade' },
   ];
+  const crews = base.map((c) => (options.rotation ? { ...c, rotation: rotations[c.id] } : c));
   return crews.map((c) => {
     const tiers = workers.filter((w) => w.crew === c.id).map((w) => acclimatisation(historyOf(date, w.acclimatisationDay - 1), date));
     const standard = tiers.filter((t) => t.limit === 'REL');
