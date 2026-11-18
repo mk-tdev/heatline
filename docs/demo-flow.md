@@ -8,19 +8,52 @@ Start with the site at human height. Then hear Anwar, watch Omar test a plan, an
 
 ## Three-minute recorded video (for the submission)
 
-Judges will most likely watch this without us in the room, so it leads with the problem and the product. The live-room order further down still works for an in-person pitch.
+Updated 19 November 2026 for the feedback round. Judges will watch this without us in the room, so it opens with the problem and spends the most time on **Site watch**, the part built in response to their feedback. Total: about 3 minutes 10 seconds.
 
-| Time | On screen | Say |
-| --- | --- | --- |
-| 0:00–0:20 | Landing page hero, then scroll to **The break ends. The heat does not.** | “The UAE stops outdoor work from 12:30 to 3. Across the last two summers, the heat near Saadiyat was over the safe limit for steady work for 13 of 14 working hours a day. The break covers a fifth of them. This is real weather, not a simulation.” |
-| 0:20–1:05 | **Plan tomorrow’s shift**. Pick **Hottest day of summer 2026**. Point to the four cards, the chart, the hour table. Switch **Crews rest in** to **Shade only** and back. Open the briefing in Bengali, then Arabic. | “Heatline turns a forecast for any site into work and rest limits for every hour. With shade alone, there is no safe heavy work that afternoon. With a cooled room, twenty-five minutes an hour. It finds the coolest pour window and writes the crew briefing in seven languages. It needs a location. No wearables, no worker data.” |
-| — | **Optional replacement for 1:35–2:30 if the video is re-cut after the feedback round:** open **Site watch**, keep **The forecast was wrong**, press play at 4 min/s from 09:30. Point to the station line pulling away from the forecast, a crew card showing **Indoor rotation**, then open **Why?** on a rotation notice and show the Bengali broadcast. Point to **Noor on watch** briefing on her own, and press **Draft the record so far** in **Shift record**. Switch the station to **Fails 09:00–12:00** and show the fallback alert. End on **How this day ends**. | “On the day itself, a station on the deck corrects the forecast every minute. Heatline tracks each crew’s last hour of heat and, fifteen minutes before the limit, rotates the crew to indoor work in a cooled workshop, or calls a rest when that is not enough, with the reasons and in the crew’s language. Noor briefs the supervisor when anything changes, and drafts the safety record at the end of the shift. Over two summers: time over the limit falls from 84 per cent to under 3, while crews stay productive 500 minutes a day.” |
-| 1:05–1:35 | Phone recording of Anwar’s page: offline indicator, **Decline sharing**, the Bengali warning, **I reached shade**, then the dashboard count going from 0 to 1. | “On the day, each worker gets a warning in their own language, offline, with or without a wearable. The supervisor sees one more person in shade. Not his name, not his readings.” |
-| 1:35–2:30 | 3D site, **Explore** under **The afternoon pour**, **Deck** view. At 15:10 press **Ask Omar**. Show the steps, then the verdict card. **Run this simulated plan**, then **Compare**. | “Before a plan reaches real people, we rehearse it. Twenty synthetic workers, a real August afternoon, a truck on its way. Omar proposes; the site rules check every proposal and refuse the ones that break them. Read the verdict as shown. Then the same afternoon, one decision changed.” |
-| 2:30–2:50 | **Evidence**: part 1, then the AI check numbers in the README. | “We tested the AI under pressure: thirty plans, none that broke a rule reached the supervisor. Sixty messages in six languages, all kept the action the rules chose.” |
-| 2:50–3:00 | Landing page, **A pilot for summer 2027**. | “This is a prototype with simulated workers and draft translations. We are looking for one contractor and an occupational hygienist to pilot it next summer. Heatline. The same right to go home well.” |
+### Before you record (10 minutes)
 
-Recording notes. Record at 1280×720 or larger with the browser zoomed so text is readable. Record Omar once and keep the take: his answer varies from run to run, and in our checks the headline question was answered with a 15:30 pour once and a cancelled pour twice. Read out whatever the card shows. The planner’s **Stored sample (offline)** button works with no connection if the weather service is slow. Keep the first-person walk and the crane for questions, not the video.
+1. **Browser.** Chrome, one window at 1920×1080 (or 1440×900), page zoom 100%. Close other tabs and turn off notifications. Use a clean profile so no extensions or bookmarks show.
+2. **Open these tabs in order**, all on https://heatline-plum.vercel.app:
+   - Tab 1: `/` (landing page)
+   - Tab 2: `/#plan` (shift planner)
+   - Tab 3: `/#watch` (site watch, replay mode)
+   - Tab 4: `/` (for the 3D site; start it only when recording that segment)
+3. **Warm up Site watch (important).** In tab 3, keep **The forecast was wrong**, set the speed to **4 min/s**, press ▶ and let it run from 10:00 to about 11:00, then drag the time slider back to **10:00**. Noor's briefs are stored in the page, so during the take she answers instantly. Do not reload tab 3 after this.
+4. **Phone clip.** Record Anwar's phone separately (screen recording on the phone, about 20 s) and cut it in: open `/worker/supervisor.html` on the laptop, **Start a fresh demo shift**, scan the QR code, wait for **Ready for offline use**, turn the phone offline, tap **Decline sharing**, show the Bengali warning, tap **I reached shade**, reconnect, and show the laptop count going from 0 to 1.
+5. **Omar clip.** Record the 3D segment once and keep the take: Omar's plan varies from run to run. Read out what the verdict card shows.
+6. Check sound: a quiet room, a headset or clip-on microphone, and speak a little slower than feels natural.
+
+### Shot list
+
+| # | Time | Tab | Do this | Say this |
+| --- | --- | --- | --- | --- |
+| 1 | 0:00–0:15 | 1 Landing | Start on the hero. Scroll slowly to **The break ends. The heat does not.** and hold on the three figures. | “The UAE stops outdoor work from 12:30 to 3. Across the last two summers near Abu Dhabi, the heat was over the safe limit for steady work for 13 of 14 working hours a day. The break covers a fifth of them. That is real weather, not a simulation.” |
+| 2 | 0:15–0:45 | 2 Planner | Click **Hottest day of summer 2026**. Point to the four cards, then the hour table. Change **Crews rest in** to **Shade only** (heavy work drops to nothing), then back to **A cooled room**. Click **বাংলা** in the crew briefing. | “The night before, Heatline turns the forecast for any site into work and rest limits for every hour, the coolest pour window, and a crew briefing in seven languages. Shade alone leaves no safe heavy work this afternoon; a cooled room gives twenty-five minutes an hour. It needs a location, nothing else.” |
+| 3 | 0:45–1:10 | 3 Site watch | Point to **Site against the forecast: +2.8 °C** and the chart, where the station line runs above the dashed forecast. Then press ▶ (4 min/s). | “On the day, the forecast is not enough. This is a real day when the forecast issued the night before was three degrees too cool. A heat-stress station on the deck corrects it every minute, and Heatline tracks each crew’s last hour of heat and effort against the NIOSH limit.” |
+| 4 | 1:10–1:40 | 3 | As crews A and B switch to **Indoor rotation**, pause (Ⅱ). In **Alerts**, open **Why?** on a **rotate at…** notice: show the numbered reasons and the chart with and without the rotation. Click **বাংলা**, then **العربية** in the crew broadcast. | “Fifteen minutes before a crew reaches its limit, Heatline moves it to indoor work in a cooled workshop, or calls a rest if that is not enough. Every alert says why, with the numbers, and the crew hears it in its own language.” |
+| 5 | 1:40–2:00 | 3 | Scroll to **Noor on watch** and point to her latest brief. Then, in **Shift record**, click **Draft the record so far** and show the draft. | “Noor, our AI, watches the board and briefs the supervisor whenever something changes. At the end of the shift she drafts the safety record for the site file. She cannot change a break, and any number not on the board is rejected.” |
+| 6 | 2:00–2:15 | 3 | Scroll up. Change **Site station** to **Fails 09:00–12:00**. Show the **Forecast only · +1 °C margin** badge and the **Site station offline** alert. | “If the station fails, Heatline says so and adds a safety margin. It never pretends to know.” |
+| 7 | 2:15–2:35 | Phone clip | Play the recorded phone clip. | “Each worker gets the warning on their own phone, offline, with or without a wearable. The supervisor sees crew totals, never a name or a body reading.” |
+| 8 | 2:35–2:55 | 4 3D site | **Step into the site** → at 15:10 **Ask Omar** → read the verdict card → **Run this simulated plan** → **Compare** (the recorded take). | “Before a plan reaches real people, we rehearse it on a 3D site with synthetic workers. Omar proposes; the site rules check every proposal and refuse the ones that break them.” |
+| 9 | 2:55–3:10 | 3 Site watch | Scroll to **Across two summers: 186 real days** and point to the **Live, rotating to indoor tasks** row. End on **← Home** and the landing page. | “Across 186 real summer days: a fixed routine kept crews over the limit 84% of the time. Heatline, with a live station and indoor rotation, brings that under 3%, while crews stay productive 500 minutes a day. We are looking for one contractor and an occupational hygienist to pilot it next summer. Heatline. The same right to go home well.” |
+
+### If something goes wrong while recording
+
+- **Noor is slow or shows a rules summary:** keep going; the alerts are complete without her. Re-record shot 5 alone later and cut it in.
+- **The weather service is slow in the planner:** click **Stored sample (offline)** and say “a stored day” instead of “the hottest day”.
+- **Omar takes more than 20 seconds:** cut the waiting in the edit, or use the recorded take.
+- **You scrub past a moment:** drag the slider back. The board recomputes instantly and nothing is lost.
+
+### Exact numbers to quote (from the repository)
+
+| Claim | Source |
+| --- | --- |
+| 13 of 14 working hours over the limit; 19% inside the break | `data/season/abu-dhabi-ban-season.json` (`npm run season`) |
+| 84% → 2.6% time over the limit; 500 vs 513 productive minutes | `data/watch/evaluation.json` (`npm run eval:watch`) |
+| Forecast up to 3.2 °C too cool on 25 Aug 2026 | `data/watch/replay-days.json` |
+| AI checks (60 messages, 30 plans, 24 briefs, 8 records) | `docs/eval/README.md` |
+
+Say “simulated workers” and “draft translations” once; judges value the honesty.
 
 ## Before presenting
 

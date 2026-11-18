@@ -102,7 +102,7 @@ const NAMES = /\b(anwar|suresh|ravi|ahmed|bilal|joel)\b/i;
 /** Reject a brief that invents a time, a crew or a name, or claims safety. Returns a reason or null. */
 export function checkWatchBrief(c: WatchContext, b: WatchBrief): string | null {
   const all = [b.headline, b.trend, ...b.priorities.map((p) => p.text)].join(' ');
-  if (!b.headline.trim() || b.priorities.length > 3 || all.length > 900) return 'shape';
+  if (!b.headline.trim() || b.priorities.length > 3 || all.length > 1400) return 'shape';
   if (NAMES.test(all)) return 'name';
   if (/\b(is|are) (safe|compliant)\b|guarantee/i.test(all)) return 'safety claim';
   const known = new Set([c.clock, ...c.crews.flatMap((x) => [x.nextBreak, x.restingUntil]).filter(Boolean), ...c.alerts.flatMap((a) => [a.time, ...(`${a.title} ${a.action}`.match(/\b\d{1,2}:\d{2}\b/g) ?? [])])] as string[]);

@@ -336,7 +336,8 @@ export async function watchBrief(ctx: WatchContext) {
         { signal },
       ),
     );
-    const out = response.output_parsed;
+    // Keep the three most urgent priorities rather than discarding a brief that lists more.
+    const out = response.output_parsed ? { ...response.output_parsed, priorities: response.output_parsed.priorities.slice(0, 3) } : null;
     const problem = out ? checkWatchBrief(ctx, out) : 'no output';
     if (out && !problem) return { ...out, source: 'model', model: MODEL, ms: Math.round(performance.now() - t0) };
     console.warn(`watch: rejected model output (${problem})`);
